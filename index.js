@@ -129,11 +129,17 @@ async function connectToWhatsApp() {
                         const response = await ai.getResponse(messageContent, context);
                         
                         // Update context (keep last 5 messages)
-                        const newContext = [
-                            ...context.slice(-8), // Keep last 4 exchanges (8 messages)
-                            { role: 'user', parts: [{ text: messageContent }] },
-                            { role: 'model', parts: [{ text: response }] }
-                        ];
+                        let newContext = [];
+                        
+                        // If there's existing context, preserve it
+                        if (context.length > 0) {
+                            newContext = [...context.slice(-8)]; // Keep last 4 exchanges (8 messages)
+                        }
+                        
+                        // Add new messages to context
+                        newContext.push({ role: 'user', parts: [{ text: messageContent }] });
+                        newContext.push({ role: 'model', parts: [{ text: response }] });
+                        
                         conversationContext.set(chatId, newContext);
                         
                         // Send response
