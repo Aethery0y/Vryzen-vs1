@@ -126,7 +126,9 @@ async function connectToWhatsApp() {
                     
                     try {
                         // Get AI response
+                        console.log('Sending message to AI:', messageContent);
                         const response = await ai.getResponse(messageContent, context);
+                        console.log('AI response received successfully');
                         
                         // Update context (keep last 5 messages)
                         let newContext = [];
@@ -146,9 +148,26 @@ async function connectToWhatsApp() {
                         await sock.sendMessage(remoteJid, { text: response });
                     } catch (error) {
                         console.error('Error getting AI response:', error);
-                        await sock.sendMessage(remoteJid, { 
-                            text: 'Sorry, I encountered an error while processing your message. Please try again later.' 
-                        });
+                        
+                        // Rate limit specific message
+                        let errorMessage = '';
+                        
+                        if (error.message && error.message.includes('429')) {
+                            errorMessage = "I'm currently handling too many requests. Please try again in a minute when I'm less busy.";
+                        } else if (error.message && error.message.includes('multiple attempts')) {
+                            errorMessage = "I'm having trouble connecting to my AI service right now. Please try a simpler question or try again later.";
+                        } else {
+                            errorMessage = "Sorry, I encountered an error while processing your message. Please try again later.";
+                        }
+                        
+                        // Track this user interaction even if AI failed
+                        const senderJid = sender || remoteJid;
+                        if (senderJid) {
+                            const number = senderJid.split('@')[0];
+                            contacts.trackEngagement(number, 1);
+                        }
+                        
+                        await sock.sendMessage(remoteJid, { text: errorMessage });
                     }
                 }
             }
