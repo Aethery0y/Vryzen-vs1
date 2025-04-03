@@ -1,6 +1,8 @@
 const generalCommands = require('./general');
 const groupCommands = require('./groups');
 const contactCommands = require('./contacts');
+const advancedMessaging = require('./advancedMessaging');
+const groupInfluence = require('./groupInfluence');
 const database = require('../lib/database');
 const animeNews = require('../lib/animeNews');
 const stickerMaker = require('../lib/stickerMaker');
@@ -51,6 +53,10 @@ async function handleCommand(params) {
             case 'cmds':
             case 'help':
                 await generalCommands.showCommands(sock, remoteJid);
+                break;
+                
+            case 'admincmds':
+                await generalCommands.showAdminCommands(sock, remoteJid, sender);
                 break;
                 
             case 'clear':
@@ -179,6 +185,397 @@ async function handleCommand(params) {
                     });
                 } else {
                     await contactCommands.showStats(sock, remoteJid, args[0]);
+                }
+                break;
+                
+            // Advanced Messaging Commands
+            case 'schedule':
+                if (args.length < 2) {
+                    await sock.sendMessage(remoteJid, { 
+                        text: '⚠️ Usage: .schedule "time" "message"\nTime format: YYYY-MM-DD HH:MM or +1h30m'
+                    });
+                } else {
+                    const scheduleTime = args[0];
+                    const scheduleMessage = args.slice(1).join(' ');
+                    const result = await advancedMessaging.scheduleMessage(sock, remoteJid, sender, scheduleTime, scheduleMessage);
+                    await sock.sendMessage(remoteJid, { text: result.message });
+                }
+                break;
+                
+            case 'cancel':
+                if (args.length < 1) {
+                    await sock.sendMessage(remoteJid, { 
+                        text: '⚠️ Usage: .cancel "schedule_id"'
+                    });
+                } else {
+                    const result = await advancedMessaging.cancelScheduledMessage(sock, remoteJid, sender, args[0]);
+                    await sock.sendMessage(remoteJid, { text: result.message });
+                }
+                break;
+                
+            case 'scheduled':
+                const scheduledResult = await advancedMessaging.listScheduledMessages(sock, remoteJid, sender);
+                await sock.sendMessage(remoteJid, { text: scheduledResult.message });
+                break;
+                
+            case 'poll':
+                if (args.length < 2) {
+                    await sock.sendMessage(remoteJid, { 
+                        text: '⚠️ Usage: .poll "question" "option1, option2, option3, ..."'
+                    });
+                } else {
+                    const question = args[0];
+                    const options = args.slice(1).join(' ');
+                    const pollResult = await advancedMessaging.createPoll(sock, remoteJid, question, options);
+                    await sock.sendMessage(remoteJid, { text: pollResult.message });
+                }
+                break;
+                
+            case 'vote':
+                if (args.length < 2) {
+                    await sock.sendMessage(remoteJid, { 
+                        text: '⚠️ Usage: .vote "poll_id" "option_number"'
+                    });
+                } else {
+                    const voteResult = await advancedMessaging.voteInPoll(sock, remoteJid, sender, args[0], args[1]);
+                    await sock.sendMessage(remoteJid, { text: voteResult.message });
+                    
+                    // Also show results if vote was successful
+                    if (voteResult.success && voteResult.results) {
+                        await sock.sendMessage(remoteJid, { text: voteResult.results });
+                    }
+                }
+                break;
+                
+            case 'results':
+                if (args.length < 1) {
+                    await sock.sendMessage(remoteJid, { 
+                        text: '⚠️ Usage: .results "poll_id"'
+                    });
+                } else {
+                    const resultData = await advancedMessaging.showPollResults(sock, remoteJid, args[0]);
+                    await sock.sendMessage(remoteJid, { text: resultData.message });
+                }
+                break;
+                
+            case 'endpoll':
+                if (args.length < 1) {
+                    await sock.sendMessage(remoteJid, { 
+                        text: '⚠️ Usage: .endpoll "poll_id"'
+                    });
+                } else {
+                    const endResult = await advancedMessaging.endPoll(sock, remoteJid, sender, args[0]);
+                    await sock.sendMessage(remoteJid, { text: endResult.message });
+                }
+                break;
+                
+            case 'broadcast':
+                if (args.length < 2) {
+                    await sock.sendMessage(remoteJid, { 
+                        text: '⚠️ Usage: .broadcast "message" "targets"\nTargets: label:name,groups,number:1234567890'
+                    });
+                } else {
+                    const broadcastMessage = args[0];
+                    const broadcastTargets = args.slice(1).join(' ');
+                    const broadcastResult = await advancedMessaging.broadcastMessage(sock, remoteJid, sender, broadcastMessage, broadcastTargets);
+                    await sock.sendMessage(remoteJid, { text: broadcastResult.message });
+                }
+                break;
+                
+            case 'autoreply':
+                const autoReplySubCmd = args[0]?.toLowerCase();
+                
+                switch (autoReplySubCmd) {
+                    case 'set':
+                        if (args.length < 3) {
+                            await sock.sendMessage(remoteJid, { 
+                                text: '⚠️ Usage: .autoreply set "trigger" "response"'
+                            });
+                        } else {
+                            const trigger = args[1];
+                            const response = args.slice(2).join(' ');
+                            const autoReplyResult = await advancedMessaging.setAutoReply(sock, remoteJid, sender, trigger, response);
+                            await sock.sendMessage(remoteJid, { text: autoReplyResult.message });
+                        }
+                        break;
+                        
+                    case 'remove':
+                        if (args.length < 2) {
+                            await sock.sendMessage(remoteJid, { 
+                                text: '⚠️ Usage: .autoreply remove "trigger"'
+                            });
+                        } else {
+                            const removeTrigger = args[1];
+                            const removeResult = await advancedMessaging.removeAutoReply(sock, remoteJid, sender, removeTrigger);
+                            await sock.sendMessage(remoteJid, { text: removeResult.message });
+                        }
+                        break;
+                        
+                    case 'list':
+                        const listResult = await advancedMessaging.listAutoReplies(sock, remoteJid);
+                        await sock.sendMessage(remoteJid, { text: listResult.message });
+                        break;
+                        
+                    default:
+                        await sock.sendMessage(remoteJid, { 
+                            text: '⚠️ Usage: .autoreply set/remove/list "trigger" "response"'
+                        });
+                }
+                break;
+                
+            case 'summarize':
+                if (!quotedMsg) {
+                    await sock.sendMessage(remoteJid, { 
+                        text: '⚠️ Reply to a message with .summarize to get a summary.'
+                    });
+                } else {
+                    const textToSummarize = quotedMsg.conversation || 
+                                          quotedMsg.extendedTextMessage?.text || 
+                                          quotedMsg.imageMessage?.caption || 
+                                          quotedMsg.videoMessage?.caption || '';
+                                          
+                    if (!textToSummarize) {
+                        await sock.sendMessage(remoteJid, { 
+                            text: '⚠️ Cannot summarize this type of message.'
+                        });
+                    } else {
+                        const summaryResult = await advancedMessaging.summarizeText(sock, remoteJid, textToSummarize);
+                        await sock.sendMessage(remoteJid, { text: summaryResult.message });
+                    }
+                }
+                break;
+                
+            case 'translate':
+                if (!quotedMsg || args.length < 1) {
+                    await sock.sendMessage(remoteJid, { 
+                        text: '⚠️ Usage: Reply to a message with .translate "language"'
+                    });
+                } else {
+                    const textToTranslate = quotedMsg.conversation || 
+                                          quotedMsg.extendedTextMessage?.text || 
+                                          quotedMsg.imageMessage?.caption || 
+                                          quotedMsg.videoMessage?.caption || '';
+                                          
+                    if (!textToTranslate) {
+                        await sock.sendMessage(remoteJid, { 
+                            text: '⚠️ Cannot translate this type of message.'
+                        });
+                    } else {
+                        const targetLang = args[0];
+                        const translationResult = await advancedMessaging.translateMessage(sock, remoteJid, textToTranslate, targetLang);
+                        await sock.sendMessage(remoteJid, { text: translationResult.message });
+                    }
+                }
+                break;
+                
+            case 'flood':
+                if (args.length < 1) {
+                    await sock.sendMessage(remoteJid, { 
+                        text: '⚠️ Usage: .flood delay="2s" count="3" message="your message"'
+                    });
+                } else {
+                    // Parse the arguments 
+                    let floodDelay = 2; // default 2 seconds
+                    let floodCount = 3; // default 3 messages
+                    let floodMessage = '';
+
+                    for (let i = 0; i < args.length; i++) {
+                        if (args[i].startsWith('delay=')) {
+                            floodDelay = parseFloat(args[i].substring(6).replace(/["']/g, ''));
+                        } else if (args[i].startsWith('count=')) {
+                            floodCount = parseInt(args[i].substring(6).replace(/["']/g, ''));
+                        } else if (args[i].startsWith('message=')) {
+                            floodMessage = args[i].substring(8).replace(/^["'](.*)["']$/, '$1');
+                            // Also include any remaining args as part of the message
+                            if (i < args.length - 1) {
+                                floodMessage += ' ' + args.slice(i + 1).join(' ');
+                            }
+                            break;
+                        }
+                    }
+
+                    if (!floodMessage) {
+                        await sock.sendMessage(remoteJid, { 
+                            text: '⚠️ Please provide a message to send.'
+                        });
+                    } else {
+                        const floodResult = await advancedMessaging.floodMessages(
+                            sock, remoteJid, sender, floodMessage, floodCount, floodDelay
+                        );
+                        
+                        // Only send confirmation if not silent
+                        if (!floodResult.silent && floodResult.message) {
+                            await sock.sendMessage(remoteJid, { text: floodResult.message });
+                        }
+                    }
+                }
+                break;
+                
+            // Group Influence Commands
+            case 'track':
+                const trackResult = await groupInfluence.trackGroupChanges(sock, remoteJid, sender);
+                await sock.sendMessage(remoteJid, { text: trackResult.message });
+                break;
+                
+            case 'active':
+                if (args.length > 0) {
+                    const activityPeriod = args[0];
+                    const activityResult = await groupInfluence.getActiveMembers(sock, remoteJid, sender, activityPeriod);
+                    await sock.sendMessage(remoteJid, { text: activityResult.message });
+                } else {
+                    const activityResult = await groupInfluence.getActiveMembers(sock, remoteJid, sender);
+                    await sock.sendMessage(remoteJid, { text: activityResult.message });
+                }
+                break;
+                
+            case 'detector':
+                const detectorResult = await groupInfluence.setupDetector(sock, remoteJid, sender);
+                await sock.sendMessage(remoteJid, { text: detectorResult.message });
+                break;
+                
+            case 'warn':
+                if (message.message?.extendedTextMessage?.contextInfo?.mentionedJid) {
+                    const mentionedUser = message.message.extendedTextMessage.contextInfo.mentionedJid[0];
+                    const reason = args.join(' ');
+                    const warnResult = await groupInfluence.warnUser(sock, remoteJid, sender, mentionedUser, reason);
+                    
+                    // Only send confirmation if not silent
+                    if (!warnResult.silent && warnResult.message) {
+                        await sock.sendMessage(remoteJid, { text: warnResult.message });
+                    }
+                } else {
+                    await sock.sendMessage(remoteJid, { 
+                        text: '⚠️ Usage: .warn @user "reason"'
+                    });
+                }
+                break;
+                
+            case 'report':
+                // Check if a specific user is mentioned
+                if (message.message?.extendedTextMessage?.contextInfo?.mentionedJid) {
+                    const mentionedUser = message.message.extendedTextMessage.contextInfo.mentionedJid[0];
+                    const reportResult = await groupInfluence.generateReport(sock, remoteJid, sender, mentionedUser);
+                    
+                    // Only send confirmation if not silent
+                    if (!reportResult.silent && reportResult.message) {
+                        await sock.sendMessage(remoteJid, { text: reportResult.message });
+                    }
+                } else {
+                    // Generate report for all warned users
+                    const reportResult = await groupInfluence.generateReport(sock, remoteJid, sender);
+                    
+                    // Only send confirmation if not silent
+                    if (!reportResult.silent && reportResult.message) {
+                        await sock.sendMessage(remoteJid, { text: reportResult.message });
+                    }
+                }
+                break;
+                
+            case 'silence':
+                if (message.message?.extendedTextMessage?.contextInfo?.mentionedJid) {
+                    const mentionedUser = message.message.extendedTextMessage.contextInfo.mentionedJid[0];
+                    let duration = args[0] || '1h';
+                    
+                    // If first arg doesn't look like duration, use default and include all args in reason
+                    if (!duration.match(/^\d+[hmd]$/)) {
+                        duration = '1h';
+                    }
+                    
+                    const silenceResult = await groupInfluence.silenceUser(sock, remoteJid, sender, mentionedUser, duration);
+                    await sock.sendMessage(remoteJid, { 
+                        text: silenceResult.message,
+                        mentions: silenceResult.mentions 
+                    });
+                } else {
+                    await sock.sendMessage(remoteJid, { 
+                        text: '⚠️ Usage: .silence @user "1h/1d/30m"'
+                    });
+                }
+                break;
+                
+            case 'influence':
+                const influenceResult = await groupInfluence.findInfluencers(sock, remoteJid);
+                await sock.sendMessage(remoteJid, { text: influenceResult.message });
+                break;
+                
+            case 'dominate':
+                const count = args[0] || 5;
+                const dominateResult = await groupInfluence.dominateChat(sock, remoteJid, sender, count);
+                
+                // Only send confirmation if not silent
+                if (!dominateResult.silent && dominateResult.message) {
+                    await sock.sendMessage(remoteJid, { text: dominateResult.message });
+                }
+                break;
+                
+            case 'distract':
+                const distractionTopic = args.join(' ');
+                const distractResult = await groupInfluence.distractGroup(sock, remoteJid, sender, distractionTopic);
+                
+                // Only send confirmation if not silent
+                if (!distractResult.silent && distractResult.message) {
+                    await sock.sendMessage(remoteJid, { text: distractResult.message });
+                }
+                break;
+                
+            case 'analyze':
+                const analysisResult = await advancedMessaging.analyzeRelationships(sock, remoteJid);
+                await sock.sendMessage(remoteJid, { text: analysisResult.message });
+                break;
+                
+            case 'activity':
+                const period = args[0] || '24h';
+                const activityDataResult = await advancedMessaging.trackActivity(sock, remoteJid, period);
+                await sock.sendMessage(remoteJid, { text: activityDataResult.message });
+                break;
+                
+            case 'topics':
+                const topicsResult = await advancedMessaging.analyzeTopics(sock, remoteJid);
+                await sock.sendMessage(remoteJid, { text: topicsResult.message });
+                break;
+                
+            case 'persona':
+                if (args.length < 1) {
+                    await sock.sendMessage(remoteJid, { 
+                        text: '⚠️ Usage: .persona "style"\nStyles: professional, casual, friendly, funny, sarcastic, poetic'
+                    });
+                } else {
+                    const personaStyle = args[0];
+                    const personaResult = await advancedMessaging.setAIPersona(sock, remoteJid, personaStyle);
+                    await sock.sendMessage(remoteJid, { text: personaResult.message });
+                }
+                break;
+                
+            case 'remember':
+                if (args.length < 1) {
+                    await sock.sendMessage(remoteJid, { 
+                        text: '⚠️ Usage: .remember "information to remember"'
+                    });
+                } else {
+                    const infoToRemember = args.join(' ');
+                    const rememberResult = await advancedMessaging.rememberInfo(sock, remoteJid, sender, infoToRemember);
+                    await sock.sendMessage(remoteJid, { text: rememberResult.message });
+                }
+                break;
+                
+            case 'recall':
+                const recallResult = await advancedMessaging.recallInfo(sock, remoteJid, sender);
+                await sock.sendMessage(remoteJid, { text: recallResult.message });
+                break;
+                
+            case 'simulate':
+                if (args.length < 1) {
+                    await sock.sendMessage(remoteJid, { 
+                        text: '⚠️ Usage: .simulate "message to send naturally"'
+                    });
+                } else {
+                    const simulatedMessage = args.join(' ');
+                    const simulateResult = await advancedMessaging.simulateMessage(sock, remoteJid, sender, simulatedMessage);
+                    
+                    // Only send confirmation if not silent
+                    if (!simulateResult.silent && simulateResult.message) {
+                        await sock.sendMessage(remoteJid, { text: simulateResult.message });
+                    }
                 }
                 break;
                 

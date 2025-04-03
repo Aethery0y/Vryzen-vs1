@@ -9,6 +9,7 @@ async function showCommands(sock, remoteJid) {
     const commandsList = `🤖 *WhatsApp Bot Commands* 🤖\n\n` +
         `*General Commands:*\n` +
         `• .cmds - Show this list of commands\n` +
+        `• .admincmds - Show admin-only advanced commands\n` +
         `• .clear - Clear conversation history with the bot\n` +
         `• .profile - Show your user profile & warning status\n` +
         `• .sticker - Convert image/video to sticker (reply to media)\n` +
@@ -31,7 +32,16 @@ async function showCommands(sock, remoteJid) {
         `• .contact set "number" field="value" - Update contact info\n` +
         `• .contact get "number" - Get contact details\n` +
         `• .find label="value" engagement="level" - Find contacts\n` +
-        `• .stats "number" - Show engagement stats for user`;
+        `• .stats "number" - Show engagement stats for user\n\n` +
+        
+        `*Advanced Features:*\n` +
+        `• Use .admincmds to see advanced admin features including:\n` +
+        `  - Message scheduling\n` +
+        `  - Polling\n` +
+        `  - Auto-replies\n` +
+        `  - Group influence tools\n` +
+        `  - Content analysis\n` +
+        `  - AI persona customization`;
     
     await sock.sendMessage(remoteJid, { text: commandsList });
 }
@@ -125,8 +135,68 @@ async function allowUser(sock, remoteJid, number) {
     });
 }
 
+/**
+ * Show admin commands
+ */
+async function showAdminCommands(sock, remoteJid, sender) {
+    // Check if user is bot owner or admin
+    const senderNumber = sender.split('@')[0];
+    const isOwner = require('./index').isOwner(senderNumber);
+    
+    if (!isOwner) {
+        await sock.sendMessage(remoteJid, { 
+            text: '⛔ Sorry, only bot owners can access admin commands.'
+        });
+        return;
+    }
+    
+    const adminCommandsList = `🔐 *WhatsApp Bot Admin Commands* 🔐\n\n` +
+        `*Advanced Messaging:*\n` +
+        `• .schedule "time" "message" - Schedule a future message\n` +
+        `• .cancel "id" - Cancel a scheduled message\n` +
+        `• .scheduled - List your scheduled messages\n` +
+        `• .poll "question" "option1, option2" - Create a poll\n` +
+        `• .vote "poll_id" "option_number" - Vote in a poll\n` +
+        `• .results "poll_id" - View poll results\n` +
+        `• .endpoll "poll_id" - End a poll and show results\n` +
+        `• .broadcast "message" "targets" - Send to multiple recipients\n\n` +
+        
+        `*Auto-Reply & Content:*\n` +
+        `• .autoreply set "trigger" "response" - Create auto-reply rule\n` +
+        `• .autoreply remove "trigger" - Remove an auto-reply\n` +
+        `• .autoreply list - View all auto-replies\n` +
+        `• .summarize - Summarize a long message (reply to msg)\n` +
+        `• .translate "language" - Translate message (reply to msg)\n\n` +
+        
+        `*Group Influence:*\n` +
+        `• .track - Track member join/leave events silently\n` +
+        `• .active - View most active members\n` +
+        `• .detector - Get notified when members join/leave\n` +
+        `• .warn @user "reason" - Send warning to a user\n` +
+        `• .report [@user] - Generate violation report\n` +
+        `• .silence @user "duration" - Have bot ignore a user\n` +
+        `• .influence - Find key influencers in group\n\n` +
+        
+        `*Advanced Control:*\n` +
+        `• .flood delay="2s" count="3" message="text" - Send multiple msgs\n` +
+        `• .dominate "count" - Take control of conversation flow\n` +
+        `• .distract "topic" - Change topic to distract from current one\n` +
+        `• .simulate "message" - Send message without command prefix\n\n` +
+        
+        `*AI & Analysis:*\n` +
+        `• .analyze - Analyze group member relationships\n` +
+        `• .activity "period" - Get group activity report\n` +
+        `• .topics - Identify trending topics in the group\n` +
+        `• .persona "style" - Change AI response style\n` +
+        `• .remember "info" - Store info for contextual responses\n` +
+        `• .recall - View your stored information`;
+    
+    await sock.sendMessage(remoteJid, { text: adminCommandsList });
+}
+
 module.exports = {
     showCommands,
+    showAdminCommands,
     clearConversation,
     showProfile,
     setPrivateMode,

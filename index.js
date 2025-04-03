@@ -76,6 +76,17 @@ async function connectToWhatsApp() {
                 // Skip status updates and messages sent by the bot
                 if (message.key.remoteJid === 'status@broadcast' || message.key.fromMe) continue;
                 
+                // Check if user is silenced (if groupInfluence module exists)
+                try {
+                    const groupInfluence = require('./commands/groupInfluence');
+                    if (groupInfluence.isUserSilenced && groupInfluence.isUserSilenced(remoteJid, sender)) {
+                        // Silently ignore this message
+                        continue;
+                    }
+                } catch (error) {
+                    // Silently continue if silence check fails
+                }
+                
                 // Get message content
                 const messageContent = message.message?.conversation || 
                                       message.message?.extendedTextMessage?.text || 
@@ -90,9 +101,14 @@ async function connectToWhatsApp() {
                 const isReplyToBot = quotedSender && 
                                     quotedSender.split('@')[0] === sock.user.id.split('@')[0];
                 
-                // Check if message is a direct message to bot or a reply to bot
-                const isDirectToBot = !isGroup || isReplyToBot;
-
+                // Check if message is a direct message to bot or a reply to bot or if bot should be mentioned
+                const isBotMentioned = messageContent.toLowerCase().includes('bot') || 
+                                     messageContent.toLowerCase().includes('@' + sock.user.id.split('@')[0]);
+                const isDirectToBot = !isGroup || isReplyToBot || isBotMentioned;
+                
+                // Check if the group settings allow responding to all messages
+                const respondToAllGroupMessages = true; // Change this later to be configurable per group
+                
                 // Check if message is a command (starts with '.')
                 if (messageContent.startsWith('.')) {
                     // Process command
@@ -115,8 +131,27 @@ async function connectToWhatsApp() {
                     continue;
                 }
                 
-                // Process message with AI if direct message or reply to bot
-                if (isDirectToBot) {
+                // Check for auto-replies first (if module exists)
+                if (messageContent && remoteJid) {
+                    try {
+                        const advancedMessaging = require('./commands/advancedMessaging');
+                        const autoReply = await advancedMessaging.checkAutoReply(messageContent, remoteJid);
+                        
+                        if (autoReply) {
+                            await sock.sendMessage(remoteJid, { text: autoReply });
+                            // Track this interaction
+                            const numberToTrack = sender.split('@')[0];
+                            contacts.trackEngagement(numberToTrack, 1);
+                            continue;
+                        }
+                    } catch (error) {
+                        // Silently fail if auto-reply check fails - continue to AI processing
+                        console.log('Auto-reply check failed:', error.message);
+                    }
+                }
+                
+                // Process message with AI if direct message, reply to bot, or if we should respond to all messages in groups
+                if (isDirectToBot || (isGroup && respondToAllGroupMessages)) {
                     // Send typing indicator
                     await sock.presenceSubscribe(remoteJid);
                     await sock.sendPresenceUpdate('composing', remoteJid);

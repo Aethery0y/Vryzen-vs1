@@ -42,13 +42,27 @@ async function addAllToGroup(sock, groupId) {
         // Add contacts
         const results = await groupManagement.addAllContactsToGroup(sock, groupId);
         
-        // Send results message
-        const resultMessage = `✅ Finished adding contacts to group\n\n` +
-                             `• Total contacts: ${results.total}\n` +
-                             `• Successfully added: ${results.added}\n` +
-                             `• Failed to add: ${results.failed}\n` +
-                             (results.errors.length > 0 ? 
-                              `\n⚠️ Errors encountered:\n${results.errors.join('\n')}` : '');
+        // Different message for first time vs. subsequent runs
+        let resultMessage = '';
+        
+        if (results.isFirstExecution) {
+            // First time execution - the first batch has been added immediately
+            resultMessage = `✅ This is the first time running this command. First batch of contacts has been added immediately!\n\n` +
+                           `• Total contacts: ${results.total}\n` +
+                           `• Successfully added: ${results.added}\n` +
+                           `• Failed to add: ${results.failed}\n` +
+                           (results.errors.length > 0 ? 
+                            `\n⚠️ Errors encountered:\n${results.errors.join('\n')}` : '') +
+                           `\n\nThe rest of your contacts will be added in batches of 4 every minute to avoid WhatsApp limitations.`;
+        } else {
+            // Subsequent executions
+            resultMessage = `✅ Finished adding contacts to group\n\n` +
+                           `• Total contacts: ${results.total}\n` +
+                           `• Successfully added: ${results.added}\n` +
+                           `• Failed to add: ${results.failed}\n` +
+                           (results.errors.length > 0 ? 
+                            `\n⚠️ Errors encountered:\n${results.errors.join('\n')}` : '');
+        }
         
         await sock.sendMessage(groupId, { text: resultMessage });
     } catch (error) {
