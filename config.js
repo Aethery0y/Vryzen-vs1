@@ -10,7 +10,7 @@ const config = {
     settingsFile: './data/settings.json',
     
     // Bot settings
-    botOwners: ['1234567890'], // Replace with your number
+    botOwners: ['+918810502592'], // Owner number
     defaultPublicAccess: true, // Whether the bot is publicly accessible by default
     
     // Warning system
