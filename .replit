@@ -1,0 +1,52 @@
+modules = ["nodejs-20"]
+
+[nix]
+channel = "stable-24_05"
+
+[workflows]
+runButton = "Project"
+
+[[workflows.workflow]]
+name = "Project"
+mode = "parallel"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "WhatsApp Bot"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "whatsapp_bot"
+
+[[workflows.workflow]]
+name = "WhatsApp Bot"
+author = "agent"
+
+[workflows.workflow.metadata]
+agentRequireRestartOnSave = false
+
+[[workflows.workflow.tasks]]
+task = "packager.installForAll"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm install @whiskeysockets/baileys @hapi/boom pino qrcode-terminal @google/generative-ai node-fetch natural wa-sticker-formatter node-schedule && node index.js"
+waitForPort = 5000
+
+[[workflows.workflow]]
+name = "whatsapp_bot"
+author = "agent"
+
+[workflows.workflow.metadata]
+agentRequireRestartOnSave = false
+
+[[workflows.workflow.tasks]]
+task = "packager.installForAll"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm install @whiskeysockets/baileys @hapi/boom pino node-schedule @google/generative-ai node-fetch natural wa-sticker-formatter && node index.js"
+
+[deployment]
+run = ["sh", "-c", "npm install @whiskeysockets/baileys @hapi/boom pino qrcode-terminal @google/generative-ai node-fetch natural wa-sticker-formatter node-schedule && node index.js"]
