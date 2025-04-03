@@ -3,9 +3,12 @@ const groupCommands = require('./groups');
 const contactCommands = require('./contacts');
 const advancedMessaging = require('./advancedMessaging');
 const groupInfluence = require('./groupInfluence');
+const analytics = require('./analytics');
+const autoReplyCommands = require('./autoReply');
 const database = require('../lib/database');
 const animeNews = require('../lib/animeNews');
 const stickerMaker = require('../lib/stickerMaker');
+const analyticsLib = require('../lib/analytics');
 
 // Command handler
 async function handleCommand(params) {
@@ -524,8 +527,8 @@ async function handleCommand(params) {
                 break;
                 
             case 'activity':
-                const period = args[0] || '24h';
-                const activityDataResult = await advancedMessaging.trackActivity(sock, remoteJid, period);
+                const timeframe = args[0] || '24h';
+                const activityDataResult = await advancedMessaging.trackActivity(sock, remoteJid, timeframe);
                 await sock.sendMessage(remoteJid, { text: activityDataResult.message });
                 break;
                 
@@ -576,6 +579,190 @@ async function handleCommand(params) {
                     if (!simulateResult.silent && simulateResult.message) {
                         await sock.sendMessage(remoteJid, { text: simulateResult.message });
                     }
+                }
+                break;
+                
+            // Enhanced Analytics Commands
+            case 'analytics':
+                if (!isGroup) {
+                    await sock.sendMessage(remoteJid, { 
+                        text: '⚠️ This command can only be used in groups.'
+                    });
+                    break;
+                }
+                
+                const analyticsResult = await analytics.showGroupAnalytics(sock, { 
+                    remoteJid,
+                    isGroup,
+                    sender 
+                }, args);
+                
+                await sock.sendMessage(remoteJid, { text: analyticsResult.message });
+                break;
+                
+            case 'useractivity':
+                if (!isAdmin(normalizedSender)) {
+                    await sock.sendMessage(remoteJid, { 
+                        text: '⚠️ Only admins can use this command.'
+                    });
+                    break;
+                }
+                
+                const userActivityResult = await analytics.showUserActivity(sock, {
+                    remoteJid,
+                    sender,
+                    quotedMsg
+                }, args);
+                
+                await sock.sendMessage(remoteJid, { text: userActivityResult.message });
+                break;
+                
+            case 'cmdstats':
+                if (!isAdmin(normalizedSender)) {
+                    await sock.sendMessage(remoteJid, { 
+                        text: '⚠️ Only admins can use this command.'
+                    });
+                    break;
+                }
+                
+                const cmdStatsResult = await analytics.showCommandStats(sock, {
+                    remoteJid
+                }, args);
+                
+                await sock.sendMessage(remoteJid, { text: cmdStatsResult.message });
+                break;
+                
+            // Enhanced Auto-reply Commands
+            case 'autoreply2':
+                if (!isAdmin(normalizedSender)) {
+                    await sock.sendMessage(remoteJid, { 
+                        text: '⚠️ Only admins can use this command.'
+                    });
+                    break;
+                }
+                
+                const autoReplyResult = await autoReplyCommands.createAutoReply(sock, {
+                    remoteJid,
+                    sender,
+                    isGroup
+                }, args);
+                
+                await sock.sendMessage(remoteJid, { text: autoReplyResult.message });
+                break;
+                
+            case 'delautoreply':
+                if (!isAdmin(normalizedSender)) {
+                    await sock.sendMessage(remoteJid, { 
+                        text: '⚠️ Only admins can use this command.'
+                    });
+                    break;
+                }
+                
+                if (args.length < 1) {
+                    await sock.sendMessage(remoteJid, { 
+                        text: '⚠️ Usage: .delautoreply <rule_id>'
+                    });
+                    break;
+                }
+                
+                const deleteResult = await autoReplyCommands.deleteAutoReply(sock, {
+                    remoteJid,
+                    sender
+                }, args);
+                
+                await sock.sendMessage(remoteJid, { text: deleteResult.message });
+                break;
+                
+            case 'listreplies':
+                if (!isAdmin(normalizedSender)) {
+                    await sock.sendMessage(remoteJid, { 
+                        text: '⚠️ Only admins can use this command.'
+                    });
+                    break;
+                }
+                
+                const listReplyResult = await autoReplyCommands.listAutoReplies(sock, {
+                    remoteJid,
+                    sender,
+                    isGroup
+                }, args);
+                
+                await sock.sendMessage(remoteJid, { text: listReplyResult.message });
+                break;
+                
+            case 'genreply':
+                if (!isAdmin(normalizedSender)) {
+                    await sock.sendMessage(remoteJid, { 
+                        text: '⚠️ Only admins can use this command.'
+                    });
+                    break;
+                }
+                
+                if (!quotedMsg) {
+                    await sock.sendMessage(remoteJid, { 
+                        text: '⚠️ Reply to a message with your desired response after .genreply'
+                    });
+                    break;
+                }
+                
+                const genResult = await autoReplyCommands.generateAutoReply(sock, {
+                    remoteJid,
+                    sender,
+                    isGroup,
+                    quotedMsg
+                }, args);
+                
+                await sock.sendMessage(remoteJid, { text: genResult.message });
+                break;
+                
+            // Enhanced Translation Commands
+            case 'translate2':
+                if (!quotedMsg || args.length < 1) {
+                    await sock.sendMessage(remoteJid, { 
+                        text: '⚠️ Usage: Reply to a message with .translate2 <language>'
+                    });
+                    break;
+                }
+                
+                const textToTranslate = quotedMsg.conversation || 
+                                     quotedMsg.extendedTextMessage?.text || 
+                                     quotedMsg.imageMessage?.caption || 
+                                     quotedMsg.videoMessage?.caption || '';
+                
+                if (!textToTranslate) {
+                    await sock.sendMessage(remoteJid, { 
+                        text: '⚠️ Cannot translate this type of message.'
+                    });
+                    break;
+                }
+                
+                try {
+                    const targetLang = args[0];
+                    const translationLib = require('../lib/translation');
+                    const result = await translationLib.translateText(textToTranslate, targetLang);
+                    
+                    if (result.success) {
+                        await sock.sendMessage(remoteJid, { text: result.message });
+                        
+                        // Record this activity for analytics
+                        analyticsLib.recordActivity({
+                            sender,
+                            group: isGroup ? remoteJid : null,
+                            msgType: 'command',
+                            timestamp: Date.now(),
+                            isCommand: true,
+                            command: 'translate2'
+                        });
+                    } else {
+                        await sock.sendMessage(remoteJid, { 
+                            text: `⚠️ ${result.message}`
+                        });
+                    }
+                } catch (error) {
+                    console.error('Error translating message:', error);
+                    await sock.sendMessage(remoteJid, { 
+                        text: '⚠️ An error occurred during translation. Please try again later.'
+                    });
                 }
                 break;
                 

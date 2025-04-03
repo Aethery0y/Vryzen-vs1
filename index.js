@@ -12,6 +12,9 @@ const ai = require('./lib/ai');
 const animeNews = require('./lib/animeNews');
 const profanityFilter = require('./lib/profanityFilter');
 const contacts = require('./lib/contacts');
+const translation = require('./lib/translation');
+const analytics = require('./lib/analytics');
+const autoReply = require('./lib/autoReply');
 const commandHandler = require('./commands');
 const config = require('./config');
 
@@ -131,18 +134,53 @@ async function connectToWhatsApp() {
                     continue;
                 }
                 
-                // Check for auto-replies first (if module exists)
+                // Record message activity for analytics
+                const messageType = message.message?.imageMessage ? 'image' : 
+                                   message.message?.videoMessage ? 'video' :
+                                   message.message?.audioMessage ? 'audio' :
+                                   message.message?.stickerMessage ? 'sticker' : 'text';
+                                   
+                analytics.recordActivity({
+                    sender,
+                    group: isGroup ? remoteJid : null,
+                    msgType: messageType,
+                    timestamp: Date.now(),
+                    isCommand: false
+                });
+                
+                // Check for auto-replies using the new system
                 if (messageContent && remoteJid) {
                     try {
-                        const advancedMessaging = require('./commands/advancedMessaging');
-                        const autoReply = await advancedMessaging.checkAutoReply(messageContent, remoteJid);
+                        // Check for auto-replies with the new system first
+                        const autoReplyResult = autoReply.processMessage({
+                            text: messageContent,
+                            isGroup,
+                            groupId: isGroup ? remoteJid : null,
+                            sender
+                        });
                         
-                        if (autoReply) {
-                            await sock.sendMessage(remoteJid, { text: autoReply });
+                        if (autoReplyResult.match) {
+                            await sock.sendMessage(remoteJid, { text: autoReplyResult.response });
                             // Track this interaction
                             const numberToTrack = sender.split('@')[0];
                             contacts.trackEngagement(numberToTrack, 1);
                             continue;
+                        }
+                        
+                        // Fall back to the old system if exists
+                        try {
+                            const advancedMessaging = require('./commands/advancedMessaging');
+                            const oldAutoReply = await advancedMessaging.checkAutoReply(messageContent, remoteJid);
+                            
+                            if (oldAutoReply) {
+                                await sock.sendMessage(remoteJid, { text: oldAutoReply });
+                                // Track this interaction
+                                const numberToTrack = sender.split('@')[0];
+                                contacts.trackEngagement(numberToTrack, 1);
+                                continue;
+                            }
+                        } catch (oldError) {
+                            // Old system not available or failed, continue
                         }
                     } catch (error) {
                         // Silently fail if auto-reply check fails - continue to AI processing
