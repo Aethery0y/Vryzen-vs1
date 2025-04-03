@@ -18,7 +18,8 @@ async function showCommands(sock, remoteJid) {
         `*Group Commands:*\n` +
         `• .save all - Save all group members' numbers\n` +
         `• .add all - Add saved numbers to the current group\n` +
-        `• .tag all "message" - Tag all group members\n\n` +
+        `• .tag all "message" - Tag all group members\n` +
+        `• .relationships - Show group relationships analysis\n\n` +
         
         `*Privacy Commands:*\n` +
         `• .private - Restrict bot access to allowed users only\n` +
@@ -189,7 +190,8 @@ async function showAdminCommands(sock, remoteJid, sender) {
         `• .topics - Identify trending topics in the group\n` +
         `• .persona "style" - Change AI response style\n` +
         `• .remember "info" - Store info for contextual responses\n` +
-        `• .recall - View your stored information`;
+        `• .recall - View your stored information\n` +
+        `• .clearrelations - Clear relationship analysis data`;
     
     await sock.sendMessage(remoteJid, { text: adminCommandsList });
 }

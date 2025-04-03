@@ -11,7 +11,18 @@ const config = {
     
     // Bot settings
     botOwners: ['+918810502592'], // Owner number
+    botAdmins: ['+918810502592'], // Admin numbers (includes owner by default)
     defaultPublicAccess: true, // Whether the bot is publicly accessible by default
+    
+    // Message handling settings
+    messageHandling: {
+        // Ability to force the bot to treat all replies as replies to the bot (useful for debugging)
+        forceReplyDetection: true,
+        // Keywords that trigger the bot's attention when included in a message
+        triggerKeywords: ['bot', 'assistant', 'help'],
+        // Only respond to messages when explicitly mentioned (reply or mention)
+        strictResponseMode: true
+    },
     
     // Warning system
     maxWarnings: 3, // Number of warnings before a strike

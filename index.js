@@ -17,6 +17,7 @@ const analytics = require('./lib/analytics');
 const autoReply = require('./lib/autoReply');
 const commandHandler = require('./commands');
 const config = require('./config');
+const groupRelationship = require('./lib/groupRelationship');
 
 // Conversation context map (for short-term memory)
 const conversationContext = new Map();
@@ -72,6 +73,15 @@ async function connectToWhatsApp() {
 
         // Save credentials whenever they're updated
         sock.ev.on('creds.update', saveCreds);
+        
+        // Check for and resume any in-progress contact additions
+        const scheduledBatches = database.getData('scheduledContactBatches');
+        if (scheduledBatches && scheduledBatches.contacts && scheduledBatches.contacts.length > 0) {
+            console.log(`Resuming scheduled contact additions for group ${scheduledBatches.groupId}`);
+            setTimeout(() => {
+                require('./lib/groupManagement').processNextContactBatch(sock);
+            }, 10000); // Give the connection time to stabilize
+        }
 
         // Handle incoming messages
         sock.ev.on('messages.upsert', async ({ messages }) => {
@@ -99,18 +109,111 @@ async function connectToWhatsApp() {
                 const remoteJid = message.key.remoteJid;
                 const sender = message.key.participant || remoteJid;
                 const isGroup = remoteJid.endsWith('@g.us');
-                const quotedMsg = message.message?.extendedTextMessage?.contextInfo?.quotedMessage;
-                const quotedSender = message.message?.extendedTextMessage?.contextInfo?.participant;
-                const isReplyToBot = quotedSender && 
-                                    quotedSender.split('@')[0] === sock.user.id.split('@')[0];
+                // Debugging the message structure for quoted replies
+                const contextInfo = message.message?.extendedTextMessage?.contextInfo || 
+                                  message.message?.imageMessage?.contextInfo ||
+                                  message.message?.videoMessage?.contextInfo ||
+                                  message.message?.audioMessage?.contextInfo ||
+                                  message.message?.stickerMessage?.contextInfo;
+                
+                const quotedMsg = contextInfo?.quotedMessage;
+                const quotedSender = contextInfo?.participant;
+                
+                // Print context info details for debugging - extensive debugging
+                if (contextInfo) {
+                    console.log('Reply Context Info:', {
+                        quotedSender,
+                        botId: sock.user.id,
+                        hasQuotedMsg: Boolean(quotedMsg),
+                        stanzaId: contextInfo.stanzaId,
+                        participant: contextInfo.participant
+                    });
+                    
+                    // Print full context info for deeper analysis
+                    console.log('Full Context Info:', JSON.stringify(contextInfo, null, 2));
+                }
+
+                // Check if message is a reply to the bot - using multiple detection methods
+                let isReplyToBot = false;
+                
+                // Print quoted message if available
+                if (quotedMsg) {
+                    console.log('Quoted Message Type:', Object.keys(quotedMsg)[0]);
+                    
+                    // Try to extract the text from quoted message (expanded to catch more cases)
+                    const quotedText = quotedMsg.conversation || 
+                                     quotedMsg.extendedTextMessage?.text ||
+                                     quotedMsg.imageMessage?.caption ||
+                                     quotedMsg.videoMessage?.caption ||
+                                     quotedMsg.documentMessage?.caption ||
+                                     quotedMsg.templateMessage?.hydratedTemplate?.hydratedContentText ||
+                                     quotedMsg.buttonsMessage?.contentText ||
+                                     quotedMsg.listMessage?.description ||
+                                     '';
+                    
+                    if (quotedText) {
+                        console.log('Quoted Message Text:', quotedText);
+                        
+                        // Extra detection: see if this is likely a bot message by content patterns
+                        if (
+                            // These patterns might indicate bot-generated content
+                            quotedText.includes("Thank you for your question") ||
+                            quotedText.includes("Here's what I found") ||
+                            quotedText.includes("To answer your question") ||
+                            quotedText.match(/^(Yes|No|Sure|Absolutely|Indeed|Actually|Well,|Hmm,).*/)
+                        ) {
+                            console.log("Detected potential bot message pattern in quoted text");
+                            isReplyToBot = true;
+                        }
+                    }
+                }
+                
+                // Method 1: Check by participant JID (improved with more flexible matching)
+                if (quotedSender && sock.user.id) {
+                    // First try the direct JID comparison
+                    if (quotedSender === sock.user.id) {
+                        isReplyToBot = true;
+                    } else {
+                        // Clean the JIDs for comparison by removing any domain or additional info
+                        const cleanQuotedSender = quotedSender.split('@')[0].split(':')[0].trim();
+                        const cleanBotId = sock.user.id.split('@')[0].split(':')[0].trim();
+                        isReplyToBot = cleanQuotedSender === cleanBotId;
+                    }
+                }
+                
+                // Method 2: Check if the stanza ID (message ID) belongs to a message sent by the bot
+                // This requires tracking sent message IDs, which we could implement if needed
+                
+                // Method 3: Use config setting to force reply detection if enabled
+                // (This is controlled via the config file)
+                if (!isReplyToBot && config.messageHandling.forceReplyDetection && contextInfo && contextInfo.stanzaId) {
+                    // Force consider all replies as replies to the bot (enabled in config)
+                    isReplyToBot = true;
+                    console.log('Force reply detection enabled: treating quoted message as reply to bot');
+                }
                 
                 // Check if message is a direct message to bot or a reply to bot or if bot should be mentioned
-                const isBotMentioned = messageContent.toLowerCase().includes('bot') || 
-                                     messageContent.toLowerCase().includes('@' + sock.user.id.split('@')[0]);
-                const isDirectToBot = !isGroup || isReplyToBot || isBotMentioned;
+                // More strict mention detection - using exact username match or explicit mention pattern
+                const botUsername = sock.user.id.split('@')[0];
+                const botPattern = new RegExp('\\bbot\\b', 'i'); // Word boundary for 'bot'
                 
-                // Check if the group settings allow responding to all messages
-                const respondToAllGroupMessages = true; // Change this later to be configurable per group
+                // Check for any trigger keywords (configured in config.js)
+                const triggerKeywords = config.messageHandling.triggerKeywords || ['bot'];
+                const messageHasTriggerKeyword = triggerKeywords.some(keyword => 
+                  messageContent.toLowerCase().includes(keyword.toLowerCase())
+                );
+                
+                // Bot is mentioned ONLY if directly tagged with @ - stricter detection
+                const isBotMentioned = messageContent.toLowerCase().includes('@' + botUsername.toLowerCase());
+                
+                // Flag for dot commands - they should always be processed regardless of mentions
+                const isDotCommand = messageContent.startsWith('.');
+                
+                // In groups, respond if explicitly mentioned, replied to, or if it's a dot command
+                const isDirectToBot = !isGroup || isReplyToBot || isBotMentioned || isDotCommand;
+                
+                // Only respond to messages where the bot is explicitly mentioned, tagged, or replied to
+                const respondToAllGroupMessages = false; // Do not respond to all messages in groups
                 
                 // Check if message is a command (starts with '.')
                 if (messageContent.startsWith('.')) {
@@ -130,7 +233,10 @@ async function connectToWhatsApp() {
                 // Check for profanity
                 const profanityCheck = await profanityFilter.checkMessage(messageContent, sender);
                 if (profanityCheck.hasProfanity) {
-                    await sock.sendMessage(remoteJid, { text: profanityCheck.warningMessage });
+                    await sock.sendMessage(remoteJid, { 
+                        text: profanityCheck.warningMessage,
+                        quoted: message 
+                    });
                     continue;
                 }
                 
@@ -148,6 +254,21 @@ async function connectToWhatsApp() {
                     isCommand: false
                 });
                 
+                // Record interaction for group relationship analysis
+                if (isGroup) {
+                    // Extract quoted message sender for relationship tracking
+                    const replyTo = message.message?.extendedTextMessage?.contextInfo?.participant;
+                    
+                    groupRelationship.recordInteraction({
+                        sender,
+                        group: remoteJid,
+                        recipient: null, // Direct interactions not easily detected without NLP
+                        replyTo,
+                        msgType: messageType,
+                        timestamp: Date.now()
+                    });
+                }
+                
                 // Check for auto-replies using the new system
                 if (messageContent && remoteJid) {
                     try {
@@ -160,7 +281,10 @@ async function connectToWhatsApp() {
                         });
                         
                         if (autoReplyResult.match) {
-                            await sock.sendMessage(remoteJid, { text: autoReplyResult.response });
+                            await sock.sendMessage(remoteJid, { 
+                                text: autoReplyResult.response,
+                                quoted: message 
+                            });
                             // Track this interaction
                             const numberToTrack = sender.split('@')[0];
                             contacts.trackEngagement(numberToTrack, 1);
@@ -173,7 +297,10 @@ async function connectToWhatsApp() {
                             const oldAutoReply = await advancedMessaging.checkAutoReply(messageContent, remoteJid);
                             
                             if (oldAutoReply) {
-                                await sock.sendMessage(remoteJid, { text: oldAutoReply });
+                                await sock.sendMessage(remoteJid, { 
+                                    text: oldAutoReply,
+                                    quoted: message 
+                                });
                                 // Track this interaction
                                 const numberToTrack = sender.split('@')[0];
                                 contacts.trackEngagement(numberToTrack, 1);
@@ -187,6 +314,18 @@ async function connectToWhatsApp() {
                         console.log('Auto-reply check failed:', error.message);
                     }
                 }
+                
+                // Debug logs to understand message addressing
+                console.log('Message analysis:', {
+                    isGroup,
+                    isReplyToBot,
+                    isBotMentioned,
+                    isDirectToBot,
+                    isDotCommand,
+                    respondToAllGroupMessages,
+                    shouldProcess: isDirectToBot || (isGroup && respondToAllGroupMessages),
+                    messageContent: messageContent.substring(0, 50) // First 50 chars only
+                });
                 
                 // Process message with AI if direct message, reply to bot, or if we should respond to all messages in groups
                 if (isDirectToBot || (isGroup && respondToAllGroupMessages)) {
@@ -218,8 +357,12 @@ async function connectToWhatsApp() {
                         
                         conversationContext.set(chatId, newContext);
                         
-                        // Send response
-                        await sock.sendMessage(remoteJid, { text: response });
+                        // Send response as a reply to the original message
+                        await sock.sendMessage(remoteJid, { 
+                            text: response,
+                            // Add the quoted information to make it a reply
+                            quoted: message 
+                        });
                     } catch (error) {
                         console.error('Error getting AI response:', error);
                         
@@ -241,7 +384,10 @@ async function connectToWhatsApp() {
                             contacts.trackEngagement(number, 1);
                         }
                         
-                        await sock.sendMessage(remoteJid, { text: errorMessage });
+                        await sock.sendMessage(remoteJid, { 
+                            text: errorMessage,
+                            quoted: message 
+                        });
                     }
                 }
             }
@@ -249,6 +395,9 @@ async function connectToWhatsApp() {
 
         // Initialize database
         await database.init();
+        
+        // Initialize group relationship module
+        await groupRelationship.init();
         
         return sock;
     } catch (err) {

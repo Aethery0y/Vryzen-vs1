@@ -5,6 +5,7 @@ const advancedMessaging = require('./advancedMessaging');
 const groupInfluence = require('./groupInfluence');
 const analytics = require('./analytics');
 const autoReplyCommands = require('./autoReply');
+const groupRelationship = require('./groupRelationship');
 const database = require('../lib/database');
 const animeNews = require('../lib/animeNews');
 const stickerMaker = require('../lib/stickerMaker');
@@ -34,7 +35,11 @@ async function handleCommand(params) {
     // Check if bot is in private mode and user is not allowed
     const settings = database.getBotSettings();
     if (!settings.isPublic) {
-        const isAllowed = settings.allowedUsers.some(allowedUser => 
+        // Check if user is owner first - owners can always use any command
+        const isUserOwner = isOwner(normalizedSender);
+        
+        // If not owner, check if they're in the allowed list
+        const isAllowed = isUserOwner || settings.allowedUsers.some(allowedUser => 
             database.normalizeNumber(allowedUser) === normalizedSender);
         
         // Admin commands that bypass private mode check
@@ -522,8 +527,14 @@ async function handleCommand(params) {
                 break;
                 
             case 'analyze':
-                const analysisResult = await advancedMessaging.analyzeRelationships(sock, remoteJid);
-                await sock.sendMessage(remoteJid, { text: analysisResult.message });
+                if (!isGroup) {
+                    await sock.sendMessage(remoteJid, { 
+                        text: '⚠️ This command can only be used in groups.'
+                    });
+                    break;
+                }
+                
+                await groupRelationship.showGroupAnalysis(sock, remoteJid);
                 break;
                 
             case 'activity':
@@ -766,6 +777,37 @@ async function handleCommand(params) {
                 }
                 break;
                 
+            // Group Relationship Analysis Commands
+            case 'relationships':
+            case 'grouprelation':
+                if (!isGroup) {
+                    await sock.sendMessage(remoteJid, { 
+                        text: '⚠️ This command can only be used in groups.'
+                    });
+                    break;
+                }
+                
+                await groupRelationship.showGroupAnalysis(sock, remoteJid);
+                break;
+                
+            case 'clearrelations':
+                if (!isGroup) {
+                    await sock.sendMessage(remoteJid, { 
+                        text: '⚠️ This command can only be used in groups.'
+                    });
+                    break;
+                }
+                
+                if (!isAdmin(normalizedSender)) {
+                    await sock.sendMessage(remoteJid, { 
+                        text: '⚠️ Only admins can use this command.'
+                    });
+                    break;
+                }
+                
+                await groupRelationship.clearGroupAnalysis(sock, remoteJid, sender);
+                break;
+                
             default:
                 await sock.sendMessage(remoteJid, { 
                     text: `⚠️ Unknown command: ${command}\nUse .cmds to see available commands.`
@@ -860,6 +902,15 @@ async function handleContactCommand(sock, remoteJid, args) {
 }
 
 /**
+ * Check if user is a bot admin
+ */
+function isAdmin(number) {
+    const normalizedNumber = database.normalizeNumber(number);
+    const config = require('../config');
+    return config.botAdmins.some(admin => database.normalizeNumber(admin) === normalizedNumber) || isOwner(number);
+}
+
+/**
  * Check if user is a bot owner
  */
 function isOwner(number) {
@@ -869,5 +920,7 @@ function isOwner(number) {
 }
 
 module.exports = {
-    handleCommand
+    handleCommand,
+    isOwner,
+    isAdmin
 };
