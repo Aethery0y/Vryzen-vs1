@@ -11,6 +11,7 @@ const database = require('./lib/database');
 const ai = require('./lib/ai');
 const animeNews = require('./lib/animeNews');
 const profanityFilter = require('./lib/profanityFilter');
+const contacts = require('./lib/contacts');
 const commandHandler = require('./commands');
 const config = require('./config');
 
