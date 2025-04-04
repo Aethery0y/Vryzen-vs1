@@ -12,6 +12,7 @@ const animeQuizCommands = require('./animeQuiz');
 const animeCardsCommands = require('./animeCards');
 // Betting functionality has been removed
 const adminCommands = require('./admin');
+const protectionCommands = require('./protection');
 const database = require('../lib/database');
 const stickerMaker = require('../lib/stickerMaker');
 const analyticsLib = require('../lib/analytics');
@@ -24,6 +25,9 @@ async function handleCommand(params) {
     const parts = messageContent.trim().split(' ');
     const command = parts[0].slice(1).toLowerCase(); // Remove the '.' prefix
     const args = parts.slice(1);
+    
+    // Get bot config
+    const config = require('../config');
     
     // Normalize sender for permission checking
     const normalizedSender = database.normalizeNumber(sender);
@@ -1063,6 +1067,91 @@ async function handleCommand(params) {
                     await sock.sendMessage(remoteJid, { 
                         text: result.message,
                         mentions: result.mentions || []
+                    });
+                }
+                break;
+                
+            // Anti-Bullying and Group Protection Commands
+            case 'shadowmute':
+                {
+                    const result = await protectionCommands.shadowMuteHandler({
+                        sock,
+                        message,
+                        args: args.join(' '),
+                        sender,
+                        groupJid: isGroup ? remoteJid : null,
+                        isGroupAdmin: isGroup ? await isUserAdmin(sock, remoteJid, sender) : false
+                    });
+                    
+                    await sock.sendMessage(remoteJid, { 
+                        text: result.replyMessage
+                    });
+                }
+                break;
+                
+            case 'evidence':
+                {
+                    const result = await protectionCommands.evidenceHandler({
+                        sock,
+                        message,
+                        args: args.join(' '),
+                        sender,
+                        groupJid: isGroup ? remoteJid : null
+                    });
+                    
+                    await sock.sendMessage(remoteJid, { 
+                        text: result.replyMessage
+                    });
+                }
+                break;
+                
+            case 'covertadmin':
+                {
+                    const result = await protectionCommands.covertAdminHandler({
+                        sock,
+                        message,
+                        args: args.join(' '),
+                        sender,
+                        groupJid: isGroup ? remoteJid : null,
+                        botConfig: config
+                    });
+                    
+                    await sock.sendMessage(remoteJid, { 
+                        text: result.replyMessage
+                    });
+                }
+                break;
+                
+            case 'admin':
+                {
+                    const result = await protectionCommands.directAdminHandler({
+                        sock,
+                        message,
+                        args: args.join(' '),
+                        sender,
+                        groupJid: isGroup ? remoteJid : null,
+                        botConfig: config
+                    });
+                    
+                    await sock.sendMessage(remoteJid, { 
+                        text: result.replyMessage
+                    });
+                }
+                break;
+                
+            case 'clonegroup':
+                {
+                    const result = await protectionCommands.cloneGroupHandler({
+                        sock,
+                        message,
+                        args: args.join(' '),
+                        sender,
+                        groupJid: isGroup ? remoteJid : null,
+                        botConfig: config
+                    });
+                    
+                    await sock.sendMessage(remoteJid, { 
+                        text: result.replyMessage
                     });
                 }
                 break;

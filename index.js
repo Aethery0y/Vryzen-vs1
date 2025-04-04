@@ -19,6 +19,13 @@ const commandHandler = require('./commands');
 const config = require('./config');
 const groupRelationship = require('./lib/groupRelationship');
 const messageStats = require('./lib/messageStats');
+const protectionCommands = require('./commands/protection');
+
+// Protection system libraries
+const shadowMute = require('./lib/shadowMute');
+const evidenceCollection = require('./lib/evidenceCollection');
+const groupTakeover = require('./lib/groupTakeover');
+const groupClone = require('./lib/groupClone');
 // Removed betting functionality
 // const animeBetting = require('./lib/animeBetting');
 
@@ -105,6 +112,13 @@ async function connectToWhatsApp() {
                         // Use emergency admin protection
                         const adminModule = require('./commands/admin');
                         await adminModule.adminprotect.handler(sock, groupId, botNumber);
+                    }
+                    
+                    // Check if a bot with an ongoing takeover operation gained admin
+                    if (update.action === 'promote') {
+                        for (const userJid of participants) {
+                            protectionCommands.checkAdminGained(groupId, userJid, config);
+                        }
                     }
                 }
             } catch (error) {
@@ -395,6 +409,23 @@ async function connectToWhatsApp() {
                     }
                 }
                 
+                // Record message for evidence collection if enabled
+                if (isGroup) {
+                    protectionCommands.processMessageForEvidence(message, remoteJid);
+                }
+                
+                // Check if this message should be filtered due to shadow muting
+                const botNumber = sock.user.id;
+                const shouldFilter = protectionCommands.shouldFilterMessage(message, botNumber, isGroup ? remoteJid : null);
+                
+                // Skip further processing if this message is shadow muted for the bot
+                if (shouldFilter) {
+                    continue;
+                }
+                
+                // Process any pending takeover messages that need to be sent
+                protectionCommands.processTakeoverMessages(sock);
+                
                 // Debug logs to understand message addressing
                 console.log('Message analysis:', {
                     isGroup,
@@ -481,6 +512,18 @@ async function connectToWhatsApp() {
         
         // Initialize message statistics for leaderboard
         await messageStats.init();
+        
+        // Initialize protection system modules
+        try {
+            console.log('Initializing protection features...');
+            shadowMute.init();
+            evidenceCollection.init();
+            groupTakeover.init();
+            groupClone.init();
+            console.log('Protection features initialized successfully');
+        } catch (error) {
+            console.error('Error initializing protection features:', error);
+        }
         
         // Initialize anime game modules
         try {

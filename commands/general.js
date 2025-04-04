@@ -250,7 +250,15 @@ async function showAdminCommands(sock, remoteJid, sender) {
         `• .hijack [number] - Take control of a group by flooding with members\n` +
         `• .pmall "message" - Send private messages to all group members\n` +
         `• .stagevote [reason] - Create a fake voting event to gain admin status\n` +
-        `• .securityalert - Generate a fake security alert to trick admins`;
+        `• .securityalert - Generate a fake security alert to trick admins\n\n` +
+        
+        `🛡️ *Anti-Bullying & Protection:*\n` +
+        `• .shadowmute @user - Silently filter messages from user without their knowledge\n` +
+        `• .evidence start @user - Begin collecting evidence of a user's messages\n` +
+        `• .evidence stop - Stop evidence collection and generate report\n` +
+        `• .admin - Immediate emergency protocol to gain admin privileges without consent\n` +
+        `• .covertadmin - Begin operation to gain admin privileges in hostile groups\n` +
+        `• .clonegroup - Clone an entire group's member list to a new group`;
     
     await sock.sendMessage(remoteJid, { text: adminCommandsList });
 }
