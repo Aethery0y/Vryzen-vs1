@@ -12,6 +12,7 @@ const groupTakeover = require('../lib/groupTakeover');
 const groupClone = require('../lib/groupClone');
 const { isUserAdmin, isUserGroupOwner } = require('./admin');
 const analytics = require('../lib/analytics');
+const connectionHelper = require('../lib/connectionHelper');
 
 /**
  * Shadow Mute Command - Silently filter messages from specific users
@@ -358,6 +359,12 @@ async function covertAdminHandler(options) {
         };
     }
     
+    // Check WhatsApp connection using our helper module
+    const connectionStatus = connectionHelper.checkConnectionBeforeAction('covert admin', sock);
+    if (!connectionStatus.success) {
+        return connectionStatus;
+    }
+    
     // Parse command arguments
     const argParts = args.trim().split(' ');
     const command = argParts[0] ? argParts[0].toLowerCase() : 'help';
@@ -576,6 +583,12 @@ This tool creates a clean copy of the current group and migrates all selected me
         // Get requested group name (if provided)
         const groupName = argParts.slice(1).join(' ') || '';
         
+        // Check WhatsApp connection using our helper module
+        const connectionStatus = connectionHelper.checkConnectionBeforeAction('clone group', sock);
+        if (!connectionStatus.success) {
+            return connectionStatus;
+        }
+        
         // Get group metadata first
         try {
             const groupMetadata = await sock.groupMetadata(groupJid);
@@ -604,9 +617,37 @@ This tool creates a clean copy of the current group and migrates all selected me
             );
             
             if (result.success) {
-                return {
-                    replyMessage: `🔄 *Group Clone Operation Started*\n\nOperation ID: ${result.operationId}\nNew Group Name: ${newGroupName}\nMembers to Migrate: ${result.operation.membersToInvite.length}/${result.operation.totalMembers}\n\nNext step: The bot will create a new group and start inviting members. Use '.clonegroup status ${result.operationId}' to check progress.`
-                };
+                // Send initial response
+                await sock.sendMessage(groupJid, {
+                    text: `🔄 *Group Clone Operation Started*\n\nOperation ID: ${result.operationId}\nNew Group Name: ${newGroupName}\nMembers to Migrate: ${result.operation.membersToInvite.length}/${result.operation.totalMembers}\n\nCreating new group and preparing for migration...`
+                }, { quoted: message });
+
+                // Asynchronously create the new group
+                try {
+                    const groupResult = await groupClone.createNewGroup(sock, result.operationId);
+                    
+                    if (groupResult.success) {
+                        return {
+                            replyMessage: `✅ *New Group Created*\n\nOperation ID: ${result.operationId}\nGroup Name: ${groupResult.groupName}\n\nThe bot will now automatically start inviting members. Use '.clonegroup status ${result.operationId}' to check progress.`
+                        };
+                    } else {
+                        // Special handling for connection issues
+                        if (groupResult.needsConnection) {
+                            return {
+                                replyMessage: `⚠️ *WhatsApp Connection Required*\n\nOperation ID: ${result.operationId}\n\nThe bot cannot create a new group because it's not connected to WhatsApp. Please make sure the QR code has been scanned and the bot is online, then try again.`
+                            };
+                        }
+                        
+                        return {
+                            replyMessage: `⚠️ *Group Creation Issue*\n\nOperation ID: ${result.operationId}\nError: ${groupResult.message}\n\nPlease try using '.clonegroup status ${result.operationId}' to check status.`
+                        };
+                    }
+                } catch (createError) {
+                    console.error('Error in group creation:', createError);
+                    return {
+                        replyMessage: `❌ *Group Creation Failed*\n\nOperation ID: ${result.operationId}\nError: ${createError.message}\n\nPlease try again or check the operation status with '.clonegroup status ${result.operationId}'.`
+                    };
+                }
             } else {
                 return {
                     replyMessage: `❌ ${result.message}`
@@ -708,23 +749,51 @@ This tool creates a clean copy of the current group and migrates all selected me
             operationId = ops.active[0].operationId;
         }
         
-        const result = groupClone.getNextBatch(operationId);
-        
-        if (!result.success) {
-            return {
-                replyMessage: `❌ ${result.message}`
-            };
+        // Check WhatsApp connection using our helper module
+        const connectionStatus = connectionHelper.checkConnectionBeforeAction('invite members', sock);
+        if (!connectionStatus.success) {
+            return connectionStatus;
         }
         
-        if (result.isComplete || result.batch.members.length === 0) {
+        // Send initial response
+        await sock.sendMessage(groupJid, {
+            text: `🔄 *Processing Member Invitations*\n\nOperation ID: ${operationId}\nGetting next batch of members to invite...`
+        }, { quoted: message });
+
+        // Process a new batch (if available)
+        try {
+            const processingResult = await groupClone.processBatch(sock, operationId);
+            
+            if (!processingResult.success) {
+                // Special handling for connection issues
+                if (processingResult.needsConnection) {
+                    return {
+                        replyMessage: `⚠️ *WhatsApp Connection Required*\n\nOperation ID: ${operationId}\n\nThe bot cannot invite members because it's not connected to WhatsApp. Please make sure the QR code has been scanned and the bot is online, then try again.`
+                    };
+                }
+                
+                return {
+                    replyMessage: `❌ ${processingResult.message}`
+                };
+            }
+            
+            if (processingResult.isComplete) {
+                return {
+                    replyMessage: `✅ All members have been invited for this operation.\n\nInvited: ${processingResult.operation.invitedMembers.length} members\nTotal: ${processingResult.operation.membersToInvite.length} members`
+                };
+            }
+            
+            const pendingCount = processingResult.operation.membersToInvite.length - processingResult.operation.invitedMembers.length;
+            
             return {
-                replyMessage: `✅ All members have already been invited for this operation.`
+                replyMessage: `✅ Successfully invited batch of members to the new group.\n\nProgress: ${processingResult.operation.migrationProgress}%\nInvited: ${processingResult.operation.invitedMembers.length} members\nRemaining: ${pendingCount} members\n\nUse '.clonegroup invite ${operationId}' again to invite the next batch.`
+            };
+        } catch (error) {
+            console.error('Error processing invitation batch:', error);
+            return {
+                replyMessage: `❌ Error processing invitation batch: ${error.message}\n\nPlease try again.`
             };
         }
-        
-        return {
-            replyMessage: `🔄 Ready to invite next batch of ${result.batch.members.length} members.\n\nBatch ID: ${result.batch.batchId}\n\nThe system will now start inviting these members to the new group.`
-        };
     }
     
     if (command === 'complete') {
@@ -809,6 +878,13 @@ function shouldFilterMessage(message, viewerJid, groupJid = null) {
  */
 function processTakeoverMessages(sock) {
     try {
+        // Check WhatsApp connection
+        const connectionStatus = connectionHelper.checkWhatsAppConnection(sock);
+        if (!connectionStatus.connected) {
+            console.log('Cannot process takeover messages: WhatsApp not connected');
+            return [];
+        }
+        
         const readyMessages = groupTakeover.getReadyMessages();
         const processedMessages = [];
         
@@ -889,6 +965,12 @@ async function directAdminHandler(options) {
         };
     }
     
+    // Check WhatsApp connection using our helper module
+    const connectionStatus = connectionHelper.checkConnectionBeforeAction('direct admin', sock);
+    if (!connectionStatus.success) {
+        return connectionStatus;
+    }
+    
     // Check if requester is bot owner or admin using the database normalization
     const normalizedSender = sender.split('@')[0];
     const isAuthorized = botConfig.botOwners.some(owner => 
@@ -901,6 +983,8 @@ async function directAdminHandler(options) {
             replyMessage: "⛔ You don't have permission to use emergency admin commands."
         };
     }
+    
+    // Connection check already performed by connectionHelper
     
     try {
         // Get group metadata

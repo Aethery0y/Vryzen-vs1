@@ -781,6 +781,18 @@
       "monthlyMessages": {
         "2025-04": 1
       }
+    },
+    "57596048347280": {
+      "totalMessages": 3,
+      "dailyMessages": {
+        "2025-04-04": 3
+      },
+      "weeklyMessages": {
+        "2025-14": 3
+      },
+      "monthlyMessages": {
+        "2025-04": 3
+      }
     }
   },
   "groups": {
@@ -1344,7 +1356,7 @@
       }
     },
     "120363413268272692@g.us": {
-      "totalMessages": 23,
+      "totalMessages": 26,
       "users": {
         "19147517862106": {
           "totalMessages": 1,
@@ -1560,6 +1572,18 @@
           },
           "monthlyMessages": {
             "2025-04": 1
+          }
+        },
+        "57596048347280": {
+          "totalMessages": 3,
+          "dailyMessages": {
+            "2025-04-04": 3
+          },
+          "weeklyMessages": {
+            "2025-14": 3
+          },
+          "monthlyMessages": {
+            "2025-04": 3
           }
         }
       }

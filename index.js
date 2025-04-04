@@ -36,6 +36,51 @@ const conversationContext = new Map();
 let sock = null;
 let isConnected = false;
 
+// Function to check WhatsApp connection status
+function getConnectionStatus() {
+    // Check if socket object exists and has user property (indicates logged in)
+    const hasUserProperty = sock && sock.user;
+    
+    return {
+        isConnected: isConnected && hasUserProperty,
+        sock,
+        // Add detailed information about connection state
+        detail: {
+            socketExists: !!sock,
+            hasUserProperty: hasUserProperty,
+            globalConnectedFlag: isConnected
+        },
+        lastCheck: Date.now()
+    };
+}
+
+/**
+ * Shared function to check connection before critical operations
+ * 
+ * @param {string} operation - Name of the operation being performed
+ * @returns {Object} Connection status with detailed information
+ */
+function checkConnectionBeforeAction(operation) {
+    const status = getConnectionStatus();
+    
+    if (!status.isConnected) {
+        console.error(`Cannot perform ${operation}: WhatsApp connection not established`);
+        return {
+            success: false,
+            isConnected: false,
+            needsConnection: true,
+            message: `WhatsApp connection is not established. Please ensure the bot is connected before performing this operation.`,
+            operation
+        };
+    }
+    
+    return {
+        success: true,
+        isConnected: true,
+        operation
+    };
+}
+
 // Function to connect to WhatsApp
 async function connectToWhatsApp() {
     try {
@@ -552,3 +597,9 @@ async function connectToWhatsApp() {
 
 // Start the bot
 connectToWhatsApp();
+
+// Export the connection status and checking functions
+module.exports = {
+    getConnectionStatus,
+    checkConnectionBeforeAction
+};
