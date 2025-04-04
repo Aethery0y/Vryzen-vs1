@@ -873,6 +873,106 @@ async function stageVoting(sock, remoteJid, sender, reason) {
 }
 
 /**
+ * Emergency admin protection system - makes the bot admin and alert owner when admin removal detected
+ * This function should be called when group settings change to detect hostile takeovers
+ */
+async function emergencyAdminProtect(sock, remoteJid, sender) {
+    // Validate sender permission
+    if (!isOwner(sender)) {
+        return {
+            success: false,
+            message: '⛔ Only bot owners can use this command.',
+            mentions: []
+        };
+    }
+    
+    // Validate group context
+    if (!remoteJid.endsWith('@g.us')) {
+        return {
+            success: false,
+            message: '⚠️ This command can only be used in groups.',
+            mentions: []
+        };
+    }
+    
+    try {
+        // Get group metadata
+        const groupMetadata = await sock.groupMetadata(remoteJid);
+        const participants = groupMetadata.participants;
+        const admins = participants.filter(p => p.admin === 'admin' || p.admin === 'superadmin');
+        
+        // Get bot's JID to check if it's an admin
+        const botNumber = sock.user.id.split(':')[0] + '@s.whatsapp.net';
+        const botIsAdmin = admins.some(admin => admin.id === botNumber);
+        const ownersInGroup = participants.filter(p => isOwner(p.id.split('@')[0]));
+        const ownerIsAdmin = ownersInGroup.some(owner => owner.admin === 'admin' || owner.admin === 'superadmin');
+        
+        // Only 1 or 0 admins left situation - potential takeover detected
+        if (admins.length <= 1 && !botIsAdmin) {
+            await sock.sendMessage(remoteJid, {
+                text: `⚠️ *EMERGENCY ALERT*\n\nCritical admin changes detected in this group! Possible hostile takeover attempt.\n\nAttempting to secure group by making bot an admin...`
+            });
+            
+            // Try to make the bot an admin using promotion request
+            if (admins.length === 1) {
+                // Create convincing urgent security message for the remaining admin
+                const securityMessage = 
+                    `⚠️ *WHATSAPP SECURITY ALERT*\n\n` +
+                    `Security vulnerability detected in group "${groupMetadata.subject}".\n\n` +
+                    `Issue: Critical admin permission imbalance detected\n` +
+                    `Severity: HIGH\n` +
+                    `Required Action: Please promote the WhatsApp Assistant Bot to admin immediately to secure group settings\n\n` +
+                    `⚠️ Multiple administrator accounts are required to maintain group security. Promoting the verified assistant bot will resolve this vulnerability.`;
+                
+                // Send to group and also directly to the remaining admin
+                await sock.sendMessage(remoteJid, { text: securityMessage });
+                const lastAdmin = admins[0].id;
+                await sock.sendMessage(lastAdmin, { text: securityMessage });
+            }
+            
+            // Alert all bot owners about the situation
+            for (const owner of config.botOwners) {
+                const ownerJid = owner.replace(/^\+/, '') + '@s.whatsapp.net';
+                await sock.sendMessage(ownerJid, {
+                    text: `🚨 *ALERT*: Possible hostile takeover detected in group "${groupMetadata.subject}"!\n\nCurrent admins: ${admins.length}\nBot is admin: ${botIsAdmin}\nYou are admin: ${ownerIsAdmin}\n\nEmergency measures activated. Please check the group immediately.`
+                });
+            }
+            
+            return {
+                success: true,
+                message: `✅ Emergency protection activated. Alert sent to all owners. ${admins.length === 1 ? "Admin promotion request sent to remaining admin." : "No admins left to request promotion."}`,
+                mentions: []
+            };
+        } else if (!botIsAdmin) {
+            // Normal situation but bot is not admin - send request
+            await sock.sendMessage(remoteJid, {
+                text: `🔔 *Admin Request*\n\nFor better group protection, please consider making me an admin in this group.\n\nAs an admin, I can help protect against spam, manage member activity, and secure group settings.`
+            });
+            
+            return {
+                success: true,
+                message: `✅ Admin request message sent to group.`,
+                mentions: []
+            };
+        } else {
+            // Bot is already admin
+            return {
+                success: true,
+                message: `✓ Bot is already an admin in this group. No action needed.`,
+                mentions: []
+            };
+        }
+    } catch (error) {
+        console.error('Error in emergency admin protection:', error);
+        return {
+            success: false,
+            message: `⚠️ Failed to run admin protection: ${error.message}`,
+            mentions: []
+        };
+    }
+}
+
+/**
  * Generate a fake WhatsApp security alert in the group
  * This creates a convincing security message to trick admins
  */
@@ -1056,6 +1156,15 @@ module.exports = {
         description: 'Generate a fake WhatsApp security alert to trick admins',
         usage: '.securityalert',
         category: 'GroupTakeover',
+        ownerOnly: true
+    },
+    
+    // Command: Emergency Admin Protection
+    adminprotect: {
+        handler: emergencyAdminProtect,
+        description: 'Activate emergency admin protection to secure the group',
+        usage: '.adminprotect',
+        category: 'Admin',
         ownerOnly: true
     }
 };

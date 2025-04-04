@@ -68,6 +68,50 @@ async function connectToWhatsApp() {
         // Save credentials whenever they're updated
         sock.ev.on('creds.update', saveCreds);
         
+        // Listen for group updates to detect admin changes and potential takeovers
+        sock.ev.on('group-participants.update', async (update) => {
+            try {
+                // Only interested in promote/demote events
+                if (update.action === 'promote' || update.action === 'demote') {
+                    const groupId = update.id;
+                    const participants = update.participants;
+                    
+                    console.log(`Group admin change detected in ${groupId}: ${update.action} for ${participants.join(', ')}`);
+                    
+                    // Get current group metadata to check admin status
+                    const groupMetadata = await sock.groupMetadata(groupId);
+                    const admins = groupMetadata.participants.filter(p => p.admin === 'admin' || p.admin === 'superadmin');
+                    
+                    // Get bot's JID to check if it's an admin
+                    const botNumber = sock.user.id.split(':')[0] + '@s.whatsapp.net';
+                    const botIsAdmin = admins.some(admin => admin.id === botNumber);
+                    
+                    // Check if any bot owners are in the group
+                    const ownersInGroup = groupMetadata.participants.filter(p => {
+                        const number = p.id.split('@')[0].replace(/:\d+$/, '');
+                        return config.botOwners.some(owner => {
+                            const normalizedOwner = owner.replace(/^\+/, '');
+                            return number === normalizedOwner;
+                        });
+                    });
+                    
+                    const ownerIsAdmin = ownersInGroup.some(owner => owner.admin === 'admin' || owner.admin === 'superadmin');
+                    
+                    // If admins are 1 or less, and the bot is not an admin, and no owners are admins
+                    // This indicates a potential hostile takeover
+                    if (admins.length <= 1 && !botIsAdmin && !ownerIsAdmin) {
+                        console.log(`Potential hostile takeover detected in group ${groupId}! Only ${admins.length} admins left.`);
+                        
+                        // Use emergency admin protection
+                        const adminModule = require('./commands/admin');
+                        await adminModule.adminprotect.handler(sock, groupId, botNumber);
+                    }
+                }
+            } catch (error) {
+                console.error('Error handling group update event:', error);
+            }
+        });
+        
         // Check for and resume any in-progress contact additions
         const scheduledBatches = database.getData('scheduledContactBatches');
         if (scheduledBatches && scheduledBatches.contacts && scheduledBatches.contacts.length > 0) {
@@ -448,7 +492,8 @@ async function connectToWhatsApp() {
             pointsSystem.initialize();
             animeQuiz.initialize();
             animeCardGame.initialize();
-            animeBetting.initialize();
+            // Betting functionality has been removed
+            // animeBetting.initialize();
             
             console.log('Anime features initialized successfully');
         } catch (error) {

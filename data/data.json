@@ -2601,6 +2601,14 @@
       "messageType": "text",
       "isCommand": false,
       "command": null
+    },
+    {
+      "timestamp": 1743752970947,
+      "sender": "51162220871844",
+      "group": "120363361913572883@g.us",
+      "messageType": "text",
+      "isCommand": false,
+      "command": null
     }
   ],
   "groupInteractionData": {
@@ -3323,10 +3331,20 @@
             "messageTypes": {
               "text": 1
             }
+          },
+          "51162220871844": {
+            "messageCount": 1,
+            "firstSeen": 1743752970949,
+            "lastActivity": 1743752970949,
+            "interactedWith": {},
+            "messageTypes": {
+              "text": 1
+            },
+            "repliedToCount": 0
           }
         },
         "interactions": [],
-        "lastUpdate": 1743745310766
+        "lastUpdate": 1743752970949
       },
       "120363413268272692@g.us": {
         "members": {
@@ -4023,14 +4041,6 @@
   "scheduledContactBatches": {
     "groupId": "120363401304716862@g.us",
     "contacts": [
-      "6285134522947@s.whatsapp.net",
-      "2349159221138@s.whatsapp.net",
-      "918260857266@s.whatsapp.net",
-      "201100396759@s.whatsapp.net",
-      "233533757770@s.whatsapp.net",
-      "919815422453@s.whatsapp.net",
-      "6282181074209@s.whatsapp.net",
-      "233592805850@s.whatsapp.net",
       "6281299492232@s.whatsapp.net",
       "918118920163@s.whatsapp.net",
       "923264727145@s.whatsapp.net",
