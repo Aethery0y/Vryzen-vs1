@@ -18,6 +18,7 @@ const autoReply = require('./lib/autoReply');
 const commandHandler = require('./commands');
 const config = require('./config');
 const groupRelationship = require('./lib/groupRelationship');
+const messageStats = require('./lib/messageStats');
 
 // Conversation context map (for short-term memory)
 const conversationContext = new Map();
@@ -86,8 +87,13 @@ async function connectToWhatsApp() {
         // Handle incoming messages
         sock.ev.on('messages.upsert', async ({ messages }) => {
             for (const message of messages) {
-                // Skip status updates and messages sent by the bot
-                if (message.key.remoteJid === 'status@broadcast' || message.key.fromMe) continue;
+                // Skip status updates
+                if (message.key.remoteJid === 'status@broadcast') continue;
+                
+                // Define basic variables needed for message processing
+                let remoteJid = message.key.remoteJid;
+                let sender = message.key.participant || remoteJid;
+                let isGroup = remoteJid.endsWith('@g.us');
                 
                 // Check if user is silenced (if groupInfluence module exists)
                 try {
@@ -106,9 +112,14 @@ async function connectToWhatsApp() {
                                       message.message?.imageMessage?.caption || 
                                       message.message?.videoMessage?.caption || '';
                 
-                const remoteJid = message.key.remoteJid;
-                const sender = message.key.participant || remoteJid;
-                const isGroup = remoteJid.endsWith('@g.us');
+                // Check if message is from the bot itself (key.fromMe is true)
+                if (message.key.fromMe) {
+                    // If it's not a command (doesn't start with '.'), skip processing
+                    if (!messageContent.startsWith('.')) {
+                        continue;
+                    }
+                    console.log('Processing command from bot number:', sender);
+                }
                 // Debugging the message structure for quoted replies
                 const contextInfo = message.message?.extendedTextMessage?.contextInfo || 
                                   message.message?.imageMessage?.contextInfo ||
@@ -254,6 +265,15 @@ async function connectToWhatsApp() {
                     isCommand: false
                 });
                 
+                // Record message for statistics and leaderboard
+                if (isGroup && messageType === 'text') {
+                    messageStats.recordMessage({
+                        sender,
+                        group: remoteJid,
+                        timestamp: Date.now()
+                    });
+                }
+                
                 // Record interaction for group relationship analysis
                 if (isGroup) {
                     // Extract quoted message sender for relationship tracking
@@ -398,6 +418,9 @@ async function connectToWhatsApp() {
         
         // Initialize group relationship module
         await groupRelationship.init();
+        
+        // Initialize message statistics for leaderboard
+        await messageStats.init();
         
         return sock;
     } catch (err) {

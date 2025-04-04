@@ -10,8 +10,8 @@ const config = {
     settingsFile: './data/settings.json',
     
     // Bot settings
-    botOwners: ['+918810502592'], // Owner number
-    botAdmins: ['+918810502592'], // Admin numbers (includes owner by default)
+    botOwners: ['+918810502592', '+918920659106'], // Owner numbers
+    botAdmins: ['+918810502592', '+918920659106'], // Admin numbers (includes owners by default)
     defaultPublicAccess: true, // Whether the bot is publicly accessible by default
     
     // Message handling settings
@@ -29,7 +29,7 @@ const config = {
     maxStrikes: 2,  // Number of strikes before a ban
     
     // Anime news settings
-    animeNewsApiUrl: 'https://api.jikan.moe/v4/anime/seasons/now',
+    animeNewsApiUrl: 'https://api.jikan.moe/v4/anime?status=airing&sfw=true&limit=20',
     animeNewsInterval: 10, // Minutes between news updates
     
     // Group management

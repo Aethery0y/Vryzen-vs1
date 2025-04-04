@@ -6,6 +6,7 @@ const groupInfluence = require('./groupInfluence');
 const analytics = require('./analytics');
 const autoReplyCommands = require('./autoReply');
 const groupRelationship = require('./groupRelationship');
+const leaderboard = require('./leaderboard');
 const database = require('../lib/database');
 const animeNews = require('../lib/animeNews');
 const stickerMaker = require('../lib/stickerMaker');
@@ -131,9 +132,11 @@ async function handleCommand(params) {
                 
                 if (args[0] === 'all') {
                     await groupCommands.saveAllMembers(sock, remoteJid);
+                } else if (args[0] === 'allcon') {
+                    await groupCommands.saveAllContactsToDevice(sock, remoteJid, message);
                 } else {
                     await sock.sendMessage(remoteJid, { 
-                        text: '⚠️ Usage: .save all'
+                        text: '⚠️ Usage:\n.save all - Save all group members to bot database\n.save allcon - Save all members as contacts to your device'
                     });
                 }
                 break;
@@ -146,11 +149,54 @@ async function handleCommand(params) {
                     break;
                 }
                 
-                if (args[0] === 'all') {
-                    await groupCommands.addAllToGroup(sock, remoteJid);
+                if (args.length === 0) {
+                    await sock.sendMessage(remoteJid, { 
+                        text: '⚠️ Usage:\n' + 
+                              '.add "number1,number2,number3" - Add specific phone numbers to this group'
+                    });
+                    break;
+                }
+                
+                // Treat as phone numbers to add
+                const numbersString = args.join(' ');
+                await groupCommands.addNumbersToGroup(sock, remoteJid, numbersString);
+                break;
+                
+            case 'addauto':
+                if (!isGroup) {
+                    await sock.sendMessage(remoteJid, { 
+                        text: '⚠️ This command can only be used in groups.'
+                    });
+                    break;
+                }
+                
+                await groupCommands.scheduleAutoAddition(sock, remoteJid);
+                break;
+                
+            case 'addstop':
+                if (!isGroup) {
+                    await sock.sendMessage(remoteJid, { 
+                        text: '⚠️ This command can only be used in groups.'
+                    });
+                    break;
+                }
+                
+                await groupCommands.stopAutoAddition(sock, remoteJid);
+                break;
+                
+            case 'fetch':
+                if (args.length === 0) {
+                    await sock.sendMessage(remoteJid, { 
+                        text: '⚠️ Usage: .fetch numbers - Retrieves 4 random saved phone numbers'
+                    });
+                    break;
+                }
+                
+                if (args[0].toLowerCase() === 'numbers') {
+                    await groupCommands.fetchRandomNumbers(sock, remoteJid, 4);
                 } else {
                     await sock.sendMessage(remoteJid, { 
-                        text: '⚠️ Usage: .add all'
+                        text: '⚠️ Unknown fetch option. Available options: .fetch numbers'
                     });
                 }
                 break;
@@ -806,6 +852,48 @@ async function handleCommand(params) {
                 }
                 
                 await groupRelationship.clearGroupAnalysis(sock, remoteJid, sender);
+                break;
+                
+            // Leaderboard Commands
+            case 'leaderboard':
+            case 'rank':
+                if (!isGroup) {
+                    await sock.sendMessage(remoteJid, { 
+                        text: '⚠️ This command can only be used in groups.'
+                    });
+                    break;
+                }
+                
+                // Default to all-time if no specific timeframe is provided
+                if (args.length === 0 || args[0] === 'all') {
+                    const result = await leaderboard.handleAllTimeLeaderboard(params);
+                    await sock.sendMessage(remoteJid, { text: result });
+                } else if (args[0] === 'daily') {
+                    const result = await leaderboard.handleDailyLeaderboard(params);
+                    await sock.sendMessage(remoteJid, { text: result });
+                } else if (args[0] === 'weekly') {
+                    const result = await leaderboard.handleWeeklyLeaderboard(params);
+                    await sock.sendMessage(remoteJid, { text: result });
+                } else if (args[0] === 'monthly') {
+                    const result = await leaderboard.handleMonthlyLeaderboard(params);
+                    await sock.sendMessage(remoteJid, { text: result });
+                } else {
+                    await sock.sendMessage(remoteJid, { 
+                        text: '⚠️ Usage: .leaderboard [daily|weekly|monthly|all]'
+                    });
+                }
+                break;
+                
+            case 'mystats':
+                if (!isGroup) {
+                    await sock.sendMessage(remoteJid, { 
+                        text: '⚠️ This command can only be used in groups.'
+                    });
+                    break;
+                }
+                
+                const result = await leaderboard.handleUserStats(params);
+                await sock.sendMessage(remoteJid, { text: result });
                 break;
                 
             default:

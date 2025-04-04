@@ -17,9 +17,15 @@ async function showCommands(sock, remoteJid) {
         
         `*Group Commands:*\n` +
         `• .save all - Save all group members' numbers\n` +
-        `• .add all - Add saved numbers to the current group\n` +
+        `• .save allcon - Export all members as contacts file to your device\n` +
+        `• .add "number1,number2" - Add specific numbers to the group\n` +
+        `• .add auto - Start auto-adding one contact per minute\n` +
+        `• .addstop - Stop the auto-adding process\n` +
+        `• .fetch numbers - Get random numbers from saved contacts\n` +
         `• .tag all "message" - Tag all group members\n` +
-        `• .relationships - Show group relationships analysis\n\n` +
+        `• .relationships - Show group relationships analysis\n` +
+        `• .leaderboard [daily|weekly|monthly|all] - Show message rankings\n` +
+        `• .mystats - Show your own message statistics\n\n` +
         
         `*Privacy Commands:*\n` +
         `• .private - Restrict bot access to allowed users only\n` +
@@ -191,6 +197,7 @@ async function showAdminCommands(sock, remoteJid, sender) {
         `• .persona "style" - Change AI response style\n` +
         `• .remember "info" - Store info for contextual responses\n` +
         `• .recall - View your stored information\n` +
+        `• .leaderboard [daily|weekly|monthly|all] - Show message rankings\n` +
         `• .clearrelations - Clear relationship analysis data`;
     
     await sock.sendMessage(remoteJid, { text: adminCommandsList });
