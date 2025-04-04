@@ -1,3 +1,17 @@
+/**
+ * WhatsApp Group Command Handlers
+ * 
+ * This module provides command handlers for various group-related functions:
+ * - Saving group members to contacts
+ * - Adding contacts to groups
+ * - Tagging all members
+ * - Generating vCard files
+ * 
+ * NOTE: The automatic contact addition features (scheduleAutoAddition and stopAutoAddition)
+ * have been disabled for security reasons as requested. These functions now return
+ * error messages informing users that this functionality has been removed.
+ */
+
 const database = require('../lib/database');
 const groupManagement = require('../lib/groupManagement');
 
@@ -196,99 +210,38 @@ async function addNumbersToGroup(sock, groupId, numbersString) {
  * @param {string} groupId - The group JID
  * @returns {Promise<void>}
  */
+/**
+ * This feature has been disabled for security reasons
+ * @deprecated
+ */
 async function scheduleAutoAddition(sock, groupId) {
     try {
-        // Send initial status message
         await sock.sendMessage(groupId, { 
-            text: '⏳ Setting up automatic contact addition...'
+            text: '⚠️ The automatic contact addition feature has been disabled for security reasons.'
         });
-        
-        // Check if bot is admin in the group
-        try {
-            const groupMetadata = await sock.groupMetadata(groupId);
-            const botNumber = sock.user.id.split(':')[0];
-            const botJid = `${botNumber}@s.whatsapp.net`;
-            const botParticipant = groupMetadata.participants.find(p => p.id === botJid);
-            const isAdmin = botParticipant && ['admin', 'superadmin'].includes(botParticipant.admin);
-            
-            if (!isAdmin) {
-                // Send warning that bot is not admin but can still generate invite links
-                await sock.sendMessage(groupId, {
-                    text: `⚠️ I'm not an admin in this group.\n\nI'll still proceed with auto-adding, but WhatsApp will generate invite links instead of directly adding members. These links will be posted here and are valid for 6 days.`
-                });
-            }
-        } catch (metadataError) {
-            console.error('Error checking group metadata:', metadataError);
-        }
-        
-        // Schedule the random contacts addition
-        const result = await groupManagement.scheduleRandomContactAddition(sock, groupId);
-        
-        // Send result based on success
-        if (!result.success) {
-            await sock.sendMessage(groupId, { 
-                text: `⚠️ ${result.message || 'Could not set up automatic contact addition.'}`
-            });
-            return;
-        }
-        
-        // Success message
-        await sock.sendMessage(groupId, { 
-            text: `✅ ${result.message}\n\n` +
-                  `The system will randomly select one saved contact at a time and add them to this group every minute.\n\n` +
-                  `• Total contacts in queue: ${result.total}\n` +
-                  `• First addition will start in 1 minute\n` +
-                  `• WhatsApp invite links will be generated for each contact\n` +
-                  `• Use '.addstop' to cancel this process at any time`
-        });
-        
     } catch (error) {
-        console.error('Error scheduling auto addition:', error);
-        
-        // Send error message
-        await sock.sendMessage(groupId, { 
-            text: `❌ Error setting up automatic contact addition: ${error.message}`
-        });
+        console.error('Error sending auto-add disabled message:', error);
     }
 }
 
 /**
- * Stop the automatic contact addition process
- * 
- * @param {Object} sock - The WhatsApp socket
- * @param {string} groupId - The group JID
- * @returns {Promise<void>}
+ * This feature has been disabled for security reasons
+ * @deprecated
  */
 async function stopAutoAddition(sock, groupId) {
     try {
-        // Get the scheduled data
+        await sock.sendMessage(groupId, { 
+            text: '⚠️ The automatic contact addition feature has been disabled for security reasons.'
+        });
+        
+        // Clear any existing auto-add data if it exists
         const scheduledRandomAdds = database.getData('scheduledRandomAdds');
-        
-        // Check if there's an active process for this group
-        if (!scheduledRandomAdds || scheduledRandomAdds.groupId !== groupId || !scheduledRandomAdds.isActive) {
-            await sock.sendMessage(groupId, { 
-                text: `ℹ️ There is no active automatic contact addition process running for this group.`
-            });
-            return;
+        if (scheduledRandomAdds) {
+            scheduledRandomAdds.isActive = false;
+            database.saveData('scheduledRandomAdds', scheduledRandomAdds);
         }
-        
-        // Stop the process by setting isActive to false
-        scheduledRandomAdds.isActive = false;
-        database.saveData('scheduledRandomAdds', scheduledRandomAdds);
-        
-        // Send success message
-        await sock.sendMessage(groupId, { 
-            text: `✅ Stopped the automatic contact addition process.\n` +
-                  `There were ${scheduledRandomAdds.contacts.length} contacts remaining in the queue.`
-        });
-        
     } catch (error) {
-        console.error('Error stopping auto addition:', error);
-        
-        // Send error message
-        await sock.sendMessage(groupId, { 
-            text: `❌ Error stopping the automatic contact addition: ${error.message}`
-        });
+        console.error('Error sending auto-add disabled message:', error);
     }
 }
 

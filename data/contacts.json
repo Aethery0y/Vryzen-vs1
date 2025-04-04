@@ -2475,8 +2475,8 @@
     "labels": [
       "group_member"
     ],
-    "engagement": 0,
-    "lastInteraction": 1743713616463,
+    "engagement": 5,
+    "lastInteraction": 1743745495541,
     "metadata": {
       "id": "254791708824@s.whatsapp.net",
       "admin": null,
@@ -2657,8 +2657,8 @@
     "labels": [
       "group_member"
     ],
-    "engagement": 0,
-    "lastInteraction": 1743713616471,
+    "engagement": 1,
+    "lastInteraction": 1743745473111,
     "metadata": {
       "id": "918929491486@s.whatsapp.net",
       "admin": null,
@@ -3609,6 +3609,27 @@
     "labels": [],
     "engagement": 1,
     "lastInteraction": 1743717072811,
+    "metadata": {}
+  },
+  "+923480528514": {
+    "number": "+923480528514",
+    "labels": [],
+    "engagement": 1,
+    "lastInteraction": 1743745216447,
+    "metadata": {}
+  },
+  "+19147517862106": {
+    "number": "+19147517862106",
+    "labels": [],
+    "engagement": 1,
+    "lastInteraction": 1743745235558,
+    "metadata": {}
+  },
+  "+77619269775612": {
+    "number": "+77619269775612",
+    "labels": [],
+    "engagement": 1,
+    "lastInteraction": 1743745310765,
     "metadata": {}
   }
 }
