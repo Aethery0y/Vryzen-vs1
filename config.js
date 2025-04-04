@@ -38,11 +38,8 @@ const config = {
     addContactsDelay: 60000, // Delay in ms between adding contacts (1 minute)
     contactBatchSize: 4,     // How many contacts to add at once
     
-    // Bad words list for profanity filter
-    badWords: [
-        'mf', 'motherf', 'mothaf', 'f u', 'fu', 'bs', 'bitch', 'bastard', 'asshole', 
-        'shit', 'fuck', 'dick', 'pussy', 'whore', 'slut'
-    ],
+    // Bad words list for profanity filter (currently disabled)
+    badWords: [],
     
     // Anime game settings
     animeGames: {
@@ -74,6 +71,16 @@ const config = {
             cardGachaInterval: 6, // Hours between free card gacha
             tradeRatio: 3, // Number of lower tier cards needed to trade up
             maxInventorySize: 100 // Max cards in inventory
+        },
+        
+        // Betting system settings
+        betting: {
+            minBetAmount: 50,
+            maxBetAmount: 5000,
+            defaultMultiplier: 2.0,
+            gameExpiry: 3, // Hours until a betting game auto-expires
+            maxActiveBetsPerUser: 5,
+            maxActiveBetsPerGroup: 10
         }
     }
 };

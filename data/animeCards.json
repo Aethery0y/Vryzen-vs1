@@ -1,6 +1,51 @@
 {
-  "playerCards": {},
-  "cardHistory": {},
+  "playerCards": {
+    "918810502592": [
+      {
+        "id": "c004",
+        "name": "Armin Arlert",
+        "anime": "Attack on Titan",
+        "rarity": "common",
+        "description": "A strategic genius and member of the Survey Corps",
+        "power": 18,
+        "instanceId": "c004_1743747588802_5297",
+        "acquiredAt": 1743747588802
+      },
+      {
+        "id": "c002",
+        "name": "Krillin",
+        "anime": "Dragon Ball",
+        "rarity": "common",
+        "description": "A skilled martial artist and close friend of Goku",
+        "power": 20,
+        "instanceId": "c002_1743748336442_9519",
+        "acquiredAt": 1743748336442
+      }
+    ]
+  },
+  "cardHistory": {
+    "918810502592": [
+      {
+        "cardId": "c004",
+        "instanceId": "c004_1743747588802_5297",
+        "name": "Armin Arlert",
+        "rarity": "common",
+        "timestamp": 1743747588802
+      },
+      {
+        "cardId": "c002",
+        "instanceId": "c002_1743748336442_9519",
+        "name": "Krillin",
+        "rarity": "common",
+        "timestamp": 1743748336442
+      }
+    ]
+  },
   "tradeLogs": [],
-  "dailyDraws": {}
+  "dailyDraws": {
+    "918810502592": {
+      "count": 2,
+      "lastDrawTime": 1743748336442
+    }
+  }
 }

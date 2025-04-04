@@ -19,6 +19,7 @@ const commandHandler = require('./commands');
 const config = require('./config');
 const groupRelationship = require('./lib/groupRelationship');
 const messageStats = require('./lib/messageStats');
+const animeBetting = require('./lib/animeBetting');
 
 // Conversation context map (for short-term memory)
 const conversationContext = new Map();
@@ -455,6 +456,8 @@ async function connectToWhatsApp() {
             pointsSystem.initialize();
             animeQuiz.initialize();
             animeCardGame.initialize();
+            animeBetting.initialize();
+            
             console.log('Anime features initialized successfully');
         } catch (error) {
             console.error('Error initializing anime features:', error);

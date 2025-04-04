@@ -1625,6 +1625,630 @@
       "messageType": "text",
       "isCommand": false,
       "command": null
+    },
+    {
+      "timestamp": 1743746070374,
+      "sender": "254791708824",
+      "group": "120363197551475655@g.us",
+      "messageType": "text",
+      "isCommand": false,
+      "command": null
+    },
+    {
+      "timestamp": 1743746077341,
+      "sender": "254791708824",
+      "group": "120363197551475655@g.us",
+      "messageType": "text",
+      "isCommand": false,
+      "command": null
+    },
+    {
+      "timestamp": 1743746142205,
+      "sender": "923152251883",
+      "group": "120363245752093043@g.us",
+      "messageType": "text",
+      "isCommand": false,
+      "command": null
+    },
+    {
+      "timestamp": 1743746142304,
+      "sender": "102272281387072",
+      "group": "120363413268272692@g.us",
+      "messageType": "text",
+      "isCommand": false,
+      "command": null
+    },
+    {
+      "timestamp": 1743746362583,
+      "sender": "918810502592",
+      "group": "120363197551475655@g.us",
+      "messageType": "text",
+      "isCommand": false,
+      "command": null
+    },
+    {
+      "timestamp": 1743746468556,
+      "sender": "918169674566",
+      "group": "120363197551475655@g.us",
+      "messageType": "text",
+      "isCommand": false,
+      "command": null
+    },
+    {
+      "timestamp": 1743746483420,
+      "sender": "918169674566",
+      "group": "120363197551475655@g.us",
+      "messageType": "text",
+      "isCommand": false,
+      "command": null
+    },
+    {
+      "timestamp": 1743746521004,
+      "sender": "918169674566",
+      "group": "120363197551475655@g.us",
+      "messageType": "text",
+      "isCommand": false,
+      "command": null
+    },
+    {
+      "timestamp": 1743746526854,
+      "sender": "120363197551475655",
+      "group": "120363197551475655@g.us",
+      "messageType": "text",
+      "isCommand": false,
+      "command": null
+    },
+    {
+      "timestamp": 1743746527317,
+      "sender": "918169674566",
+      "group": "120363197551475655@g.us",
+      "messageType": "text",
+      "isCommand": false,
+      "command": null
+    },
+    {
+      "timestamp": 1743746531782,
+      "sender": "918810502592",
+      "group": "120363197551475655@g.us",
+      "messageType": "text",
+      "isCommand": false,
+      "command": null
+    },
+    {
+      "timestamp": 1743746536764,
+      "sender": "918169674566",
+      "group": "120363197551475655@g.us",
+      "messageType": "text",
+      "isCommand": false,
+      "command": null
+    },
+    {
+      "timestamp": 1743746582915,
+      "sender": "923202609045",
+      "group": "120363245752093043@g.us",
+      "messageType": "text",
+      "isCommand": false,
+      "command": null
+    },
+    {
+      "timestamp": 1743746615473,
+      "sender": "918169674566",
+      "group": "120363197551475655@g.us",
+      "messageType": "text",
+      "isCommand": false,
+      "command": null
+    },
+    {
+      "timestamp": 1743746620955,
+      "sender": "918169674566",
+      "group": "120363197551475655@g.us",
+      "messageType": "text",
+      "isCommand": false,
+      "command": null
+    },
+    {
+      "timestamp": 1743746621314,
+      "sender": "120363197551475655",
+      "group": "120363197551475655@g.us",
+      "messageType": "text",
+      "isCommand": false,
+      "command": null
+    },
+    {
+      "timestamp": 1743746665226,
+      "sender": "918169674566",
+      "group": "120363197551475655@g.us",
+      "messageType": "text",
+      "isCommand": false,
+      "command": null
+    },
+    {
+      "timestamp": 1743746671570,
+      "sender": "918810502592",
+      "group": "120363197551475655@g.us",
+      "messageType": "text",
+      "isCommand": false,
+      "command": null
+    },
+    {
+      "timestamp": 1743746717093,
+      "sender": "918810502592",
+      "group": "120363197551475655@g.us",
+      "messageType": "text",
+      "isCommand": false,
+      "command": null
+    },
+    {
+      "timestamp": 1743746739550,
+      "sender": "918810502592",
+      "group": "120363197551475655@g.us",
+      "messageType": "text",
+      "isCommand": false,
+      "command": null
+    },
+    {
+      "timestamp": 1743746816986,
+      "sender": "918169674566",
+      "group": "120363197551475655@g.us",
+      "messageType": "text",
+      "isCommand": false,
+      "command": null
+    },
+    {
+      "timestamp": 1743746825209,
+      "sender": "918810502592",
+      "group": "120363197551475655@g.us",
+      "messageType": "text",
+      "isCommand": false,
+      "command": null
+    },
+    {
+      "timestamp": 1743746838627,
+      "sender": "918169674566",
+      "group": "120363197551475655@g.us",
+      "messageType": "text",
+      "isCommand": false,
+      "command": null
+    },
+    {
+      "timestamp": 1743746847095,
+      "sender": "918810502592",
+      "group": "120363197551475655@g.us",
+      "messageType": "text",
+      "isCommand": false,
+      "command": null
+    },
+    {
+      "timestamp": 1743746854098,
+      "sender": "918169674566",
+      "group": "120363197551475655@g.us",
+      "messageType": "text",
+      "isCommand": false,
+      "command": null
+    },
+    {
+      "timestamp": 1743746855550,
+      "sender": "918169674566",
+      "group": "120363197551475655@g.us",
+      "messageType": "text",
+      "isCommand": false,
+      "command": null
+    },
+    {
+      "timestamp": 1743746863669,
+      "sender": "918810502592",
+      "group": "120363197551475655@g.us",
+      "messageType": "text",
+      "isCommand": false,
+      "command": null
+    },
+    {
+      "timestamp": 1743746909303,
+      "sender": "918169674566",
+      "group": "120363197551475655@g.us",
+      "messageType": "text",
+      "isCommand": false,
+      "command": null
+    },
+    {
+      "timestamp": 1743746934190,
+      "sender": "918810502592",
+      "group": "120363197551475655@g.us",
+      "messageType": "text",
+      "isCommand": false,
+      "command": null
+    },
+    {
+      "timestamp": 1743746942002,
+      "sender": "918810502592",
+      "group": "120363197551475655@g.us",
+      "messageType": "text",
+      "isCommand": false,
+      "command": null
+    },
+    {
+      "timestamp": 1743746966086,
+      "sender": "918810502592",
+      "group": "120363197551475655@g.us",
+      "messageType": "text",
+      "isCommand": false,
+      "command": null
+    },
+    {
+      "timestamp": 1743746982670,
+      "sender": "918169674566",
+      "group": "120363197551475655@g.us",
+      "messageType": "text",
+      "isCommand": false,
+      "command": null
+    },
+    {
+      "timestamp": 1743747038980,
+      "sender": "918169674566",
+      "group": "120363197551475655@g.us",
+      "messageType": "text",
+      "isCommand": false,
+      "command": null
+    },
+    {
+      "timestamp": 1743747087806,
+      "sender": "918169674566",
+      "group": "120363197551475655@g.us",
+      "messageType": "text",
+      "isCommand": false,
+      "command": null
+    },
+    {
+      "timestamp": 1743747092971,
+      "sender": "919699982697",
+      "group": "120363197551475655@g.us",
+      "messageType": "text",
+      "isCommand": false,
+      "command": null
+    },
+    {
+      "timestamp": 1743747093451,
+      "sender": "918169674566",
+      "group": "120363197551475655@g.us",
+      "messageType": "text",
+      "isCommand": false,
+      "command": null
+    },
+    {
+      "timestamp": 1743747125980,
+      "sender": "918169674566",
+      "group": "120363197551475655@g.us",
+      "messageType": "text",
+      "isCommand": false,
+      "command": null
+    },
+    {
+      "timestamp": 1743747139398,
+      "sender": "919699982697",
+      "group": "120363197551475655@g.us",
+      "messageType": "text",
+      "isCommand": false,
+      "command": null
+    },
+    {
+      "timestamp": 1743747145244,
+      "sender": "918810502592",
+      "group": "120363197551475655@g.us",
+      "messageType": "text",
+      "isCommand": false,
+      "command": null
+    },
+    {
+      "timestamp": 1743747151348,
+      "sender": "918169674566",
+      "group": "120363197551475655@g.us",
+      "messageType": "text",
+      "isCommand": false,
+      "command": null
+    },
+    {
+      "timestamp": 1743747151913,
+      "sender": "919699982697",
+      "group": "120363197551475655@g.us",
+      "messageType": "text",
+      "isCommand": false,
+      "command": null
+    },
+    {
+      "timestamp": 1743747157587,
+      "sender": "919699982697",
+      "group": "120363197551475655@g.us",
+      "messageType": "text",
+      "isCommand": false,
+      "command": null
+    },
+    {
+      "timestamp": 1743747158509,
+      "sender": "919699982697",
+      "group": "120363197551475655@g.us",
+      "messageType": "text",
+      "isCommand": false,
+      "command": null
+    },
+    {
+      "timestamp": 1743747158730,
+      "sender": "919699982697",
+      "group": "120363197551475655@g.us",
+      "messageType": "text",
+      "isCommand": false,
+      "command": null
+    },
+    {
+      "timestamp": 1743747164504,
+      "sender": "919699982697",
+      "group": "120363197551475655@g.us",
+      "messageType": "text",
+      "isCommand": false,
+      "command": null
+    },
+    {
+      "timestamp": 1743747164558,
+      "sender": "918169674566",
+      "group": "120363197551475655@g.us",
+      "messageType": "text",
+      "isCommand": false,
+      "command": null
+    },
+    {
+      "timestamp": 1743747182005,
+      "sender": "919699982697",
+      "group": "120363197551475655@g.us",
+      "messageType": "text",
+      "isCommand": false,
+      "command": null
+    },
+    {
+      "timestamp": 1743747211684,
+      "sender": "918810502592",
+      "group": "120363197551475655@g.us",
+      "messageType": "text",
+      "isCommand": false,
+      "command": null
+    },
+    {
+      "timestamp": 1743747219985,
+      "sender": "972547712954",
+      "group": "120363197551475655@g.us",
+      "messageType": "text",
+      "isCommand": false,
+      "command": null
+    },
+    {
+      "timestamp": 1743747241234,
+      "sender": "918169674566",
+      "group": "120363197551475655@g.us",
+      "messageType": "text",
+      "isCommand": false,
+      "command": null
+    },
+    {
+      "timestamp": 1743747260495,
+      "sender": "918810502592",
+      "group": "120363197551475655@g.us",
+      "messageType": "text",
+      "isCommand": false,
+      "command": null
+    },
+    {
+      "timestamp": 1743747272750,
+      "sender": "919699982697",
+      "group": "120363197551475655@g.us",
+      "messageType": "text",
+      "isCommand": false,
+      "command": null
+    },
+    {
+      "timestamp": 1743747293699,
+      "sender": "919699982697",
+      "group": "120363197551475655@g.us",
+      "messageType": "text",
+      "isCommand": false,
+      "command": null
+    },
+    {
+      "timestamp": 1743747351645,
+      "sender": "918810502592",
+      "group": "120363197551475655@g.us",
+      "messageType": "text",
+      "isCommand": false,
+      "command": null
+    },
+    {
+      "timestamp": 1743747370527,
+      "sender": "919699982697",
+      "group": "120363197551475655@g.us",
+      "messageType": "text",
+      "isCommand": false,
+      "command": null
+    },
+    {
+      "timestamp": 1743747395664,
+      "sender": "919699982697",
+      "group": "120363197551475655@g.us",
+      "messageType": "text",
+      "isCommand": false,
+      "command": null
+    },
+    {
+      "timestamp": 1743747399950,
+      "sender": "919699982697",
+      "group": "120363197551475655@g.us",
+      "messageType": "text",
+      "isCommand": false,
+      "command": null
+    },
+    {
+      "timestamp": 1743747409323,
+      "sender": "918810502592",
+      "group": "120363197551475655@g.us",
+      "messageType": "text",
+      "isCommand": false,
+      "command": null
+    },
+    {
+      "timestamp": 1743747418319,
+      "sender": "919699982697",
+      "group": "120363197551475655@g.us",
+      "messageType": "text",
+      "isCommand": false,
+      "command": null
+    },
+    {
+      "timestamp": 1743747423261,
+      "sender": "918810502592",
+      "group": "120363197551475655@g.us",
+      "messageType": "text",
+      "isCommand": false,
+      "command": null
+    },
+    {
+      "timestamp": 1743747429596,
+      "sender": "918810502592",
+      "group": "120363197551475655@g.us",
+      "messageType": "text",
+      "isCommand": false,
+      "command": null
+    },
+    {
+      "timestamp": 1743747456332,
+      "sender": "918810502592",
+      "group": "120363197551475655@g.us",
+      "messageType": "text",
+      "isCommand": false,
+      "command": null
+    },
+    {
+      "timestamp": 1743747868084,
+      "sender": "918476881591",
+      "group": "120363197551475655@g.us",
+      "messageType": "text",
+      "isCommand": false,
+      "command": null
+    },
+    {
+      "timestamp": 1743747877217,
+      "sender": "2349055848294",
+      "group": "120363368631211382@g.us",
+      "messageType": "text",
+      "isCommand": false,
+      "command": null
+    },
+    {
+      "timestamp": 1743747883361,
+      "sender": "120363368631211382",
+      "group": "120363368631211382@g.us",
+      "messageType": "text",
+      "isCommand": false,
+      "command": null
+    },
+    {
+      "timestamp": 1743747924472,
+      "sender": "2349055848294",
+      "group": "120363368631211382@g.us",
+      "messageType": "text",
+      "isCommand": false,
+      "command": null
+    },
+    {
+      "timestamp": 1743747948476,
+      "sender": "918810502592",
+      "group": "120363197551475655@g.us",
+      "messageType": "text",
+      "isCommand": false,
+      "command": null
+    },
+    {
+      "timestamp": 1743747958465,
+      "sender": "918810502592",
+      "group": "120363197551475655@g.us",
+      "messageType": "text",
+      "isCommand": false,
+      "command": null
+    },
+    {
+      "timestamp": 1743747976324,
+      "sender": "918476881591",
+      "group": "120363197551475655@g.us",
+      "messageType": "text",
+      "isCommand": false,
+      "command": null
+    },
+    {
+      "timestamp": 1743748000260,
+      "sender": "918476881591",
+      "group": "120363197551475655@g.us",
+      "messageType": "text",
+      "isCommand": false,
+      "command": null
+    },
+    {
+      "timestamp": 1743748029819,
+      "sender": "918476881591",
+      "group": "120363197551475655@g.us",
+      "messageType": "text",
+      "isCommand": false,
+      "command": null
+    },
+    {
+      "timestamp": 1743748041338,
+      "sender": "918476881591",
+      "group": "120363197551475655@g.us",
+      "messageType": "text",
+      "isCommand": false,
+      "command": null
+    },
+    {
+      "timestamp": 1743748042858,
+      "sender": "918810502592",
+      "group": "120363197551475655@g.us",
+      "messageType": "text",
+      "isCommand": false,
+      "command": null
+    },
+    {
+      "timestamp": 1743748073907,
+      "sender": "918476881591",
+      "group": "120363197551475655@g.us",
+      "messageType": "text",
+      "isCommand": false,
+      "command": null
+    },
+    {
+      "timestamp": 1743748134817,
+      "sender": "918476881591",
+      "group": "120363197551475655@g.us",
+      "messageType": "text",
+      "isCommand": false,
+      "command": null
+    },
+    {
+      "timestamp": 1743748147443,
+      "sender": "918810502592",
+      "group": "120363197551475655@g.us",
+      "messageType": "text",
+      "isCommand": false,
+      "command": null
+    },
+    {
+      "timestamp": 1743748181198,
+      "sender": "918476881591",
+      "group": "120363197551475655@g.us",
+      "messageType": "text",
+      "isCommand": false,
+      "command": null
+    },
+    {
+      "timestamp": 1743748368580,
+      "sender": "918810502592",
+      "group": "120363401304716862@g.us",
+      "messageType": "text",
+      "isCommand": false,
+      "command": null
     }
   ],
   "groupInteractionData": {
@@ -1801,6 +2425,35 @@
             "messageTypes": {
               "text": 1
             }
+          },
+          "2349055848294": {
+            "messageCount": 2,
+            "firstSeen": 1743747877219,
+            "lastActivity": 1743747924474,
+            "interactedWith": {
+              "919630072740": 1
+            },
+            "messageTypes": {
+              "text": 2
+            }
+          },
+          "120363368631211382": {
+            "messageCount": 1,
+            "firstSeen": 1743747883362,
+            "lastActivity": 1743747883362,
+            "interactedWith": {
+              "919630072740": 1
+            },
+            "messageTypes": {
+              "text": 1
+            }
+          },
+          "919630072740": {
+            "messageCount": 0,
+            "firstSeen": 1743747883362,
+            "lastActivity": 1743747883362,
+            "interactedWith": {},
+            "messageTypes": {}
           }
         },
         "interactions": [
@@ -2127,9 +2780,21 @@
             "to": "2349139224351",
             "type": "text",
             "timestamp": 1743713673489
+          },
+          {
+            "from": "120363368631211382",
+            "to": "919630072740",
+            "type": "text",
+            "timestamp": 1743747883362
+          },
+          {
+            "from": "2349055848294",
+            "to": "919630072740",
+            "type": "text",
+            "timestamp": 1743747924474
           }
         ],
-        "lastUpdate": 1743717072081
+        "lastUpdate": 1743747924474
       },
       "120363418322689990@g.us": {
         "members": {
@@ -2165,14 +2830,14 @@
       "120363401304716862@g.us": {
         "members": {
           "918810502592": {
-            "messageCount": 14,
+            "messageCount": 15,
             "firstSeen": 1743711896518,
-            "lastActivity": 1743715070028,
+            "lastActivity": 1743748368612,
             "interactedWith": {
               "918920659106": 10
             },
             "messageTypes": {
-              "text": 14
+              "text": 15
             }
           },
           "918920659106": {
@@ -2245,7 +2910,7 @@
             "timestamp": 1743713229949
           }
         ],
-        "lastUpdate": 1743715070028
+        "lastUpdate": 1743748368612
       },
       "120363361913572883@g.us": {
         "members": {
@@ -2326,10 +2991,19 @@
             "messageTypes": {
               "text": 1
             }
+          },
+          "102272281387072": {
+            "messageCount": 1,
+            "firstSeen": 1743746142305,
+            "lastActivity": 1743746142305,
+            "interactedWith": {},
+            "messageTypes": {
+              "text": 1
+            }
           }
         },
         "interactions": [],
-        "lastUpdate": 1743745235559
+        "lastUpdate": 1743746142305
       },
       "120363198335986642@g.us": {
         "members": {
@@ -2376,14 +3050,14 @@
             }
           },
           "254791708824": {
-            "messageCount": 5,
+            "messageCount": 7,
             "firstSeen": 1743745442751,
-            "lastActivity": 1743745495541,
+            "lastActivity": 1743746077357,
             "interactedWith": {
-              "918920659106": 3
+              "918920659106": 5
             },
             "messageTypes": {
-              "text": 5
+              "text": 7
             }
           },
           "918920659106": {
@@ -2400,6 +3074,80 @@
             "interactedWith": {},
             "messageTypes": {
               "sticker": 1
+            }
+          },
+          "918810502592": {
+            "messageCount": 23,
+            "firstSeen": 1743746362585,
+            "lastActivity": 1743748147444,
+            "interactedWith": {
+              "918920659106": 8,
+              "918169674566": 6,
+              "919699982697": 4,
+              "918476881591": 1
+            },
+            "messageTypes": {
+              "text": 23
+            }
+          },
+          "918169674566": {
+            "messageCount": 21,
+            "firstSeen": 1743746468557,
+            "lastActivity": 1743747241235,
+            "interactedWith": {
+              "918920659106": 4,
+              "918810502592": 8,
+              "919699982697": 2
+            },
+            "messageTypes": {
+              "text": 21
+            }
+          },
+          "120363197551475655": {
+            "messageCount": 2,
+            "firstSeen": 1743746526856,
+            "lastActivity": 1743746621315,
+            "interactedWith": {
+              "918920659106": 1,
+              "918810502592": 1
+            },
+            "messageTypes": {
+              "text": 2
+            }
+          },
+          "919699982697": {
+            "messageCount": 14,
+            "firstSeen": 1743747092972,
+            "lastActivity": 1743747418320,
+            "interactedWith": {
+              "918169674566": 2,
+              "918810502592": 4,
+              "919699982697": 1
+            },
+            "messageTypes": {
+              "text": 14
+            }
+          },
+          "972547712954": {
+            "messageCount": 1,
+            "firstSeen": 1743747219986,
+            "lastActivity": 1743747219986,
+            "interactedWith": {},
+            "messageTypes": {
+              "text": 1
+            }
+          },
+          "918476881591": {
+            "messageCount": 8,
+            "firstSeen": 1743747868086,
+            "lastActivity": 1743748181200,
+            "interactedWith": {
+              "918810502592": 4,
+              "918476881591": 2,
+              "918920659106": 1
+            },
+            "messageTypes": {
+              "text": 8
             }
           }
         },
@@ -2421,9 +3169,315 @@
             "to": "918920659106",
             "type": "text",
             "timestamp": 1743745472049
+          },
+          {
+            "from": "254791708824",
+            "to": "918920659106",
+            "type": "text",
+            "timestamp": 1743746070375
+          },
+          {
+            "from": "254791708824",
+            "to": "918920659106",
+            "type": "text",
+            "timestamp": 1743746077357
+          },
+          {
+            "from": "918810502592",
+            "to": "918920659106",
+            "type": "text",
+            "timestamp": 1743746362585
+          },
+          {
+            "from": "918169674566",
+            "to": "918920659106",
+            "type": "text",
+            "timestamp": 1743746468557
+          },
+          {
+            "from": "918169674566",
+            "to": "918920659106",
+            "type": "text",
+            "timestamp": 1743746483421
+          },
+          {
+            "from": "120363197551475655",
+            "to": "918920659106",
+            "type": "text",
+            "timestamp": 1743746526856
+          },
+          {
+            "from": "918169674566",
+            "to": "918920659106",
+            "type": "text",
+            "timestamp": 1743746527318
+          },
+          {
+            "from": "918169674566",
+            "to": "918810502592",
+            "type": "text",
+            "timestamp": 1743746620957
+          },
+          {
+            "from": "120363197551475655",
+            "to": "918810502592",
+            "type": "text",
+            "timestamp": 1743746621315
+          },
+          {
+            "from": "918810502592",
+            "to": "918169674566",
+            "type": "text",
+            "timestamp": 1743746671571
+          },
+          {
+            "from": "918810502592",
+            "to": "918169674566",
+            "type": "text",
+            "timestamp": 1743746717095
+          },
+          {
+            "from": "918169674566",
+            "to": "918810502592",
+            "type": "text",
+            "timestamp": 1743746816987
+          },
+          {
+            "from": "918810502592",
+            "to": "918169674566",
+            "type": "text",
+            "timestamp": 1743746825211
+          },
+          {
+            "from": "918169674566",
+            "to": "918810502592",
+            "type": "text",
+            "timestamp": 1743746838629
+          },
+          {
+            "from": "918810502592",
+            "to": "918169674566",
+            "type": "text",
+            "timestamp": 1743746847097
+          },
+          {
+            "from": "918169674566",
+            "to": "918810502592",
+            "type": "text",
+            "timestamp": 1743746854101
+          },
+          {
+            "from": "918810502592",
+            "to": "918169674566",
+            "type": "text",
+            "timestamp": 1743746863670
+          },
+          {
+            "from": "918169674566",
+            "to": "918810502592",
+            "type": "text",
+            "timestamp": 1743746909305
+          },
+          {
+            "from": "918810502592",
+            "to": "918169674566",
+            "type": "text",
+            "timestamp": 1743746934192
+          },
+          {
+            "from": "918810502592",
+            "to": "918920659106",
+            "type": "text",
+            "timestamp": 1743746942004
+          },
+          {
+            "from": "918810502592",
+            "to": "918920659106",
+            "type": "text",
+            "timestamp": 1743746966090
+          },
+          {
+            "from": "918169674566",
+            "to": "918810502592",
+            "type": "text",
+            "timestamp": 1743746982672
+          },
+          {
+            "from": "918169674566",
+            "to": "918920659106",
+            "type": "text",
+            "timestamp": 1743747038981
+          },
+          {
+            "from": "918169674566",
+            "to": "918810502592",
+            "type": "text",
+            "timestamp": 1743747087809
+          },
+          {
+            "from": "918169674566",
+            "to": "919699982697",
+            "type": "text",
+            "timestamp": 1743747125982
+          },
+          {
+            "from": "919699982697",
+            "to": "918169674566",
+            "type": "text",
+            "timestamp": 1743747139399
+          },
+          {
+            "from": "918810502592",
+            "to": "919699982697",
+            "type": "text",
+            "timestamp": 1743747145245
+          },
+          {
+            "from": "918169674566",
+            "to": "919699982697",
+            "type": "text",
+            "timestamp": 1743747151350
+          },
+          {
+            "from": "919699982697",
+            "to": "918810502592",
+            "type": "text",
+            "timestamp": 1743747158732
+          },
+          {
+            "from": "919699982697",
+            "to": "918169674566",
+            "type": "text",
+            "timestamp": 1743747164505
+          },
+          {
+            "from": "918169674566",
+            "to": "918810502592",
+            "type": "text",
+            "timestamp": 1743747164560
+          },
+          {
+            "from": "918810502592",
+            "to": "919699982697",
+            "type": "text",
+            "timestamp": 1743747211685
+          },
+          {
+            "from": "918810502592",
+            "to": "918920659106",
+            "type": "text",
+            "timestamp": 1743747260496
+          },
+          {
+            "from": "919699982697",
+            "to": "918810502592",
+            "type": "text",
+            "timestamp": 1743747272752
+          },
+          {
+            "from": "919699982697",
+            "to": "919699982697",
+            "type": "text",
+            "timestamp": 1743747293701
+          },
+          {
+            "from": "918810502592",
+            "to": "919699982697",
+            "type": "text",
+            "timestamp": 1743747351646
+          },
+          {
+            "from": "919699982697",
+            "to": "918810502592",
+            "type": "text",
+            "timestamp": 1743747370529
+          },
+          {
+            "from": "918810502592",
+            "to": "919699982697",
+            "type": "text",
+            "timestamp": 1743747409324
+          },
+          {
+            "from": "919699982697",
+            "to": "918810502592",
+            "type": "text",
+            "timestamp": 1743747418320
+          },
+          {
+            "from": "918810502592",
+            "to": "918920659106",
+            "type": "text",
+            "timestamp": 1743747423262
+          },
+          {
+            "from": "918810502592",
+            "to": "918920659106",
+            "type": "text",
+            "timestamp": 1743747429597
+          },
+          {
+            "from": "918476881591",
+            "to": "918810502592",
+            "type": "text",
+            "timestamp": 1743747868086
+          },
+          {
+            "from": "918810502592",
+            "to": "918920659106",
+            "type": "text",
+            "timestamp": 1743747948478
+          },
+          {
+            "from": "918476881591",
+            "to": "918476881591",
+            "type": "text",
+            "timestamp": 1743747976326
+          },
+          {
+            "from": "918476881591",
+            "to": "918920659106",
+            "type": "text",
+            "timestamp": 1743748000262
+          },
+          {
+            "from": "918476881591",
+            "to": "918810502592",
+            "type": "text",
+            "timestamp": 1743748041340
+          },
+          {
+            "from": "918810502592",
+            "to": "918920659106",
+            "type": "text",
+            "timestamp": 1743748042861
+          },
+          {
+            "from": "918476881591",
+            "to": "918810502592",
+            "type": "text",
+            "timestamp": 1743748073908
+          },
+          {
+            "from": "918476881591",
+            "to": "918476881591",
+            "type": "text",
+            "timestamp": 1743748134818
+          },
+          {
+            "from": "918810502592",
+            "to": "918476881591",
+            "type": "text",
+            "timestamp": 1743748147444
+          },
+          {
+            "from": "918476881591",
+            "to": "918810502592",
+            "type": "text",
+            "timestamp": 1743748181200
           }
         ],
-        "lastUpdate": 1743745495541
+        "lastUpdate": 1743748181200
       },
       "120363245752093043@g.us": {
         "members": {
@@ -2435,10 +3489,28 @@
             "messageTypes": {
               "text": 1
             }
+          },
+          "923152251883": {
+            "messageCount": 1,
+            "firstSeen": 1743746142206,
+            "lastActivity": 1743746142206,
+            "interactedWith": {},
+            "messageTypes": {
+              "text": 1
+            }
+          },
+          "923202609045": {
+            "messageCount": 1,
+            "firstSeen": 1743746582917,
+            "lastActivity": 1743746582917,
+            "interactedWith": {},
+            "messageTypes": {
+              "text": 1
+            }
           }
         },
         "interactions": [],
-        "lastUpdate": 1743745216448
+        "lastUpdate": 1743746582917
       }
     },
     "lastAnalysis": {}
@@ -2446,22 +3518,6 @@
   "scheduledContactBatches": {
     "groupId": "120363401304716862@g.us",
     "contacts": [
-      "2349067876931@s.whatsapp.net",
-      "6285136020229@s.whatsapp.net",
-      "917355477662@s.whatsapp.net",
-      "6282181074212@s.whatsapp.net",
-      "254713264389@s.whatsapp.net",
-      "918839733971@s.whatsapp.net",
-      "243852211992@s.whatsapp.net",
-      "6281214131560@s.whatsapp.net",
-      "6285191449562@s.whatsapp.net",
-      "917869097785@s.whatsapp.net",
-      "66644347350@s.whatsapp.net",
-      "918921507985@s.whatsapp.net",
-      "972547712954@s.whatsapp.net",
-      "2348109572981@s.whatsapp.net",
-      "6283166865577@s.whatsapp.net",
-      "918169674566@s.whatsapp.net",
       "6285134522947@s.whatsapp.net",
       "2349159221138@s.whatsapp.net",
       "918260857266@s.whatsapp.net",

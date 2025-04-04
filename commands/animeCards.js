@@ -55,8 +55,7 @@ async function drawCard(sock, remoteJid, sender) {
     // Check if the user can draw a card
     if (!animeCardGame.canDrawCard(sender)) {
         await sock.sendMessage(remoteJid, { 
-            text: `You've reached your daily card draw limit. Try again tomorrow!`,
-            quoted: message 
+            text: `You've reached your daily card draw limit. Try again tomorrow!`
         });
         return;
     }
@@ -66,8 +65,7 @@ async function drawCard(sock, remoteJid, sender) {
     
     if (!result.success) {
         await sock.sendMessage(remoteJid, { 
-            text: result.message,
-            quoted: message 
+            text: result.message
         });
         return;
     }
@@ -93,8 +91,7 @@ async function drawCard(sock, remoteJid, sender) {
     
     // Send card message
     await sock.sendMessage(remoteJid, { 
-        text: cardMessage,
-        quoted: message 
+        text: cardMessage
     });
 }
 
@@ -200,8 +197,7 @@ async function tradeCard(sock, remoteJid, sender, args, quotedMsg) {
     // Check if trading is to another user (must be in reply to their message)
     if (!quotedMsg || !quotedMsg.participant) {
         await sock.sendMessage(remoteJid, { 
-            text: "To trade a card, reply to the recipient's message with: .card trade [card_id]",
-            quoted: message 
+            text: "To trade a card, reply to the recipient's message with: .card trade [card_id]"
         });
         return;
     }
@@ -212,8 +208,7 @@ async function tradeCard(sock, remoteJid, sender, args, quotedMsg) {
     // Check if sender is trying to trade with themselves
     if (recipient === sender) {
         await sock.sendMessage(remoteJid, { 
-            text: "You cannot trade cards with yourself!",
-            quoted: message 
+            text: "You cannot trade cards with yourself!"
         });
         return;
     }
@@ -222,8 +217,7 @@ async function tradeCard(sock, remoteJid, sender, args, quotedMsg) {
     const cardId = args.trim();
     if (!cardId) {
         await sock.sendMessage(remoteJid, { 
-            text: "Please specify a card ID to trade. Use .card inventory to see your cards.",
-            quoted: message 
+            text: "Please specify a card ID to trade. Use .card inventory to see your cards."
         });
         return;
     }
@@ -233,8 +227,7 @@ async function tradeCard(sock, remoteJid, sender, args, quotedMsg) {
     
     if (!result.success) {
         await sock.sendMessage(remoteJid, { 
-            text: result.message,
-            quoted: message 
+            text: result.message
         });
         return;
     }

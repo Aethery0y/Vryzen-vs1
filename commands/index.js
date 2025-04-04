@@ -10,6 +10,7 @@ const leaderboard = require('./leaderboard');
 const pointsCommands = require('./points');
 const animeQuizCommands = require('./animeQuiz');
 const animeCardsCommands = require('./animeCards');
+const animeBettingCommands = require('./animeBetting');
 const database = require('../lib/database');
 const animeNews = require('../lib/animeNews');
 const stickerMaker = require('../lib/stickerMaker');
@@ -112,6 +113,39 @@ async function handleCommand(params) {
             // Anime Card Game Commands
             case 'card':
                 await animeCardsCommands.handleCardCommand(params);
+                break;
+                
+            // Anime Betting Commands
+            case 'createbet':
+                await animeBettingCommands.createBet(sock, remoteJid, sender, args);
+                break;
+                
+            case 'bet':
+                await animeBettingCommands.placeBet(sock, remoteJid, sender, args);
+                break;
+                
+            case 'bets':
+                await animeBettingCommands.listBets(sock, remoteJid);
+                break;
+                
+            case 'betinfo':
+                await animeBettingCommands.showBetInfo(sock, remoteJid, args);
+                break;
+                
+            case 'endbet':
+                await animeBettingCommands.endBet(sock, remoteJid, sender, args);
+                break;
+                
+            case 'bettypes':
+                await animeBettingCommands.showBetTypes(sock, remoteJid);
+                break;
+                
+            case 'bethelp':
+                await animeBettingCommands.showBettingHelp(sock, remoteJid);
+                break;
+                
+            case 'betstats':
+                await animeBettingCommands.showUserStats(sock, remoteJid, sender);
                 break;
                 
             // Privacy settings

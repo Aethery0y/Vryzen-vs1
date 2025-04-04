@@ -87,9 +87,22 @@ async function showGroupAnalysis(sock, remoteJid) {
  */
 async function clearGroupAnalysis(sock, remoteJid, sender) {
     try {
-        // Check if user is admin
-        const commandsIndex = require('./index');
-        if (!commandsIndex.isAdmin(sender)) {
+        // Check if user is admin or owner
+        const config = require('../config');
+        const senderNumber = sender.split('@')[0];
+        const normalizedNumber = database.normalizeNumber(senderNumber);
+        
+        // Check if owner
+        const isUserOwner = config.botOwners.some(owner => 
+            database.normalizeNumber(owner) === normalizedNumber
+        );
+        
+        // Check if admin
+        const isUserAdmin = config.botAdmins.some(admin => 
+            database.normalizeNumber(admin) === normalizedNumber
+        ) || isUserOwner;
+        
+        if (!isUserAdmin) {
             await sock.sendMessage(remoteJid, { 
                 text: '⛔ Only bot administrators can clear group analysis data.'
             });

@@ -8,7 +8,7 @@ const config = require('../config');
 
 // Helper to format points profile
 function formatProfile(profile) {
-    if (!profile.exists) {
+    if (!profile || !profile.points) {
         return `*🌟 You're new here! 🌟*
 
 You don't have any points yet. Start chatting, using commands, and participating in activities to earn points and level up!
@@ -16,42 +16,40 @@ You don't have any points yet. Start chatting, using commands, and participating
 Type *.dailycheck* to get your first points!`;
     }
     
-    // Create progress bar for level
+    // Calculate a simple level based on points
+    const points = profile.points;
+    const level = Math.floor(Math.sqrt(points / 10)) + 1;
+    const nextLevelPoints = Math.pow(level, 2) * 10;
+    const progress = Math.min(100, Math.floor((points / nextLevelPoints) * 100));
+    
+    // Create progress bar
     const progressBarLength = 15;
-    const filledBars = Math.floor(profile.level.progress / 100 * progressBarLength);
+    const filledBars = Math.floor(progress / 100 * progressBarLength);
     const progressBar = '▰'.repeat(filledBars) + '▱'.repeat(progressBarLength - filledBars);
     
-    let response = `*🏆 ${profile.level.title} - LEVEL ${profile.level.level} 🏆*
+    // Get titles based on level
+    const titles = [
+        'Anime Newcomer', 'Manga Reader', 'Anime Fan', 'Otaku Apprentice', 
+        'Otaku Explorer', 'Anime Enthusiast', 'Anime Scholar', 'Manga Master', 
+        'Anime Connoisseur', 'Legendary Weeb'
+    ];
+    const title = titles[Math.min(level - 1, titles.length - 1)];
+    
+    let response = `*🏆 ${title} - LEVEL ${level} 🏆*
 
 *Points:* ${profile.points} pts
-*Rank:* #${profile.rank} of ${profile.totalUsers} users
-*Current Streak:* ${profile.streak} days 🔥
-*Best Streak:* ${profile.maxStreak} days
+*Rank:* #${profile.rank || '??'} 
+*Daily Stats:* ${profile.dailyStats ? `${profile.dailyStats.total} points earned today` : 'No activity today'}
 
-*Level Progress:* ${profile.level.progress}%
+*Level Progress:* ${progress}%
 ${progressBar}`;
 
-    if (profile.level.pointsToNextLevel) {
-        response += `\n*Next Level:* ${profile.level.pointsToNextLevel} points needed`;
-    } else {
-        response += `\n*Max Level Reached!* 🎉`;
-    }
+    response += `\n*Next Level:* ${nextLevelPoints - points} points needed`;
     
-    // Add achievements if any
-    if (profile.achievements && profile.achievements.length > 0) {
-        response += `\n\n*🏅 Achievements 🏅*\n`;
-        profile.achievements.forEach(achievement => {
-            response += `${achievement.name}\n`;
-        });
-    }
-    
-    // Add top 3 most active groups
-    if (profile.topGroups && profile.topGroups.length > 0) {
-        response += `\n*Most Active Groups:*\n`;
-        profile.topGroups.forEach((group, index) => {
-            response += `${index + 1}. ${group.points} pts\n`;
-        });
-    }
+    // Add basic stats
+    response += `\n\n*📊 Stats 📊*`;
+    response += `\n• Current Points: ${points}`;
+    response += `\n• Current Level: ${level}`;
     
     return response;
 }
@@ -66,7 +64,8 @@ function formatLeaderboard(users, title) {
     
     users.forEach((user, index) => {
         const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `${index + 1}.`;
-        response += `${medal} ${user.userId.replace(/^\+/, '')}: ${user.points} pts (Lvl ${user.level.level} - ${user.level.title})\n`;
+        // Simplified display without level info for now
+        response += `${medal} ${user.userId.replace(/^\+/, '')}: ${user.points} pts (Rank #${user.rank || (index + 1)})\n`;
     });
     
     response += `\n_Type *.profile* to see your stats!_`;
@@ -90,15 +89,15 @@ async function handleProfileCommand({ sock, sender, message, remoteJid }) {
     });
     
     // Award points for using the command
-    pointsSystem.awardPoints(sender, 'COMMAND', remoteJid);
+    pointsSystem.updatePoints(sender, 5, 'command_usage');
 }
 
 /**
  * Command handler for leaderboard (.leaderboard)
  */
 async function handleLeaderboardCommand({ sock, sender, message, remoteJid, isGroup }) {
-    // Get top users, filtered by group if in a group chat
-    const topUsers = pointsSystem.getTopUsers(10, isGroup ? remoteJid : null);
+    // Get top users
+    const topUsers = pointsSystem.getTopUsers(10);
     
     // Format leaderboard
     const title = isGroup ? '🏆 Group Leaderboard 🏆' : '🌟 Global Leaderboard 🌟';
@@ -110,15 +109,15 @@ async function handleLeaderboardCommand({ sock, sender, message, remoteJid, isGr
     });
     
     // Award points for using the command
-    pointsSystem.awardPoints(sender, 'COMMAND', remoteJid);
+    pointsSystem.updatePoints(sender, 5, 'command_usage');
 }
 
 /**
  * Command handler for daily check-in (.dailycheck)
  */
 async function handleDailyCheckInCommand({ sock, sender, message, remoteJid }) {
-    // Process daily check-in
-    const checkInResult = pointsSystem.dailyCheckIn(sender);
+    // Process daily check-in - use grantDailyBonus instead of dailyCheckIn
+    const checkInResult = pointsSystem.grantDailyBonus(sender);
     
     await sock.sendMessage(remoteJid, { 
         text: checkInResult.message,
@@ -130,22 +129,13 @@ async function handleDailyCheckInCommand({ sock, sender, message, remoteJid }) {
  * Command handler for seeing possible achievements (.achievements)
  */
 async function handleAchievementsCommand({ sock, sender, message, remoteJid }) {
-    // Get all available badges
-    const badges = pointsSystem.BADGES;
-    
-    // Get user achievements
+    // Get user profile
     const profile = pointsSystem.getUserProfile(sender);
-    const userAchievementIds = profile.achievements.map(a => a.id);
     
-    // Format message
+    // Simple achievement message since BADGES aren't implemented yet
     let response = `*🏅 Available Achievements 🏅*\n\n`;
-    
-    Object.values(badges).forEach(badge => {
-        const achieved = userAchievementIds.includes(badge.id);
-        response += `${achieved ? '✅' : '⬜'} ${badge.name}: ${badge.requirement}\n`;
-    });
-    
-    response += `\n_You've earned ${profile.achievements.length} out of ${Object.keys(badges).length} achievements!_`;
+    response += `Achievement system is being updated. Check back later!\n\n`;
+    response += `You currently have ${profile.points} points.`;
     
     await sock.sendMessage(remoteJid, { 
         text: response,
@@ -153,53 +143,45 @@ async function handleAchievementsCommand({ sock, sender, message, remoteJid }) {
     });
     
     // Award points for using the command
-    pointsSystem.awardPoints(sender, 'COMMAND', remoteJid);
+    pointsSystem.updatePoints(sender, 5, 'command_usage');
 }
 
 /**
  * Command handler for seeing the points system rules (.pointsinfo)
  */
 async function handlePointsInfoCommand({ sock, sender, message, remoteJid }) {
-    // Format levels
-    let levelsInfo = '*🌟 Levels & Titles 🌟*\n\n';
-    pointsSystem.LEVELS.forEach(level => {
-        levelsInfo += `*Level ${level.level} - ${level.title}*: ${level.points} points\n`;
-    });
+    // Get points system settings from config
+    const pointsSettings = require('../config').animeGames.points;
     
     // Format point values
     let pointsInfo = '*💯 Points System 💯*\n\n';
     pointsInfo += `*Basic Interactions:*\n`;
-    pointsInfo += `• Regular message: ${pointsSystem.POINT_VALUES.MESSAGE} point\n`;
-    pointsInfo += `• Using a bot command: ${pointsSystem.POINT_VALUES.COMMAND} points\n`;
-    pointsInfo += `• Daily check-in: ${pointsSystem.POINT_VALUES.DAILY_LOGIN} points\n\n`;
+    pointsInfo += `• Regular message: ${pointsSettings.messagePoints} point\n`;
+    pointsInfo += `• Using a bot command: 5 points\n`;
+    pointsInfo += `• Daily check-in: ${pointsSettings.dailyBonus} points\n\n`;
     
     pointsInfo += `*Anime Activities:*\n`;
-    pointsInfo += `• Correct anime quiz answer: ${pointsSystem.POINT_VALUES.ANIME_QUIZ_CORRECT} points\n`;
-    pointsInfo += `• Quiz participation: ${pointsSystem.POINT_VALUES.ANIME_QUIZ_PARTICIPATION} points\n`;
-    pointsInfo += `• Anime recommendation: ${pointsSystem.POINT_VALUES.ANIME_RECOMMENDATION} points\n\n`;
+    pointsInfo += `• Correct anime quiz answer: ${pointsSettings.quizPoints} points\n`;
+    pointsInfo += `• Card collection: 5-50 points (based on rarity)\n`;
+    pointsInfo += `• Betting games: Win back double your bet!\n\n`;
     
     pointsInfo += `*Special Activities:*\n`;
-    pointsInfo += `• Creating stickers: ${pointsSystem.POINT_VALUES.CREATE_STICKER} points\n`;
-    pointsInfo += `• Sharing content: ${pointsSystem.POINT_VALUES.SHARE_CONTENT} points\n`;
-    pointsInfo += `• Group games: ${pointsSystem.POINT_VALUES.GROUP_GAME} points\n\n`;
+    pointsInfo += `• Creating stickers: 10 points\n`;
+    pointsInfo += `• Sharing content: 5 points\n`;
+    pointsInfo += `• Group games: 15-30 points\n\n`;
     
-    pointsInfo += `*Bonuses:*\n`;
-    pointsInfo += `• Level up bonus: ${pointsSystem.POINT_VALUES.LEVEL_UP_BONUS} points\n`;
-    pointsInfo += `• 7-day streak: 30 bonus points\n`;
-    pointsInfo += `• 30-day streak: 150 bonus points\n`;
+    pointsInfo += `*Limits:*\n`;
+    pointsInfo += `• Maximum daily points: ${pointsSettings.maxPointsPerDay} points\n`;
+    pointsInfo += `• Points reset: Never\n`;
     
-    // Send messages (split for better readability)
+    // Send message
     await sock.sendMessage(remoteJid, { 
         text: pointsInfo,
         quoted: message 
     });
     
-    await sock.sendMessage(remoteJid, { 
-        text: levelsInfo
-    });
-    
     // Award points for using the command
-    pointsSystem.awardPoints(sender, 'COMMAND', remoteJid);
+    pointsSystem.updatePoints(sender, 5, 'command_usage');
 }
 
 module.exports = {
@@ -208,7 +190,16 @@ module.exports = {
     handleDailyCheckInCommand,
     handleAchievementsCommand,
     handlePointsInfoCommand,
-    awardPointsForInteraction: (userId, action, groupId) => {
-        return pointsSystem.awardPoints(userId, action, groupId);
+    awardPointsForInteraction: (userId, action) => {
+        // Map actions to point values
+        const pointValues = {
+            'MESSAGE': 1,
+            'COMMAND': 5,
+            'QUIZ': 15,
+            'STICKER': 10,
+            'SHARE': 5
+        };
+        const points = pointValues[action] || 1;
+        return pointsSystem.updatePoints(userId, points, action.toLowerCase());
     }
 };

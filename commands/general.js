@@ -29,6 +29,14 @@ async function showCommands(sock, remoteJid) {
         `• .card trade - Trade cards with other users\n` +
         `• .card help - Get detailed card game instructions\n\n` +
         
+        `🎲 *Anime Betting System:*\n` +
+        `• .createbet <type> - Create a new betting game\n` +
+        `• .bet <game_id> <option> <amount> - Place a bet\n` +
+        `• .bets - List all active betting games\n` +
+        `• .betinfo <game_id> - View details about a game\n` +
+        `• .endbet <game_id> <winner> - End a betting game\n` +
+        `• .mystats - View your betting statistics\n\n` +
+        
         `👥 *Group Management:*\n` +
         `• .save all - Add all group members to bot database\n` +
         `• .save allcon - Export members as a contacts file\n` +
@@ -171,9 +179,12 @@ async function allowUser(sock, remoteJid, number) {
 async function showAdminCommands(sock, remoteJid, sender) {
     // Check if user is bot owner or admin
     const senderNumber = sender.split('@')[0];
-    const isOwner = require('./index').isOwner(senderNumber);
+    const config = require('../config');
+    const database = require('../lib/database');
+    const normalizedNumber = database.normalizeNumber(senderNumber);
+    const isUserOwner = config.botOwners.some(owner => database.normalizeNumber(owner) === normalizedNumber);
     
-    if (!isOwner) {
+    if (!isUserOwner) {
         await sock.sendMessage(remoteJid, { 
             text: '⛔ Sorry, only bot owners can access admin commands.'
         });

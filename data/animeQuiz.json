@@ -1,6 +1,73 @@
 {
   "activeQuizzes": {},
-  "quizHistory": {},
-  "userStats": {},
-  "dailyLimits": {}
+  "quizHistory": {
+    "120363401304716862@g.us": [
+      {
+        "questionId": 12,
+        "startTime": 1743746793912,
+        "endTime": 1743746854028,
+        "participants": 1,
+        "winners": 0
+      },
+      {
+        "questionId": 11,
+        "startTime": 1743747483906,
+        "endTime": 1743747544027,
+        "participants": 0,
+        "winners": 0
+      }
+    ],
+    "120363197551475655@g.us": [
+      {
+        "questionId": 1,
+        "startTime": 1743746889170,
+        "endTime": 1743746949365,
+        "participants": 2,
+        "winners": 1
+      },
+      {
+        "questionId": 4,
+        "startTime": 1743746995393,
+        "endTime": 1743747055603,
+        "participants": 2,
+        "winners": 2
+      },
+      {
+        "questionId": 3,
+        "startTime": 1743747205708,
+        "endTime": 1743747265912,
+        "participants": 2,
+        "winners": 2
+      },
+      {
+        "questionId": 0,
+        "startTime": 1743747274435,
+        "endTime": 1743747334630,
+        "participants": 1,
+        "winners": 1
+      }
+    ]
+  },
+  "userStats": {
+    "918169674566@s.whatsapp.net": {
+      "totalAnswered": 4,
+      "correctAnswers": 4,
+      "incorrectAnswers": 0,
+      "streakCurrent": 4,
+      "streakBest": 4,
+      "lastQuizTimestamp": 1743747334630
+    },
+    "918810502592@s.whatsapp.net": {
+      "totalAnswered": 2,
+      "correctAnswers": 2,
+      "incorrectAnswers": 0,
+      "streakCurrent": 2,
+      "streakBest": 2,
+      "lastQuizTimestamp": 1743747265913
+    }
+  },
+  "dailyLimits": {
+    "120363401304716862@g.us": 2,
+    "120363197551475655@g.us": 4
+  }
 }
