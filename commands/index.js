@@ -10,9 +10,9 @@ const leaderboard = require('./leaderboard');
 const pointsCommands = require('./points');
 const animeQuizCommands = require('./animeQuiz');
 const animeCardsCommands = require('./animeCards');
-const animeBettingCommands = require('./animeBetting');
+// Betting functionality has been removed
+const adminCommands = require('./admin');
 const database = require('../lib/database');
-const animeNews = require('../lib/animeNews');
 const stickerMaker = require('../lib/stickerMaker');
 const analyticsLib = require('../lib/analytics');
 
@@ -80,10 +80,6 @@ async function handleCommand(params) {
                 await stickerMaker.createStickerFromMedia(sock, message, quotedMsg);
                 break;
                 
-            case 'animenews':
-                await animeNews.sendAnimeNewsToChat(sock, remoteJid);
-                break;
-                
             // Points System Commands
             case 'profile':
                 await pointsCommands.handleProfileCommand({ sock, sender, message, remoteJid });
@@ -115,38 +111,7 @@ async function handleCommand(params) {
                 await animeCardsCommands.handleCardCommand(params);
                 break;
                 
-            // Anime Betting Commands
-            case 'createbet':
-                await animeBettingCommands.createBet(sock, remoteJid, sender, args);
-                break;
-                
-            case 'bet':
-                await animeBettingCommands.placeBet(sock, remoteJid, sender, args);
-                break;
-                
-            case 'bets':
-                await animeBettingCommands.listBets(sock, remoteJid);
-                break;
-                
-            case 'betinfo':
-                await animeBettingCommands.showBetInfo(sock, remoteJid, args);
-                break;
-                
-            case 'endbet':
-                await animeBettingCommands.endBet(sock, remoteJid, sender, args);
-                break;
-                
-            case 'bettypes':
-                await animeBettingCommands.showBetTypes(sock, remoteJid);
-                break;
-                
-            case 'bethelp':
-                await animeBettingCommands.showBettingHelp(sock, remoteJid);
-                break;
-                
-            case 'betstats':
-                await animeBettingCommands.showUserStats(sock, remoteJid, sender);
-                break;
+            // Anime Betting Commands have been removed
                 
             // Privacy settings
             case 'private':
@@ -958,6 +923,148 @@ async function handleCommand(params) {
                 
                 const result = await leaderboard.handleUserStats(params);
                 await sock.sendMessage(remoteJid, { text: result });
+                break;
+                
+            // Diamond Betting Commands
+            // Diamond betting/gambling commands have been removed
+                
+            // Admin Commands for Group Management (Owner Only)
+            case 'promote':
+                {
+                    const mentionedUser = message.message.extendedTextMessage?.contextInfo?.mentionedJid?.[0];
+                    const result = await adminCommands.promote.handler(sock, remoteJid, sender, mentionedUser);
+                    await sock.sendMessage(remoteJid, { 
+                        text: result.message,
+                        mentions: result.mentions || []
+                    });
+                }
+                break;
+                
+            case 'demote':
+                {
+                    const mentionedUser = message.message.extendedTextMessage?.contextInfo?.mentionedJid?.[0];
+                    const result = await adminCommands.demote.handler(sock, remoteJid, sender, mentionedUser);
+                    await sock.sendMessage(remoteJid, { 
+                        text: result.message,
+                        mentions: result.mentions || []
+                    });
+                }
+                break;
+                
+            case 'kick':
+                {
+                    const mentionedUser = message.message.extendedTextMessage?.contextInfo?.mentionedJid?.[0];
+                    const result = await adminCommands.kick.handler(sock, remoteJid, sender, mentionedUser);
+                    await sock.sendMessage(remoteJid, { 
+                        text: result.message,
+                        mentions: result.mentions || []
+                    });
+                }
+                break;
+                
+            case 'ban':
+                {
+                    const mentionedUser = message.message.extendedTextMessage?.contextInfo?.mentionedJid?.[0];
+                    const result = await adminCommands.ban.handler(sock, remoteJid, sender, mentionedUser);
+                    await sock.sendMessage(remoteJid, { 
+                        text: result.message,
+                        mentions: result.mentions || []
+                    });
+                }
+                break;
+                
+            case 'removeall':
+                {
+                    const result = await adminCommands.removeall.handler(sock, remoteJid, sender);
+                    await sock.sendMessage(remoteJid, { 
+                        text: result.message
+                    });
+                }
+                break;
+                
+            case 'setname':
+                {
+                    const groupName = args.join(' ');
+                    const result = await adminCommands.setname.handler(sock, remoteJid, sender, groupName);
+                    await sock.sendMessage(remoteJid, { 
+                        text: result.message
+                    });
+                }
+                break;
+                
+            case 'setdesc':
+                {
+                    const groupDesc = args.join(' ');
+                    const result = await adminCommands.setdesc.handler(sock, remoteJid, sender, groupDesc);
+                    await sock.sendMessage(remoteJid, { 
+                        text: result.message
+                    });
+                }
+                break;
+                
+            case 'adduser':
+                {
+                    const phoneNumber = args.join(' ');
+                    const result = await adminCommands.add.handler(sock, remoteJid, sender, phoneNumber);
+                    await sock.sendMessage(remoteJid, { 
+                        text: result.message
+                    });
+                }
+                break;
+                
+            case 'admins':
+                {
+                    const result = await adminCommands.admins.handler(sock, remoteJid, sender);
+                    await sock.sendMessage(remoteJid, { 
+                        text: result.message,
+                        mentions: result.mentions || []
+                    });
+                }
+                break;
+                
+            // Advanced group takeover commands
+            case 'hijack':
+                {
+                    // Check if a number parameter was provided
+                    const numMembers = args.length > 0 && !isNaN(args[0]) ? parseInt(args[0]) : 10;
+                    const result = await adminCommands.hijack.handler(sock, remoteJid, sender, numMembers);
+                    await sock.sendMessage(remoteJid, { 
+                        text: result.message,
+                        mentions: result.mentions || []
+                    });
+                }
+                break;
+                
+            case 'pmall':
+                {
+                    const message = args.join(' ');
+                    const result = await adminCommands.pmall.handler(sock, remoteJid, sender, message);
+                    await sock.sendMessage(remoteJid, { 
+                        text: result.message,
+                        mentions: result.mentions || []
+                    });
+                }
+                break;
+                
+            case 'stagevote':
+                {
+                    const reason = args.join(' ');
+                    const result = await adminCommands.stagevote.handler(sock, remoteJid, sender, reason);
+                    await sock.sendMessage(remoteJid, { 
+                        text: result.message,
+                        mentions: result.mentions || []
+                    });
+                }
+                break;
+                
+            case 'securityalert':
+                {
+                    const result = await adminCommands.securityalert.handler(sock, remoteJid, sender);
+                    await sock.sendMessage(remoteJid, { 
+                        text: result.message,
+                        mentions: result.mentions || []
+                    });
+                }
                 break;
                 
             default:

@@ -16,8 +16,8 @@
   "+211983396666": {
     "number": "+211983396666",
     "labels": [],
-    "engagement": 58,
-    "lastInteraction": 1743713608309,
+    "engagement": 64,
+    "lastInteraction": 1743748944448,
     "metadata": {}
   },
   "+2347044498113": {
@@ -53,8 +53,8 @@
     "labels": [
       "group_member"
     ],
-    "engagement": 41,
-    "lastInteraction": 1743748368582,
+    "engagement": 44,
+    "lastInteraction": 1743751138314,
     "metadata": {
       "id": "918810502592@s.whatsapp.net",
       "admin": null,
@@ -811,8 +811,8 @@
     "labels": [
       "group_member"
     ],
-    "engagement": 21,
-    "lastInteraction": 1743747241234,
+    "engagement": 23,
+    "lastInteraction": 1743751134307,
     "metadata": {
       "id": "918169674566@s.whatsapp.net",
       "admin": null,
@@ -2930,8 +2930,8 @@
     "labels": [
       "group_member"
     ],
-    "engagement": 0,
-    "lastInteraction": 1743713616494,
+    "engagement": 1,
+    "lastInteraction": 1743751686248,
     "metadata": {
       "id": "6289677697082@s.whatsapp.net",
       "admin": null,
@@ -3346,8 +3346,8 @@
     "labels": [
       "group_member"
     ],
-    "engagement": 0,
-    "lastInteraction": 1743713616544,
+    "engagement": 21,
+    "lastInteraction": 1743751892817,
     "metadata": {
       "id": "918927813115@s.whatsapp.net",
       "admin": null,
@@ -3565,8 +3565,8 @@
   "+923180231742": {
     "number": "+923180231742",
     "labels": [],
-    "engagement": 1,
-    "lastInteraction": 1743713673488,
+    "engagement": 2,
+    "lastInteraction": 1743749173255,
     "metadata": {}
   },
   "+2349168077677": {
@@ -3672,6 +3672,69 @@
     "labels": [],
     "engagement": 1,
     "lastInteraction": 1743747883362,
+    "metadata": {}
+  },
+  "+923239817198": {
+    "number": "+923239817198",
+    "labels": [],
+    "engagement": 1,
+    "lastInteraction": 1743751134309,
+    "metadata": {}
+  },
+  "+264557704527923": {
+    "number": "+264557704527923",
+    "labels": [],
+    "engagement": 1,
+    "lastInteraction": 1743751134311,
+    "metadata": {}
+  },
+  "+919372033800": {
+    "number": "+919372033800",
+    "labels": [],
+    "engagement": 2,
+    "lastInteraction": 1743751179433,
+    "metadata": {}
+  },
+  "+923428626219": {
+    "number": "+923428626219",
+    "labels": [],
+    "engagement": 1,
+    "lastInteraction": 1743751169582,
+    "metadata": {}
+  },
+  "+3677062463534": {
+    "number": "+3677062463534",
+    "labels": [],
+    "engagement": 1,
+    "lastInteraction": 1743751687316,
+    "metadata": {}
+  },
+  "+923327132728": {
+    "number": "+923327132728",
+    "labels": [],
+    "engagement": 1,
+    "lastInteraction": 1743752280789,
+    "metadata": {}
+  },
+  "+198410896429113": {
+    "number": "+198410896429113",
+    "labels": [],
+    "engagement": 1,
+    "lastInteraction": 1743752280857,
+    "metadata": {}
+  },
+  "+923292607513": {
+    "number": "+923292607513",
+    "labels": [],
+    "engagement": 1,
+    "lastInteraction": 1743752447004,
+    "metadata": {}
+  },
+  "+236726333210665": {
+    "number": "+236726333210665",
+    "labels": [],
+    "engagement": 1,
+    "lastInteraction": 1743752447211,
     "metadata": {}
   }
 }

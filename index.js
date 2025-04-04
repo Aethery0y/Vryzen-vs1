@@ -9,7 +9,7 @@ const schedule = require('node-schedule');
 // Import modules
 const database = require('./lib/database');
 const ai = require('./lib/ai');
-const animeNews = require('./lib/animeNews');
+// const animeNews = require('./lib/animeNews'); // Removed news functionality
 const profanityFilter = require('./lib/profanityFilter');
 const contacts = require('./lib/contacts');
 const translation = require('./lib/translation');
@@ -19,7 +19,8 @@ const commandHandler = require('./commands');
 const config = require('./config');
 const groupRelationship = require('./lib/groupRelationship');
 const messageStats = require('./lib/messageStats');
-const animeBetting = require('./lib/animeBetting');
+// Removed betting functionality
+// const animeBetting = require('./lib/animeBetting');
 
 // Conversation context map (for short-term memory)
 const conversationContext = new Map();
@@ -60,16 +61,7 @@ async function connectToWhatsApp() {
                 console.log('WhatsApp bot connected!');
                 isConnected = true;
                 
-                // Schedule anime news updates
-                schedule.scheduleJob('*/10 * * * *', async () => { // Every 10 minutes
-                    if (isConnected) {
-                        try {
-                            await animeNews.sendAnimeNewsUpdates(sock);
-                        } catch (error) {
-                            console.error('Error sending scheduled anime news:', error);
-                        }
-                    }
-                });
+                // News updates scheduler has been removed
             }
         });
 

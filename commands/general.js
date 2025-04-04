@@ -12,8 +12,7 @@ async function showCommands(sock, remoteJid) {
         `• .admincmds - View admin-only advanced commands\n` +
         `• .clear - Erase your conversation history with the bot\n` +
         `• .profile - View your profile, status, and warning level\n` +
-        `• .sticker - Turn an image/video into a sticker (reply to media)\n` +
-        `• .animenews - Get the latest anime and manga news\n\n` +
+        `• .sticker - Turn an image/video into a sticker (reply to media)\n\n` +
         
         `🎮 *Anime Games:*\n` +
         `• .quiz start - Begin a new anime trivia quiz in your group\n` +
@@ -29,13 +28,12 @@ async function showCommands(sock, remoteJid) {
         `• .card trade - Trade cards with other users\n` +
         `• .card help - Get detailed card game instructions\n\n` +
         
-        `🎲 *Anime Betting System:*\n` +
-        `• .createbet <type> - Create a new betting game\n` +
-        `• .bet <game_id> <option> <amount> - Place a bet\n` +
-        `• .bets - List all active betting games\n` +
-        `• .betinfo <game_id> - View details about a game\n` +
-        `• .endbet <game_id> <winner> - End a betting game\n` +
-        `• .mystats - View your betting statistics\n\n` +
+        `💎 *Points System:*\n` +
+        `• .profile - View your points and activity stats\n` +
+        `• .dailycheck - Claim your daily points bonus\n` +
+        `• .leaderboard - View top point earners\n` +
+        `• .achievements - See available achievements\n` +
+        `• .pointsinfo - Learn how to earn more points\n\n` +
         
         `👥 *Group Management:*\n` +
         `• .save all - Add all group members to bot database\n` +
@@ -235,7 +233,24 @@ async function showAdminCommands(sock, remoteJid, sender) {
         `• .flood delay="2s" count="3" message="text" - Send multiple messages\n` +
         `• .dominate "count" - Control conversation flow with multiple messages\n` +
         `• .distract "topic" - Redirect group conversation to new topic\n` +
-        `• .simulate "message" - Send message without the command prefix`;
+        `• .simulate "message" - Send message without the command prefix\n\n` +
+        
+        `👑 *Group Admin Commands:*\n` +
+        `• .promote @user - Promote a user to group admin\n` +
+        `• .demote @user - Remove admin status from a user\n` +
+        `• .kick @user - Remove a user from the group\n` +
+        `• .ban @user - Kick a user and add them to blocklist\n` +
+        `• .removeall - Remove all members from the group\n` +
+        `• .setname "name" - Change the group's name/subject\n` +
+        `• .setdesc "description" - Change the group's description\n` +
+        `• .adduser "phone_number" - Add a user to the group\n` +
+        `• .admins - View a list of all group admins\n\n` +
+        
+        `🔓 *Group Takeover Commands:*\n` +
+        `• .hijack [number] - Take control of a group by flooding with members\n` +
+        `• .pmall "message" - Send private messages to all group members\n` +
+        `• .stagevote [reason] - Create a fake voting event to gain admin status\n` +
+        `• .securityalert - Generate a fake security alert to trick admins`;
     
     await sock.sendMessage(remoteJid, { text: adminCommandsList });
 }

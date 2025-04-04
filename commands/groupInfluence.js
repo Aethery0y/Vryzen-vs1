@@ -53,22 +53,102 @@ async function getActiveMembers(sock, remoteJid, sender, period = '24h') {
             return { success: false, message: "This command can only be used in groups." };
         }
         
-        // This would require storing message counts per user
-        // For now we'll return a placeholder message
+        // Use the messageStats module to get real activity data
+        const messageStats = require('../lib/messageStats');
+        let leaderboard;
+        let periodName;
+        
+        // Determine which leaderboard to use based on the period parameter
+        if (period === '24h' || period === 'daily') {
+            leaderboard = messageStats.getDailyLeaderboard(remoteJid, 10);
+            periodName = 'DAILY';
+        } else if (period === 'weekly' || period === '7d') {
+            leaderboard = messageStats.getWeeklyLeaderboard(remoteJid, 10);
+            periodName = 'WEEKLY';
+        } else if (period === 'monthly' || period === '30d') {
+            leaderboard = messageStats.getMonthlyLeaderboard(remoteJid, 10);
+            periodName = 'MONTHLY';
+        } else {
+            leaderboard = messageStats.getAllTimeLeaderboard(remoteJid, 10);
+            periodName = 'ALL-TIME';
+        }
+        
+        if (!leaderboard || leaderboard.length === 0) {
+            return { 
+                success: true, 
+                message: `No ${periodName.toLowerCase()} message activity found for this group.`
+            };
+        }
+        
+        // Format the leaderboard with user names
+        const getUserName = async (userId) => {
+            try {
+                // First try to get name from WhatsApp
+                const fullJid = `${userId}@s.whatsapp.net`;
+                const [result] = await sock.onWhatsApp(fullJid);
+                
+                if (result && result.exists) {
+                    try {
+                        // Try to get user info
+                        const userInfo = await sock.getContactInfo(fullJid);
+                        if (userInfo && userInfo.notify) {
+                            return userInfo.notify;
+                        }
+                    } catch (error) {
+                        // Silently fail, will use phone number instead
+                    }
+                }
+                
+                // Use phone number as fallback with formatting
+                return formatPhoneNumber(userId);
+            } catch (error) {
+                // Fallback to just showing the ID
+                return formatPhoneNumber(userId);
+            }
+        };
+        
+        // Format phone number for display
+        function formatPhoneNumber(phoneNumber) {
+            // Remove any prefix like "+" if present
+            phoneNumber = phoneNumber.replace(/^\+/, '');
+            
+            // Basic formatting based on length
+            if (phoneNumber.length <= 5) {
+                return phoneNumber;
+            } else if (phoneNumber.length <= 8) {
+                return phoneNumber.slice(0, 3) + '-' + phoneNumber.slice(3);
+            } else if (phoneNumber.length <= 10) {
+                return phoneNumber.slice(0, 3) + '-' + phoneNumber.slice(3, 6) + '-' + phoneNumber.slice(6);
+            } else {
+                // For longer international numbers
+                return '+' + phoneNumber.slice(0, 2) + ' ' + 
+                       phoneNumber.slice(2, 5) + '-' + 
+                       phoneNumber.slice(5, 8) + '-' + 
+                       phoneNumber.slice(8);
+            }
+        }
+        
+        // Create leaderboard header
+        let message = `📊 *${periodName} ACTIVE MEMBERS* 📊\n\n`;
+        
+        // Add each user entry
+        for (let i = 0; i < leaderboard.length; i++) {
+            const entry = leaderboard[i];
+            const rank = i + 1;
+            const medal = rank <= 3 ? ['🥇', '🥈', '🥉'][rank - 1] : `${rank}.`;
+            const userName = await getUserName(entry.userId);
+            message += `${medal} ${userName}: ${entry.count} messages\n`;
+        }
+        
+        message += `\nUpdated: ${new Date().toLocaleString()}`;
         
         return { 
             success: true, 
-            message: `*Most Active Members (${period})*\n\n` +
-                     `1. [Member 1] - 45 messages\n` +
-                     `2. [Member 2] - 32 messages\n` +
-                     `3. [Member 3] - 27 messages\n` +
-                     `4. [Member 4] - 18 messages\n` +
-                     `5. [Member 5] - 12 messages\n\n` +
-                     `Note: This is a placeholder. To track real activity, message history storage is needed.`
+            message: message
         };
     } catch (error) {
         console.error('Error getting active members:', error);
-        return { success: false, message: "Failed to identify active members." };
+        return { success: false, message: "Failed to identify active members: " + error.message };
     }
 }
 
@@ -341,21 +421,150 @@ async function findInfluencers(sock, remoteJid) {
             return { success: false, message: "This command can only be used in groups." };
         }
         
-        // This would require analyzing message patterns and responses
-        // For now, we'll return a placeholder message
+        // Use the groupRelationship module to analyze real data
+        const groupRelationship = require('../lib/groupRelationship');
+        const messageStats = require('../lib/messageStats');
+        
+        // Get activity analysis from the group relationship module
+        const analysisResult = groupRelationship.analyzeGroup(remoteJid);
+        
+        if (analysisResult.error) {
+            if (analysisResult.needsData) {
+                return { 
+                    success: false, 
+                    message: "Not enough group interaction data collected yet.\n\nThe bot needs to observe more message activity and replies between members to identify influencers. Keep chatting!"
+                };
+            }
+            return { 
+                success: false, 
+                message: "Failed to analyze group dynamics: " + analysisResult.error
+            };
+        }
+        
+        // Format phone number for display
+        function formatPhoneNumber(phoneNumber) {
+            // Remove any prefix like "+" if present
+            phoneNumber = phoneNumber.replace(/^\+/, '');
+            
+            // Basic formatting based on length
+            if (phoneNumber.length <= 5) {
+                return phoneNumber;
+            } else if (phoneNumber.length <= 8) {
+                return phoneNumber.slice(0, 3) + '-' + phoneNumber.slice(3);
+            } else if (phoneNumber.length <= 10) {
+                return phoneNumber.slice(0, 3) + '-' + phoneNumber.slice(3, 6) + '-' + phoneNumber.slice(6);
+            } else {
+                // For longer international numbers
+                return '+' + phoneNumber.slice(0, 2) + ' ' + 
+                       phoneNumber.slice(2, 5) + '-' + 
+                       phoneNumber.slice(5, 8) + '-' + 
+                       phoneNumber.slice(8);
+            }
+        }
+        
+        // Get user name from WhatsApp
+        const getUserName = async (userId) => {
+            try {
+                // First try to get name from WhatsApp
+                const fullJid = `${userId}@s.whatsapp.net`;
+                const [result] = await sock.onWhatsApp(fullJid);
+                
+                if (result && result.exists) {
+                    try {
+                        // Try to get user info
+                        const userInfo = await sock.getContactInfo(fullJid);
+                        if (userInfo && userInfo.notify) {
+                            return userInfo.notify;
+                        }
+                    } catch (error) {
+                        // Silently fail, will use phone number instead
+                    }
+                }
+                
+                // Use phone number as fallback with formatting
+                return formatPhoneNumber(userId);
+            } catch (error) {
+                // Fallback to just showing the ID
+                return formatPhoneNumber(userId);
+            }
+        };
+        
+        // Get all-time message stats for context
+        const topMessages = messageStats.getAllTimeLeaderboard(remoteJid, 5);
+        
+        // Prepare the report
+        let message = `📊 *GROUP INFLUENCE ANALYSIS* 📊\n\n`;
+        
+        // Add key influencers section if we have them
+        if (analysisResult.keyInfluencers && analysisResult.keyInfluencers.length > 0) {
+            message += `🌟 *KEY INFLUENCERS*\n`;
+            let count = 0;
+            
+            for (const influencer of analysisResult.keyInfluencers) {
+                if (count >= 3) break; // Only show top 3
+                
+                const name = await getUserName(influencer.id);
+                let metric = "";
+                
+                if (influencer.responseRate) {
+                    metric = `Response rate: ${(influencer.responseRate * 100).toFixed(0)}%`;
+                } else if (influencer.receivedReplies) {
+                    metric = `Gets ${influencer.receivedReplies} replies`;
+                } else if (influencer.threadStarts) {
+                    metric = `Starts ${influencer.threadStarts} convos`;
+                }
+                
+                message += `${count + 1}. ${name} - ${metric}\n`;
+                count++;
+            }
+            message += `\n`;
+        }
+        
+        // Add conversation starters if available
+        if (analysisResult.conversationStarters && analysisResult.conversationStarters.length > 0) {
+            message += `💬 *CONVERSATION STARTERS*\n`;
+            
+            for (let i = 0; i < Math.min(3, analysisResult.conversationStarters.length); i++) {
+                const starter = analysisResult.conversationStarters[i];
+                const name = await getUserName(starter.id);
+                message += `${i + 1}. ${name} - ${starter.count} new topics\n`;
+            }
+            message += `\n`;
+        }
+        
+        // Add most replied to members if available
+        if (analysisResult.mostRepliedTo && analysisResult.mostRepliedTo.length > 0) {
+            message += `📨 *MOST REPLIED TO*\n`;
+            
+            for (let i = 0; i < Math.min(3, analysisResult.mostRepliedTo.length); i++) {
+                const member = analysisResult.mostRepliedTo[i];
+                const name = await getUserName(member.id);
+                message += `${i + 1}. ${name} - ${member.count} replies received\n`;
+            }
+            message += `\n`;
+        }
+        
+        // Add most active members from message stats
+        if (topMessages && topMessages.length > 0) {
+            message += `📝 *MOST ACTIVE MEMBERS*\n`;
+            
+            for (let i = 0; i < topMessages.length; i++) {
+                const member = topMessages[i];
+                const name = await getUserName(member.userId);
+                message += `${i + 1}. ${name} - ${member.count} messages\n`;
+            }
+        }
+        
+        // Add analysis timestamp
+        message += `\nAnalysis updated: ${new Date().toLocaleString()}`;
         
         return { 
             success: true, 
-            message: `*Group Influence Analysis*\n\n` +
-                     `Primary Influencers:\n` +
-                     `1. [Member 1] - High response rate (82%)\n` +
-                     `2. [Member 2] - Most responded to (65 replies)\n` +
-                     `3. [Member 3] - Conversation starter (23 threads)\n\n` +
-                     `Note: This is a placeholder. To track real influence, message interaction analysis is needed.`
+            message: message
         };
     } catch (error) {
         console.error('Error finding influencers:', error);
-        return { success: false, message: "Failed to identify group influencers." };
+        return { success: false, message: "Failed to identify group influencers: " + error.message };
     }
 }
 

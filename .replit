@@ -32,7 +32,6 @@ task = "packager.installForAll"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "npm install @whiskeysockets/baileys @hapi/boom pino qrcode-terminal @google/generative-ai node-fetch natural wa-sticker-formatter node-schedule && node index.js"
-waitForPort = 5000
 
 [[workflows.workflow]]
 name = "whatsapp_bot"

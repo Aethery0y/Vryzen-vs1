@@ -31,8 +31,9 @@ const config = {
     maxStrikes: 2,  // Number of strikes before a ban
     
     // Anime news settings
-    animeNewsApiUrl: 'https://api.jikan.moe/v4/anime?status=airing&sfw=true&limit=20',
-    animeNewsInterval: 10, // Minutes between news updates
+    // Removed anime news functionality
+    // animeNewsApiUrl: 'https://api.jikan.moe/v4/anime?status=airing&sfw=true&limit=20',
+    // animeNewsInterval: 10, // Minutes between news updates
     
     // Group management
     addContactsDelay: 60000, // Delay in ms between adding contacts (1 minute)
@@ -71,16 +72,6 @@ const config = {
             cardGachaInterval: 6, // Hours between free card gacha
             tradeRatio: 3, // Number of lower tier cards needed to trade up
             maxInventorySize: 100 // Max cards in inventory
-        },
-        
-        // Betting system settings
-        betting: {
-            minBetAmount: 50,
-            maxBetAmount: 5000,
-            defaultMultiplier: 2.0,
-            gameExpiry: 3, // Hours until a betting game auto-expires
-            maxActiveBetsPerUser: 5,
-            maxActiveBetsPerGroup: 10
         }
     }
 };
