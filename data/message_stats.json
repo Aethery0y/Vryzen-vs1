@@ -25,16 +25,16 @@
       }
     },
     "918810502592": {
-      "totalMessages": 28,
+      "totalMessages": 30,
       "dailyMessages": {
         "2025-04-03": 2,
-        "2025-04-04": 26
+        "2025-04-04": 28
       },
       "weeklyMessages": {
-        "2025-14": 28
+        "2025-14": 30
       },
       "monthlyMessages": {
-        "2025-04": 28
+        "2025-04": 30
       }
     },
     "254757934518": {
@@ -420,6 +420,18 @@
       "monthlyMessages": {
         "2025-04": 1
       }
+    },
+    "2347078502947": {
+      "totalMessages": 6,
+      "dailyMessages": {
+        "2025-04-04": 6
+      },
+      "weeklyMessages": {
+        "2025-14": 6
+      },
+      "monthlyMessages": {
+        "2025-04": 6
+      }
     }
   },
   "groups": {
@@ -589,7 +601,7 @@
       }
     },
     "120363197551475655@g.us": {
-      "totalMessages": 79,
+      "totalMessages": 85,
       "users": {
         "242067985991": {
           "totalMessages": 1,
@@ -697,6 +709,18 @@
           },
           "monthlyMessages": {
             "2025-04": 1
+          }
+        },
+        "2347078502947": {
+          "totalMessages": 6,
+          "dailyMessages": {
+            "2025-04-04": 6
+          },
+          "weeklyMessages": {
+            "2025-14": 6
+          },
+          "monthlyMessages": {
+            "2025-04": 6
           }
         }
       }
@@ -883,6 +907,40 @@
           }
         },
         "923428626219": {
+          "totalMessages": 1,
+          "dailyMessages": {
+            "2025-04-04": 1
+          },
+          "weeklyMessages": {
+            "2025-14": 1
+          },
+          "monthlyMessages": {
+            "2025-04": 1
+          }
+        }
+      }
+    },
+    "120363399990057355@g.us": {
+      "totalMessages": 1,
+      "users": {
+        "918810502592": {
+          "totalMessages": 1,
+          "dailyMessages": {
+            "2025-04-04": 1
+          },
+          "weeklyMessages": {
+            "2025-14": 1
+          },
+          "monthlyMessages": {
+            "2025-04": 1
+          }
+        }
+      }
+    },
+    "120363418322689990@g.us": {
+      "totalMessages": 1,
+      "users": {
+        "918810502592": {
           "totalMessages": 1,
           "dailyMessages": {
             "2025-04-04": 1

