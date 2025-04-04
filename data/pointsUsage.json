@@ -11,5 +11,11 @@
       "quiz": 50,
       "card_collection": 20
     }
+  },
+  "918920659106": {
+    "total": 5,
+    "sources": {
+      "command_usage": 5
+    }
   }
 }

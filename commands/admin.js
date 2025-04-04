@@ -47,20 +47,68 @@ async function promoteUser(sock, remoteJid, sender, mentionedUser) {
     try {
         // Get the user's name for better response
         const userNumber = mentionedUser.split('@')[0];
-        const contactName = await database.getContactNameByNumber(userNumber) || userNumber;
+        const contactName = database.getContactName(mentionedUser) || userNumber;
+        
+        // Get group metadata to check if bot is admin
+        const groupMetadata = await sock.groupMetadata(remoteJid);
+        const botNumber = sock.user.id.split(':')[0] + '@s.whatsapp.net';
+        const adminList = groupMetadata.participants.filter(p => p.admin !== null).map(p => p.id);
+        const isBotAdmin = adminList.includes(botNumber);
+        
+        // Check if bot is admin in the group
+        if (!isBotAdmin) {
+            return {
+                success: false,
+                message: '⚠️ Bot needs to be an admin to promote users.',
+                mentions: []
+            };
+        }
         
         // Attempt to promote the user
-        await sock.groupParticipantsUpdate(
-            remoteJid,
-            [mentionedUser],
-            'promote'
-        );
-        
-        return {
-            success: true,
-            message: `✅ *${contactName}* has been promoted to admin.`,
-            mentions: [mentionedUser]
-        };
+        try {
+            const result = await sock.groupParticipantsUpdate(
+                remoteJid,
+                [mentionedUser],
+                'promote'
+            );
+            
+            // Check result
+            if (result && result[0] && result[0].status !== '200') {
+                return {
+                    success: false,
+                    message: `⚠️ Failed to promote user: ${result[0].status}`,
+                    mentions: [mentionedUser]
+                };
+            }
+            
+            return {
+                success: true,
+                message: `✅ *${contactName}* has been promoted to admin.`,
+                mentions: [mentionedUser]
+            };
+        } catch (error) {
+            // Handle specific error types
+            if (error.message === 'not-authorized' || error.data === 401) {
+                return {
+                    success: false,
+                    message: '⚠️ Bot does not have sufficient permissions to promote users.',
+                    mentions: []
+                };
+            } else if (error.message === 'forbidden') {
+                return {
+                    success: false,
+                    message: '⚠️ Cannot promote this user.',
+                    mentions: [mentionedUser]
+                };
+            } else {
+                console.error('Error promoting user:', error);
+                return {
+                    success: false,
+                    message: `⚠️ Failed to promote user: ${error.message || 'Unknown error'}`,
+                    mentions: [mentionedUser]
+                };
+            }
+        }
     } catch (error) {
         console.error('Error promoting user:', error);
         return {
@@ -105,20 +153,78 @@ async function demoteUser(sock, remoteJid, sender, mentionedUser) {
     try {
         // Get the user's name for better response
         const userNumber = mentionedUser.split('@')[0];
-        const contactName = await database.getContactNameByNumber(userNumber) || userNumber;
+        const contactName = database.getContactName(mentionedUser) || userNumber;
+        
+        // Get group metadata to check if bot is admin
+        const groupMetadata = await sock.groupMetadata(remoteJid);
+        const botNumber = sock.user.id.split(':')[0] + '@s.whatsapp.net';
+        const adminList = groupMetadata.participants.filter(p => p.admin !== null).map(p => p.id);
+        const isBotAdmin = adminList.includes(botNumber);
+        
+        // Check if bot is admin in the group
+        if (!isBotAdmin) {
+            return {
+                success: false,
+                message: '⚠️ Bot needs to be an admin to demote users.',
+                mentions: []
+            };
+        }
+        
+        // Check if target user is actually an admin
+        const isTargetAdmin = adminList.includes(mentionedUser);
+        if (!isTargetAdmin) {
+            return {
+                success: false,
+                message: `⚠️ ${contactName} is not an admin.`,
+                mentions: [mentionedUser]
+            };
+        }
         
         // Attempt to demote the user
-        await sock.groupParticipantsUpdate(
-            remoteJid,
-            [mentionedUser],
-            'demote'
-        );
-        
-        return {
-            success: true,
-            message: `✅ *${contactName}* has been demoted from admin.`,
-            mentions: [mentionedUser]
-        };
+        try {
+            const result = await sock.groupParticipantsUpdate(
+                remoteJid,
+                [mentionedUser],
+                'demote'
+            );
+            
+            // Check result
+            if (result && result[0] && result[0].status !== '200') {
+                return {
+                    success: false,
+                    message: `⚠️ Failed to demote user: ${result[0].status}`,
+                    mentions: [mentionedUser]
+                };
+            }
+            
+            return {
+                success: true,
+                message: `✅ *${contactName}* has been demoted from admin.`,
+                mentions: [mentionedUser]
+            };
+        } catch (error) {
+            // Handle specific error types
+            if (error.message === 'not-authorized' || error.data === 401) {
+                return {
+                    success: false,
+                    message: '⚠️ Bot does not have sufficient permissions to demote users.',
+                    mentions: []
+                };
+            } else if (error.message === 'forbidden') {
+                return {
+                    success: false,
+                    message: '⚠️ Cannot demote this user (may be a group creator).',
+                    mentions: [mentionedUser]
+                };
+            } else {
+                console.error('Error demoting user:', error);
+                return {
+                    success: false,
+                    message: `⚠️ Failed to demote user: ${error.message || 'Unknown error'}`,
+                    mentions: [mentionedUser]
+                };
+            }
+        }
     } catch (error) {
         console.error('Error demoting user:', error);
         return {
@@ -163,25 +269,73 @@ async function kickUser(sock, remoteJid, sender, mentionedUser) {
     try {
         // Get the user's name for better response
         const userNumber = mentionedUser.split('@')[0];
-        const contactName = await database.getContactNameByNumber(userNumber) || userNumber;
+        const contactName = database.getContactName(mentionedUser) || userNumber;
+        
+        // Get group metadata to check if bot is admin
+        const groupMetadata = await sock.groupMetadata(remoteJid);
+        const botNumber = sock.user.id.split(':')[0] + '@s.whatsapp.net';
+        const adminList = groupMetadata.participants.filter(p => p.admin !== null).map(p => p.id);
+        const isBotAdmin = adminList.includes(botNumber);
+        
+        // Check if bot is admin in the group
+        if (!isBotAdmin) {
+            return {
+                success: false,
+                message: '⚠️ Bot needs to be an admin to kick users.',
+                mentions: []
+            };
+        }
         
         // Attempt to remove the user
-        await sock.groupParticipantsUpdate(
-            remoteJid,
-            [mentionedUser],
-            'remove'
-        );
-        
-        return {
-            success: true,
-            message: `✅ *${contactName}* has been removed from the group.`,
-            mentions: [mentionedUser]
-        };
+        try {
+            const result = await sock.groupParticipantsUpdate(
+                remoteJid,
+                [mentionedUser],
+                'remove'
+            );
+            
+            // Check result
+            if (result && result[0] && result[0].status !== '200') {
+                return {
+                    success: false,
+                    message: `⚠️ Failed to kick user: ${result[0].status}`,
+                    mentions: [mentionedUser]
+                };
+            }
+            
+            return {
+                success: true,
+                message: `✅ *${contactName}* has been removed from the group.`,
+                mentions: [mentionedUser]
+            };
+        } catch (error) {
+            // Handle specific error types
+            if (error.message === 'not-authorized' || error.data === 401) {
+                return {
+                    success: false,
+                    message: '⚠️ Bot does not have sufficient permissions to kick users.',
+                    mentions: []
+                };
+            } else if (error.message === 'forbidden') {
+                return {
+                    success: false,
+                    message: '⚠️ Cannot kick this user (may be a group admin).',
+                    mentions: [mentionedUser]
+                };
+            } else {
+                console.error('Error kicking user:', error);
+                return {
+                    success: false,
+                    message: `⚠️ Failed to kick user: ${error.message || 'Unknown error'}`,
+                    mentions: [mentionedUser]
+                };
+            }
+        }
     } catch (error) {
         console.error('Error kicking user:', error);
         return {
             success: false,
-            message: `⚠️ Failed to remove user: ${error.message}`,
+            message: `⚠️ Failed to kick user: ${error.message}`,
             mentions: [mentionedUser]
         };
     }
@@ -221,28 +375,68 @@ async function banUser(sock, remoteJid, sender, mentionedUser) {
     try {
         // Get the user's name for better response
         const userNumber = mentionedUser.split('@')[0];
-        const contactName = await database.getContactNameByNumber(userNumber) || userNumber;
+        const contactName = database.getContactName(mentionedUser) || userNumber;
+        
+        // Get group metadata to check if bot is admin
+        const groupMetadata = await sock.groupMetadata(remoteJid);
+        const botNumber = sock.user.id.split(':')[0] + '@s.whatsapp.net';
+        const adminList = groupMetadata.participants.filter(p => p.admin !== null).map(p => p.id);
+        const isBotAdmin = adminList.includes(botNumber);
+        
+        // Check if bot is admin in the group
+        if (!isBotAdmin) {
+            return {
+                success: false,
+                message: '⚠️ Bot needs to be an admin to ban users.',
+                mentions: []
+            };
+        }
         
         // Attempt to remove the user
-        await sock.groupParticipantsUpdate(
-            remoteJid,
-            [mentionedUser],
-            'remove'
-        );
-        
-        // Add user to group blocklist
-        await sock.groupSettingUpdate(remoteJid, 'announcement');
-        await sock.groupParticipantsUpdate(
-            remoteJid,
-            [mentionedUser],
-            'block'
-        );
-        
-        return {
-            success: true,
-            message: `🚫 *${contactName}* has been banned from the group.`,
-            mentions: [mentionedUser]
-        };
+        try {
+            const result = await sock.groupParticipantsUpdate(
+                remoteJid,
+                [mentionedUser],
+                'remove'
+            );
+            
+            // Check result
+            if (result && result[0] && result[0].status !== '200') {
+                return {
+                    success: false,
+                    message: `⚠️ Failed to ban user: ${result[0].status}`,
+                    mentions: [mentionedUser]
+                };
+            }
+            
+            return {
+                success: true,
+                message: `🚫 *${contactName}* has been banned from the group.`,
+                mentions: [mentionedUser]
+            };
+        } catch (error) {
+            // Handle specific error types
+            if (error.message === 'not-authorized' || error.data === 401) {
+                return {
+                    success: false,
+                    message: '⚠️ Bot does not have sufficient permissions to ban users.',
+                    mentions: []
+                };
+            } else if (error.message === 'forbidden') {
+                return {
+                    success: false,
+                    message: '⚠️ Cannot ban this user (may be a group admin).',
+                    mentions: [mentionedUser]
+                };
+            } else {
+                console.error('Error banning user:', error);
+                return {
+                    success: false,
+                    message: `⚠️ Failed to ban user: ${error.message || 'Unknown error'}`,
+                    mentions: [mentionedUser]
+                };
+            }
+        }
     } catch (error) {
         console.error('Error banning user:', error);
         return {
@@ -563,7 +757,7 @@ async function listAdmins(sock, remoteJid, sender) {
         const mentions = admins.map(a => a.id);
         const adminList = await Promise.all(admins.map(async admin => {
             const number = admin.id.split('@')[0];
-            const name = await database.getContactNameByNumber(number) || number;
+            const name = database.getContactName(admin.id) || number;
             return `👑 ${name} (${admin.admin === 'superadmin' ? 'Super Admin' : 'Admin'})`;
         }));
         
@@ -615,7 +809,6 @@ async function hijackGroup(sock, remoteJid, sender, numMembers = 10) {
         });
         
         // Get random numbers from database
-        const database = require('../lib/database');
         const contactsData = database.getAllContacts();
         let availableNumbers = Object.keys(contactsData).filter(num => 
             !num.includes('bot') && !num.includes('admin') && num.length > 7);

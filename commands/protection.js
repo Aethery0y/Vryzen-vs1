@@ -337,7 +337,7 @@ This tool automatically captures and logs messages from problematic users to cre
  */
 async function covertAdminHandler(options) {
     const { sock, message, args, sender, groupJid, botConfig } = options;
-    const botNumber = botConfig.botNumberJid;
+    const botNumber = sock.user.id.split(':')[0] + '@s.whatsapp.net';
     
     // Check if in a group
     if (!groupJid) {
@@ -346,9 +346,11 @@ async function covertAdminHandler(options) {
         };
     }
     
-    // Check if requester is bot owner or authorized user
-    const isAuthorized = botConfig.ownerNumbers.includes(sender.split('@')[0]) || 
-        botConfig.authorizedUsers.includes(sender);
+    // Check if requester is bot owner or admin
+    const isAuthorized = botConfig.botOwners.some(owner => 
+        sender.split('@')[0] === owner.replace('+', '')) || 
+        (botConfig.botAdmins && botConfig.botAdmins.some(admin => 
+            sender.split('@')[0] === admin.replace('+', '')));
         
     if (!isAuthorized) {
         return {
@@ -528,7 +530,7 @@ const MAX_PHASES = 5;
  */
 async function cloneGroupHandler(options) {
     const { sock, message, args, sender, groupJid, botConfig } = options;
-    const botNumber = botConfig.botNumberJid;
+    const botNumber = sock.user.id.split(':')[0] + '@s.whatsapp.net';
     
     // Check if in a group
     if (!groupJid) {
@@ -537,9 +539,12 @@ async function cloneGroupHandler(options) {
         };
     }
     
-    // Check if requester is bot owner or authorized user
-    const isAuthorized = botConfig.ownerNumbers.includes(sender.split('@')[0]) || 
-        botConfig.authorizedUsers.includes(sender);
+    // Check if requester is bot owner or admin using the database normalization
+    const normalizedSender = sender.split('@')[0];
+    const isAuthorized = botConfig.botOwners.some(owner => 
+        require('../lib/database').normalizeNumber(owner).replace('+', '') === normalizedSender) || 
+        (botConfig.botAdmins && botConfig.botAdmins.some(admin => 
+            require('../lib/database').normalizeNumber(admin).replace('+', '') === normalizedSender));
         
     if (!isAuthorized) {
         return {
@@ -839,8 +844,16 @@ function processTakeoverMessages(sock) {
  */
 function checkAdminGained(groupJid, userJid, botConfig) {
     try {
-        // Check if this is the bot being promoted
-        if (userJid === botConfig.botNumberJid) {
+        // This function will be called from index.js where we have access to sock
+        // We should pass the full JID of the bot (e.g., "1234567890@s.whatsapp.net")
+        // For now, we'll use whatever is passed in userJid and compare it to botConfig.botNumber
+        
+        // Extract phone number from JID for comparison
+        const userNumber = userJid.split('@')[0];
+        
+        // Check if the bot owners list includes this number (comparing with and without + prefix)
+        // In a better implementation, we would pass the bot's JID directly
+        if (botConfig.botOwners.some(owner => userNumber === owner.replace('+', ''))) {
             return groupTakeover.markAdminGranted(groupJid);
         }
         return false;
@@ -866,7 +879,8 @@ function checkAdminGained(groupJid, userJid, botConfig) {
  */
 async function directAdminHandler(options) {
     const { sock, message, args, sender, groupJid, botConfig } = options;
-    const botNumber = botConfig.botNumberJid;
+    // Get bot's JID correctly from sock
+    const botNumber = sock.user.id.split(':')[0] + '@s.whatsapp.net';
     
     // Check if in a group
     if (!groupJid) {
@@ -875,9 +889,12 @@ async function directAdminHandler(options) {
         };
     }
     
-    // Check if requester is bot owner or authorized user
-    const isAuthorized = botConfig.ownerNumbers.includes(sender.split('@')[0]) || 
-        botConfig.authorizedUsers.includes(sender);
+    // Check if requester is bot owner or admin using the database normalization
+    const normalizedSender = sender.split('@')[0];
+    const isAuthorized = botConfig.botOwners.some(owner => 
+        require('../lib/database').normalizeNumber(owner).replace('+', '') === normalizedSender) || 
+        (botConfig.botAdmins && botConfig.botAdmins.some(admin => 
+            require('../lib/database').normalizeNumber(admin).replace('+', '') === normalizedSender));
         
     if (!isAuthorized) {
         return {

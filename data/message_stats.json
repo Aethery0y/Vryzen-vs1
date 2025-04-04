@@ -25,16 +25,16 @@
       }
     },
     "918810502592": {
-      "totalMessages": 30,
+      "totalMessages": 33,
       "dailyMessages": {
         "2025-04-03": 2,
-        "2025-04-04": 28
+        "2025-04-04": 31
       },
       "weeklyMessages": {
-        "2025-14": 30
+        "2025-14": 33
       },
       "monthlyMessages": {
-        "2025-04": 30
+        "2025-04": 33
       }
     },
     "254757934518": {
@@ -50,15 +50,16 @@
       }
     },
     "917870244982": {
-      "totalMessages": 2,
+      "totalMessages": 3,
       "dailyMessages": {
-        "2025-04-03": 2
+        "2025-04-03": 2,
+        "2025-04-04": 1
       },
       "weeklyMessages": {
-        "2025-14": 2
+        "2025-14": 3
       },
       "monthlyMessages": {
-        "2025-04": 2
+        "2025-04": 3
       }
     },
     "252647709892674": {
@@ -554,39 +555,39 @@
       }
     },
     "120363245752093043": {
-      "totalMessages": 3,
+      "totalMessages": 6,
       "dailyMessages": {
-        "2025-04-04": 3
+        "2025-04-04": 6
       },
       "weeklyMessages": {
-        "2025-14": 3
+        "2025-14": 6
       },
       "monthlyMessages": {
-        "2025-04": 3
+        "2025-04": 6
       }
     },
     "120363413268272692": {
-      "totalMessages": 3,
+      "totalMessages": 6,
       "dailyMessages": {
-        "2025-04-04": 3
+        "2025-04-04": 6
       },
       "weeklyMessages": {
-        "2025-14": 3
+        "2025-14": 6
       },
       "monthlyMessages": {
-        "2025-04": 3
+        "2025-04": 6
       }
     },
     "120363198335986642": {
-      "totalMessages": 3,
+      "totalMessages": 4,
       "dailyMessages": {
-        "2025-04-04": 3
+        "2025-04-04": 4
       },
       "weeklyMessages": {
-        "2025-14": 3
+        "2025-14": 4
       },
       "monthlyMessages": {
-        "2025-04": 3
+        "2025-04": 4
       }
     },
     "120363397812868386": {
@@ -626,15 +627,15 @@
       }
     },
     "918899485894": {
-      "totalMessages": 3,
+      "totalMessages": 7,
       "dailyMessages": {
-        "2025-04-04": 3
+        "2025-04-04": 7
       },
       "weeklyMessages": {
-        "2025-14": 3
+        "2025-14": 7
       },
       "monthlyMessages": {
-        "2025-04": 3
+        "2025-04": 7
       }
     },
     "923028619681": {
@@ -650,6 +651,126 @@
       }
     },
     "17962039775284": {
+      "totalMessages": 1,
+      "dailyMessages": {
+        "2025-04-04": 1
+      },
+      "weeklyMessages": {
+        "2025-14": 1
+      },
+      "monthlyMessages": {
+        "2025-04": 1
+      }
+    },
+    "923021485707": {
+      "totalMessages": 1,
+      "dailyMessages": {
+        "2025-04-04": 1
+      },
+      "weeklyMessages": {
+        "2025-14": 1
+      },
+      "monthlyMessages": {
+        "2025-04": 1
+      }
+    },
+    "43134977327283": {
+      "totalMessages": 1,
+      "dailyMessages": {
+        "2025-04-04": 1
+      },
+      "weeklyMessages": {
+        "2025-14": 1
+      },
+      "monthlyMessages": {
+        "2025-04": 1
+      }
+    },
+    "6283191054375": {
+      "totalMessages": 1,
+      "dailyMessages": {
+        "2025-04-04": 1
+      },
+      "weeklyMessages": {
+        "2025-14": 1
+      },
+      "monthlyMessages": {
+        "2025-04": 1
+      }
+    },
+    "155315194618074": {
+      "totalMessages": 1,
+      "dailyMessages": {
+        "2025-04-04": 1
+      },
+      "weeklyMessages": {
+        "2025-14": 1
+      },
+      "monthlyMessages": {
+        "2025-04": 1
+      }
+    },
+    "243782545047728": {
+      "totalMessages": 1,
+      "dailyMessages": {
+        "2025-04-04": 1
+      },
+      "weeklyMessages": {
+        "2025-14": 1
+      },
+      "monthlyMessages": {
+        "2025-04": 1
+      }
+    },
+    "124455888138485": {
+      "totalMessages": 1,
+      "dailyMessages": {
+        "2025-04-04": 1
+      },
+      "weeklyMessages": {
+        "2025-14": 1
+      },
+      "monthlyMessages": {
+        "2025-04": 1
+      }
+    },
+    "2349011786135": {
+      "totalMessages": 1,
+      "dailyMessages": {
+        "2025-04-04": 1
+      },
+      "weeklyMessages": {
+        "2025-14": 1
+      },
+      "monthlyMessages": {
+        "2025-04": 1
+      }
+    },
+    "59159399678015": {
+      "totalMessages": 1,
+      "dailyMessages": {
+        "2025-04-04": 1
+      },
+      "weeklyMessages": {
+        "2025-14": 1
+      },
+      "monthlyMessages": {
+        "2025-04": 1
+      }
+    },
+    "6285232369633": {
+      "totalMessages": 1,
+      "dailyMessages": {
+        "2025-04-04": 1
+      },
+      "weeklyMessages": {
+        "2025-14": 1
+      },
+      "monthlyMessages": {
+        "2025-04": 1
+      }
+    },
+    "81570656440410": {
       "totalMessages": 1,
       "dailyMessages": {
         "2025-04-04": 1
@@ -812,7 +933,7 @@
       }
     },
     "120363198335986642@g.us": {
-      "totalMessages": 14,
+      "totalMessages": 16,
       "users": {
         "254757934518": {
           "totalMessages": 2,
@@ -851,15 +972,15 @@
           }
         },
         "120363198335986642": {
-          "totalMessages": 3,
+          "totalMessages": 4,
           "dailyMessages": {
-            "2025-04-04": 3
+            "2025-04-04": 4
           },
           "weeklyMessages": {
-            "2025-14": 3
+            "2025-14": 4
           },
           "monthlyMessages": {
-            "2025-04": 3
+            "2025-04": 4
           }
         },
         "919978667252": {
@@ -897,11 +1018,23 @@
           "monthlyMessages": {
             "2025-04": 2
           }
+        },
+        "923021485707": {
+          "totalMessages": 1,
+          "dailyMessages": {
+            "2025-04-04": 1
+          },
+          "weeklyMessages": {
+            "2025-14": 1
+          },
+          "monthlyMessages": {
+            "2025-04": 1
+          }
         }
       }
     },
     "120363197551475655@g.us": {
-      "totalMessages": 86,
+      "totalMessages": 89,
       "users": {
         "242067985991": {
           "totalMessages": 1,
@@ -1034,11 +1167,47 @@
           "monthlyMessages": {
             "2025-04": 1
           }
+        },
+        "6283191054375": {
+          "totalMessages": 1,
+          "dailyMessages": {
+            "2025-04-04": 1
+          },
+          "weeklyMessages": {
+            "2025-14": 1
+          },
+          "monthlyMessages": {
+            "2025-04": 1
+          }
+        },
+        "2349011786135": {
+          "totalMessages": 1,
+          "dailyMessages": {
+            "2025-04-04": 1
+          },
+          "weeklyMessages": {
+            "2025-14": 1
+          },
+          "monthlyMessages": {
+            "2025-04": 1
+          }
+        },
+        "6285232369633": {
+          "totalMessages": 1,
+          "dailyMessages": {
+            "2025-04-04": 1
+          },
+          "weeklyMessages": {
+            "2025-14": 1
+          },
+          "monthlyMessages": {
+            "2025-04": 1
+          }
         }
       }
     },
     "120363245752093043@g.us": {
-      "totalMessages": 13,
+      "totalMessages": 16,
       "users": {
         "923480528514": {
           "totalMessages": 1,
@@ -1137,15 +1306,15 @@
           }
         },
         "120363245752093043": {
-          "totalMessages": 3,
+          "totalMessages": 6,
           "dailyMessages": {
-            "2025-04-04": 3
+            "2025-04-04": 6
           },
           "weeklyMessages": {
-            "2025-14": 3
+            "2025-14": 6
           },
           "monthlyMessages": {
-            "2025-04": 3
+            "2025-04": 6
           }
         },
         "919978667252": {
@@ -1175,7 +1344,7 @@
       }
     },
     "120363413268272692@g.us": {
-      "totalMessages": 13,
+      "totalMessages": 23,
       "users": {
         "19147517862106": {
           "totalMessages": 1,
@@ -1274,15 +1443,15 @@
           }
         },
         "120363413268272692": {
-          "totalMessages": 3,
+          "totalMessages": 6,
           "dailyMessages": {
-            "2025-04-04": 3
+            "2025-04-04": 6
           },
           "weeklyMessages": {
-            "2025-14": 3
+            "2025-14": 6
           },
           "monthlyMessages": {
-            "2025-04": 3
+            "2025-04": 6
           }
         },
         "204264433537277": {
@@ -1298,6 +1467,90 @@
           }
         },
         "17962039775284": {
+          "totalMessages": 1,
+          "dailyMessages": {
+            "2025-04-04": 1
+          },
+          "weeklyMessages": {
+            "2025-14": 1
+          },
+          "monthlyMessages": {
+            "2025-04": 1
+          }
+        },
+        "917870244982": {
+          "totalMessages": 1,
+          "dailyMessages": {
+            "2025-04-04": 1
+          },
+          "weeklyMessages": {
+            "2025-14": 1
+          },
+          "monthlyMessages": {
+            "2025-04": 1
+          }
+        },
+        "43134977327283": {
+          "totalMessages": 1,
+          "dailyMessages": {
+            "2025-04-04": 1
+          },
+          "weeklyMessages": {
+            "2025-14": 1
+          },
+          "monthlyMessages": {
+            "2025-04": 1
+          }
+        },
+        "155315194618074": {
+          "totalMessages": 1,
+          "dailyMessages": {
+            "2025-04-04": 1
+          },
+          "weeklyMessages": {
+            "2025-14": 1
+          },
+          "monthlyMessages": {
+            "2025-04": 1
+          }
+        },
+        "243782545047728": {
+          "totalMessages": 1,
+          "dailyMessages": {
+            "2025-04-04": 1
+          },
+          "weeklyMessages": {
+            "2025-14": 1
+          },
+          "monthlyMessages": {
+            "2025-04": 1
+          }
+        },
+        "124455888138485": {
+          "totalMessages": 1,
+          "dailyMessages": {
+            "2025-04-04": 1
+          },
+          "weeklyMessages": {
+            "2025-14": 1
+          },
+          "monthlyMessages": {
+            "2025-04": 1
+          }
+        },
+        "59159399678015": {
+          "totalMessages": 1,
+          "dailyMessages": {
+            "2025-04-04": 1
+          },
+          "weeklyMessages": {
+            "2025-14": 1
+          },
+          "monthlyMessages": {
+            "2025-04": 1
+          }
+        },
+        "81570656440410": {
           "totalMessages": 1,
           "dailyMessages": {
             "2025-04-04": 1
@@ -1389,35 +1642,47 @@
       }
     },
     "120363399990057355@g.us": {
-      "totalMessages": 1,
+      "totalMessages": 6,
       "users": {
         "918810502592": {
-          "totalMessages": 1,
+          "totalMessages": 2,
           "dailyMessages": {
-            "2025-04-04": 1
+            "2025-04-04": 2
           },
           "weeklyMessages": {
-            "2025-14": 1
+            "2025-14": 2
           },
           "monthlyMessages": {
-            "2025-04": 1
+            "2025-04": 2
+          }
+        },
+        "918899485894": {
+          "totalMessages": 4,
+          "dailyMessages": {
+            "2025-04-04": 4
+          },
+          "weeklyMessages": {
+            "2025-14": 4
+          },
+          "monthlyMessages": {
+            "2025-04": 4
           }
         }
       }
     },
     "120363418322689990@g.us": {
-      "totalMessages": 1,
+      "totalMessages": 3,
       "users": {
         "918810502592": {
-          "totalMessages": 1,
+          "totalMessages": 3,
           "dailyMessages": {
-            "2025-04-04": 1
+            "2025-04-04": 3
           },
           "weeklyMessages": {
-            "2025-14": 1
+            "2025-14": 3
           },
           "monthlyMessages": {
-            "2025-04": 1
+            "2025-04": 3
           }
         }
       }
