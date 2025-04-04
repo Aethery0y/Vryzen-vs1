@@ -1,0 +1,167 @@
+[
+  {
+    "question": "Which anime features a boy who wants to become the Pirate King?",
+    "options": [
+      "One Piece",
+      "Naruto",
+      "Dragon Ball",
+      "Bleach"
+    ],
+    "correctAnswer": 0,
+    "difficulty": "easy"
+  },
+  {
+    "question": "In 'Attack on Titan', what are the giant humanoid creatures called?",
+    "options": [
+      "Monsters",
+      "Titans",
+      "Giants",
+      "Colossi"
+    ],
+    "correctAnswer": 1,
+    "difficulty": "easy"
+  },
+  {
+    "question": "Which anime features a world where people have superpowers called 'Quirks'?",
+    "options": [
+      "One Punch Man",
+      "Fairy Tail",
+      "My Hero Academia",
+      "Black Clover"
+    ],
+    "correctAnswer": 2,
+    "difficulty": "easy"
+  },
+  {
+    "question": "What is the name of the main character in 'Naruto'?",
+    "options": [
+      "Sasuke Uchiha",
+      "Naruto Uzumaki",
+      "Kakashi Hatake",
+      "Sakura Haruno"
+    ],
+    "correctAnswer": 1,
+    "difficulty": "easy"
+  },
+  {
+    "question": "Which anime is about a high school student who finds a notebook that can kill people?",
+    "options": [
+      "Tokyo Ghoul",
+      "Death Parade",
+      "Death Note",
+      "Another"
+    ],
+    "correctAnswer": 2,
+    "difficulty": "medium"
+  },
+  {
+    "question": "In 'Demon Slayer', what is Tanjiro's sister's name?",
+    "options": [
+      "Nezuko",
+      "Kanao",
+      "Shinobu",
+      "Mitsuri"
+    ],
+    "correctAnswer": 0,
+    "difficulty": "easy"
+  },
+  {
+    "question": "What studio produced 'Spirited Away'?",
+    "options": [
+      "Toei Animation",
+      "Studio Ghibli",
+      "Madhouse",
+      "Kyoto Animation"
+    ],
+    "correctAnswer": 1,
+    "difficulty": "medium"
+  },
+  {
+    "question": "Which of these is NOT a Pokémon?",
+    "options": [
+      "Pikachu",
+      "Digimon",
+      "Charmander",
+      "Squirtle"
+    ],
+    "correctAnswer": 1,
+    "difficulty": "easy"
+  },
+  {
+    "question": "What is the name of the ship in 'One Piece'?",
+    "options": [
+      "Going Merry",
+      "Thousand Sunny",
+      "Both A and B",
+      "Red Force"
+    ],
+    "correctAnswer": 2,
+    "difficulty": "medium"
+  },
+  {
+    "question": "Who is the creator of 'Dragon Ball'?",
+    "options": [
+      "Masashi Kishimoto",
+      "Eiichiro Oda",
+      "Akira Toriyama",
+      "Tite Kubo"
+    ],
+    "correctAnswer": 2,
+    "difficulty": "medium"
+  },
+  {
+    "question": "What is the name of Goku's signature attack in 'Dragon Ball'?",
+    "options": [
+      "Spirit Bomb",
+      "Kamehameha",
+      "Final Flash",
+      "Galick Gun"
+    ],
+    "correctAnswer": 1,
+    "difficulty": "easy"
+  },
+  {
+    "question": "Which of these anime is set in a virtual reality game?",
+    "options": [
+      "No Game No Life",
+      "Sword Art Online",
+      "Overlord",
+      "All of the above"
+    ],
+    "correctAnswer": 3,
+    "difficulty": "medium"
+  },
+  {
+    "question": "What is the highest-grossing anime film of all time?",
+    "options": [
+      "Your Name",
+      "Spirited Away",
+      "Demon Slayer: Mugen Train",
+      "Princess Mononoke"
+    ],
+    "correctAnswer": 2,
+    "difficulty": "hard"
+  },
+  {
+    "question": "Which anime features a character named Saitama who can defeat any enemy with one punch?",
+    "options": [
+      "Hunter x Hunter",
+      "One Punch Man",
+      "Mob Psycho 100",
+      "Jujutsu Kaisen"
+    ],
+    "correctAnswer": 1,
+    "difficulty": "easy"
+  },
+  {
+    "question": "In 'Death Note', what is the name of the Shinigami who drops the Death Note in the human world?",
+    "options": [
+      "Rem",
+      "Ryuk",
+      "Gelus",
+      "Sidoh"
+    ],
+    "correctAnswer": 1,
+    "difficulty": "medium"
+  }
+]

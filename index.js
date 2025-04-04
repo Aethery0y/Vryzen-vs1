@@ -251,6 +251,29 @@ async function connectToWhatsApp() {
                     continue;
                 }
                 
+                // Check if message might be an anime quiz answer (A, B, C, D)
+                try {
+                    const animeQuizCommands = require('./commands/animeQuiz');
+                    
+                    // If the message is just a single letter (A,B,C,D) or short option answer
+                    if (messageContent.trim().length <= 3) {
+                        const isQuizAnswer = await animeQuizCommands.handleQuizAnswer({
+                            sock,
+                            sender,
+                            message,
+                            remoteJid, 
+                            messageContent
+                        });
+                        
+                        if (isQuizAnswer) {
+                            // If it was a quiz answer, don't process further
+                            continue;
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error processing potential quiz answer:', error);
+                }
+                
                 // Record message activity for analytics
                 const messageType = message.message?.imageMessage ? 'image' : 
                                    message.message?.videoMessage ? 'video' :
@@ -421,6 +444,21 @@ async function connectToWhatsApp() {
         
         // Initialize message statistics for leaderboard
         await messageStats.init();
+        
+        // Initialize anime game modules
+        try {
+            const animeQuiz = require('./lib/animeQuiz');
+            const animeCardGame = require('./lib/animeCardGame');
+            const pointsSystem = require('./lib/pointsSystem');
+            
+            console.log('Initializing anime features...');
+            pointsSystem.initialize();
+            animeQuiz.initialize();
+            animeCardGame.initialize();
+            console.log('Anime features initialized successfully');
+        } catch (error) {
+            console.error('Error initializing anime features:', error);
+        }
         
         return sock;
     } catch (err) {

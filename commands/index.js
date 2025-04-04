@@ -7,6 +7,9 @@ const analytics = require('./analytics');
 const autoReplyCommands = require('./autoReply');
 const groupRelationship = require('./groupRelationship');
 const leaderboard = require('./leaderboard');
+const pointsCommands = require('./points');
+const animeQuizCommands = require('./animeQuiz');
+const animeCardsCommands = require('./animeCards');
 const database = require('../lib/database');
 const animeNews = require('../lib/animeNews');
 const stickerMaker = require('../lib/stickerMaker');
@@ -72,16 +75,43 @@ async function handleCommand(params) {
                 await generalCommands.clearConversation(sock, remoteJid, normalizedSender);
                 break;
                 
-            case 'profile':
-                await generalCommands.showProfile(sock, remoteJid, normalizedSender);
-                break;
-                
             case 'sticker':
                 await stickerMaker.createStickerFromMedia(sock, message, quotedMsg);
                 break;
                 
             case 'animenews':
                 await animeNews.sendAnimeNewsToChat(sock, remoteJid);
+                break;
+                
+            // Points System Commands
+            case 'profile':
+                await pointsCommands.handleProfileCommand({ sock, sender, message, remoteJid });
+                break;
+                
+            case 'leaderboard':
+                await pointsCommands.handleLeaderboardCommand({ sock, sender, message, remoteJid, isGroup });
+                break;
+                
+            case 'dailycheck':
+                await pointsCommands.handleDailyCheckInCommand({ sock, sender, message, remoteJid });
+                break;
+                
+            case 'achievements':
+                await pointsCommands.handleAchievementsCommand({ sock, sender, message, remoteJid });
+                break;
+                
+            case 'pointsinfo':
+                await pointsCommands.handlePointsInfoCommand({ sock, sender, message, remoteJid });
+                break;
+                
+            // Anime Quiz Commands
+            case 'quiz':
+                await animeQuizCommands.handleQuizCommand(params);
+                break;
+                
+            // Anime Card Game Commands
+            case 'card':
+                await animeCardsCommands.handleCardCommand(params);
                 break;
                 
             // Privacy settings

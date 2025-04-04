@@ -7,48 +7,71 @@ const contacts = require('../lib/contacts');
  */
 async function showCommands(sock, remoteJid) {
     const commandsList = `🤖 *WhatsApp Bot Commands* 🤖\n\n` +
-        `*General Commands:*\n` +
-        `• .cmds - Show this list of commands\n` +
-        `• .admincmds - Show admin-only advanced commands\n` +
-        `• .clear - Clear conversation history with the bot\n` +
-        `• .profile - Show your user profile & warning status\n` +
-        `• .sticker - Convert image/video to sticker (reply to media)\n` +
-        `• .animenews - Get latest anime news\n\n` +
+        `📝 *Basic Commands:*\n` +
+        `• .cmds - Show this complete command list\n` +
+        `• .admincmds - View admin-only advanced commands\n` +
+        `• .clear - Erase your conversation history with the bot\n` +
+        `• .profile - View your profile, status, and warning level\n` +
+        `• .sticker - Turn an image/video into a sticker (reply to media)\n` +
+        `• .animenews - Get the latest anime and manga news\n\n` +
         
-        `*Group Commands:*\n` +
-        `• .save all - Save all group members' numbers\n` +
-        `• .save allcon - Export all members as contacts file to your device\n` +
+        `🎮 *Anime Games:*\n` +
+        `• .quiz start - Begin a new anime trivia quiz in your group\n` +
+        `• .quiz end - End the current ongoing quiz\n` +
+        `• .quiz stats - View your personal quiz statistics\n` +
+        `• .quiz leaderboard - See the quiz high scores\n` +
+        `• .quiz help - Get detailed quiz game instructions\n\n` +
+        
+        `🃏 *Anime Card Collection:*\n` +
+        `• .card draw - Get a random anime character card\n` +
+        `• .card inventory - View your card collection\n` +
+        `• .card stats - Check your collection statistics\n` +
+        `• .card trade - Trade cards with other users\n` +
+        `• .card help - Get detailed card game instructions\n\n` +
+        
+        `👥 *Group Management:*\n` +
+        `• .save all - Add all group members to bot database\n` +
+        `• .save allcon - Export members as a contacts file\n` +
         `• .add "number1,number2" - Add specific numbers to the group\n` +
-        `• .add auto - Start auto-adding one contact per minute\n` +
-        `• .addstop - Stop the auto-adding process\n` +
+        `• .addauto - Automatically add one contact per minute\n` +
+        `• .addstop - Stop the automatic adding process\n` +
         `• .fetch numbers - Get random numbers from saved contacts\n` +
-        `• .tag all "message" - Tag all group members\n` +
-        `• .relationships - Show group relationships analysis\n` +
-        `• .leaderboard [daily|weekly|monthly|all] - Show message rankings\n` +
-        `• .mystats - Show your own message statistics\n\n` +
+        `• .tag all "message" - Mention all group members\n\n` +
         
-        `*Privacy Commands:*\n` +
-        `• .private - Restrict bot access to allowed users only\n` +
-        `• .public - Make the bot accessible to everyone\n` +
-        `• .allow "number" - Add a number to allowed users list\n\n` +
+        `📊 *Analytics & Statistics:*\n` +
+        `• .relationships - View group interaction patterns\n` +
+        `• .leaderboard daily - See today's most active members\n` +
+        `• .leaderboard weekly - View this week's most active users\n` +
+        `• .leaderboard monthly - See this month's top participants\n` +
+        `• .leaderboard all - View all-time most active members\n` +
+        `• .mystats - Get your personal message statistics\n\n` +
         
-        `*Contact Management:*\n` +
-        `• .label add "number" "label" - Add label to contact\n` +
-        `• .label remove "number" "label" - Remove label\n` +
-        `• .label list "number" - List labels for a contact\n` +
-        `• .contact set "number" field="value" - Update contact info\n` +
-        `• .contact get "number" - Get contact details\n` +
-        `• .find label="value" engagement="level" - Find contacts\n` +
-        `• .stats "number" - Show engagement stats for user\n\n` +
+        `🔐 *Privacy Settings:*\n` +
+        `• .private - Set bot to private mode (allowed users only)\n` +
+        `• .public - Set bot to public mode (accessible to everyone)\n` +
+        `• .allow "number" - Add a user to the allowed users list\n\n` +
         
-        `*Advanced Features:*\n` +
-        `• Use .admincmds to see advanced admin features including:\n` +
-        `  - Message scheduling\n` +
-        `  - Polling\n` +
-        `  - Auto-replies\n` +
-        `  - Group influence tools\n` +
-        `  - Content analysis\n` +
-        `  - AI persona customization`;
+        `📇 *Contact Management:*\n` +
+        `• .label add "number" "label" - Tag a contact with a label\n` +
+        `• .label remove "number" "label" - Remove a contact's label\n` +
+        `• .label list "number" - View all labels for a contact\n` +
+        `• .contact set "number" field="value" - Update contact details\n` +
+        `• .contact get "number" - Retrieve contact information\n` +
+        `• .find label="value" - Search contacts by criteria\n` +
+        `• .stats "number" - View engagement stats for any user\n\n` +
+        
+        `⚙️ *Advanced Features:*\n` +
+        `• Message scheduling: .schedule "time" "message"\n` +
+        `• Interactive polls: .poll "question" "options"\n` +
+        `• Custom auto-replies: .autoreply set "trigger" "response"\n` +
+        `• Group influence tools: .influence, .warn, .silence\n` +
+        `• Content analysis: .analyze, .topics, .summarize\n` +
+        `• AI responses: .persona "style", .translate "language"\n\n` +
+        
+        `💬 *Help & Support:*\n` +
+        `• Type .quiz help or .card help for game instructions\n` +
+        `• Use .admincmds to see owner/admin-only commands\n` +
+        `• Reply to a message from the bot for direct interaction`;
     
     await sock.sendMessage(remoteJid, { text: commandsList });
 }
@@ -158,47 +181,50 @@ async function showAdminCommands(sock, remoteJid, sender) {
     }
     
     const adminCommandsList = `🔐 *WhatsApp Bot Admin Commands* 🔐\n\n` +
-        `*Advanced Messaging:*\n` +
-        `• .schedule "time" "message" - Schedule a future message\n` +
-        `• .cancel "id" - Cancel a scheduled message\n` +
-        `• .scheduled - List your scheduled messages\n` +
-        `• .poll "question" "option1, option2" - Create a poll\n` +
-        `• .vote "poll_id" "option_number" - Vote in a poll\n` +
-        `• .results "poll_id" - View poll results\n` +
-        `• .endpoll "poll_id" - End a poll and show results\n` +
-        `• .broadcast "message" "targets" - Send to multiple recipients\n\n` +
+        `⏰ *Scheduled Messaging:*\n` +
+        `• .schedule "time" "message" - Schedule a message for future delivery\n` +
+        `• .cancel "id" - Cancel a scheduled message by its ID\n` +
+        `• .scheduled - View all your pending scheduled messages\n` +
+        `• .broadcast "message" "targets" - Send message to multiple recipients\n\n` +
         
-        `*Auto-Reply & Content:*\n` +
-        `• .autoreply set "trigger" "response" - Create auto-reply rule\n` +
-        `• .autoreply remove "trigger" - Remove an auto-reply\n` +
-        `• .autoreply list - View all auto-replies\n` +
-        `• .summarize - Summarize a long message (reply to msg)\n` +
-        `• .translate "language" - Translate message (reply to msg)\n\n` +
+        `📊 *Polls & Voting:*\n` +
+        `• .poll "question" "option1, option2" - Create an interactive poll\n` +
+        `• .vote "poll_id" "option_number" - Cast your vote in a poll\n` +
+        `• .results "poll_id" - Check current poll results\n` +
+        `• .endpoll "poll_id" - Finish a poll and display final results\n\n` +
         
-        `*Group Influence:*\n` +
-        `• .track - Track member join/leave events silently\n` +
-        `• .active - View most active members\n` +
-        `• .detector - Get notified when members join/leave\n` +
-        `• .warn @user "reason" - Send warning to a user\n` +
-        `• .report [@user] - Generate violation report\n` +
-        `• .silence @user "duration" - Have bot ignore a user\n` +
-        `• .influence - Find key influencers in group\n\n` +
+        `🤖 *Auto-Reply System:*\n` +
+        `• .autoreply set "trigger" "response" - Create new auto-reply rule\n` +
+        `• .autoreply remove "trigger" - Delete an existing auto-reply\n` +
+        `• .autoreply list - Display all configured auto-replies\n\n` +
         
-        `*Advanced Control:*\n` +
-        `• .flood delay="2s" count="3" message="text" - Send multiple msgs\n` +
-        `• .dominate "count" - Take control of conversation flow\n` +
-        `• .distract "topic" - Change topic to distract from current one\n` +
-        `• .simulate "message" - Send message without command prefix\n\n` +
+        `✨ *AI & Content:*\n` +
+        `• .persona "style" - Customize AI response style and personality\n` +
+        `• .summarize - Create summary of long text (reply to message)\n` +
+        `• .translate "language" - Convert message to another language\n` +
+        `• .remember "info" - Store information for contextual responses\n` +
+        `• .recall - Review all your stored information\n\n` +
         
-        `*AI & Analysis:*\n` +
-        `• .analyze - Analyze group member relationships\n` +
-        `• .activity "period" - Get group activity report\n` +
-        `• .topics - Identify trending topics in the group\n` +
-        `• .persona "style" - Change AI response style\n` +
-        `• .remember "info" - Store info for contextual responses\n` +
-        `• .recall - View your stored information\n` +
-        `• .leaderboard [daily|weekly|monthly|all] - Show message rankings\n` +
-        `• .clearrelations - Clear relationship analysis data`;
+        `🔍 *Group Intelligence:*\n` +
+        `• .analyze - Generate comprehensive group relationships map\n` +
+        `• .activity "period" - Create detailed group activity report\n` +
+        `• .topics - Identify current trending topics in the group\n` +
+        `• .influence - Discover key influencers and opinion leaders\n` +
+        `• .track - Silently monitor member join/leave events\n` +
+        `• .active - View list of most active group members\n` +
+        `• .detector - Receive notifications for group membership changes\n` +
+        `• .clearrelations - Reset all relationship analysis data\n\n` +
+        
+        `👮 *Moderation Tools:*\n` +
+        `• .warn @user "reason" - Issue formal warning to a user\n` +
+        `• .report [@user] - Generate user violation report\n` +
+        `• .silence @user "duration" - Temporarily ignore messages from user\n\n` +
+        
+        `⚡ *Conversation Control:*\n` +
+        `• .flood delay="2s" count="3" message="text" - Send multiple messages\n` +
+        `• .dominate "count" - Control conversation flow with multiple messages\n` +
+        `• .distract "topic" - Redirect group conversation to new topic\n` +
+        `• .simulate "message" - Send message without the command prefix`;
     
     await sock.sendMessage(remoteJid, { text: adminCommandsList });
 }

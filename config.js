@@ -8,6 +8,8 @@ const config = {
     contactsFile: './data/contacts.json',
     warningsFile: './data/warnings.json',
     settingsFile: './data/settings.json',
+    animeQuizFile: './data/animeQuiz.json',
+    animeCardsFile: './data/animeCards.json',
     
     // Bot settings
     botOwners: ['+918810502592', '+918920659106'], // Owner numbers
@@ -40,7 +42,40 @@ const config = {
     badWords: [
         'mf', 'motherf', 'mothaf', 'f u', 'fu', 'bs', 'bitch', 'bastard', 'asshole', 
         'shit', 'fuck', 'dick', 'pussy', 'whore', 'slut'
-    ]
+    ],
+    
+    // Anime game settings
+    animeGames: {
+        // Points system settings
+        points: {
+            dailyBonus: 50,
+            messagePoints: 2,
+            quizPoints: 25,
+            cardRarityPoints: {
+                common: 10,
+                uncommon: 20,
+                rare: 40,
+                epic: 80,
+                legendary: 150
+            },
+            maxPointsPerDay: 300
+        },
+        
+        // Quiz settings
+        quiz: {
+            questionInterval: 30, // Minutes between quiz questions in a group
+            timeToAnswer: 60, // Seconds to answer a quiz question
+            maxQuestionsPerDay: 20
+        },
+        
+        // Card game settings
+        cards: {
+            dailyFreeCards: 3,
+            cardGachaInterval: 6, // Hours between free card gacha
+            tradeRatio: 3, // Number of lower tier cards needed to trade up
+            maxInventorySize: 100 // Max cards in inventory
+        }
+    }
 };
 
 module.exports = config;

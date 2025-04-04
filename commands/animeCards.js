@@ -1,314 +1,305 @@
 /**
- * Anime Card Game Commands
- * Handles all commands related to the anime card game
+ * Anime Cards Commands for WhatsApp Bot
+ * Handles card game related commands
  */
 
 const animeCardGame = require('../lib/animeCardGame');
 const pointsSystem = require('../lib/pointsSystem');
 
 /**
- * Command handler for drawing a card (.drawcard)
+ * Handle card game commands
+ * @param {object} params Command parameters
  */
-async function handleDrawCardCommand({ sock, sender, message, remoteJid }) {
-    // Draw a card for the user
-    const drawResult = animeCardGame.drawCard(sender);
+async function handleCardCommand(params) {
+    const { sock, message, messageContent, sender, remoteJid, quotedMsg } = params;
     
-    if (!drawResult.success) {
+    // Get command and arguments
+    const parts = messageContent.split(' ');
+    const subCommand = parts[1]?.toLowerCase();
+    
+    // Extract args (combine remaining parts)
+    const args = parts.slice(2).join(' ');
+    
+    switch (subCommand) {
+        case 'draw':
+            await drawCard(sock, remoteJid, sender);
+            break;
+            
+        case 'inventory':
+        case 'inv':
+            await showInventory(sock, remoteJid, sender, args);
+            break;
+            
+        case 'stats':
+            await showCardStats(sock, remoteJid, sender, args);
+            break;
+            
+        case 'trade':
+            await tradeCard(sock, remoteJid, sender, args, quotedMsg);
+            break;
+            
+        case 'help':
+        default:
+            await showCardHelp(sock, remoteJid);
+            break;
+    }
+}
+
+/**
+ * Draw a card for a user
+ * @param {object} sock WA socket
+ * @param {string} remoteJid Chat ID
+ * @param {string} sender Sender ID
+ */
+async function drawCard(sock, remoteJid, sender) {
+    // Check if the user can draw a card
+    if (!animeCardGame.canDrawCard(sender)) {
         await sock.sendMessage(remoteJid, { 
-            text: `❌ ${drawResult.error}`,
+            text: `You've reached your daily card draw limit. Try again tomorrow!`,
             quoted: message 
         });
         return;
     }
     
-    // Format the card
-    const formattedCard = animeCardGame.formatCard(drawResult.card);
+    // Draw a card
+    const result = animeCardGame.drawCard(sender);
     
-    // Create response message
-    let response = `*🎴 You drew a new card! 🎴*\n\n`;
-    response += formattedCard;
-    
-    if (drawResult.pointsAwarded > 0) {
-        response += `\n\n*+${drawResult.pointsAwarded} points* for drawing a ${drawResult.rarity.name} card!`;
+    if (!result.success) {
+        await sock.sendMessage(remoteJid, { 
+            text: result.message,
+            quoted: message 
+        });
+        return;
     }
     
-    response += `\n\nYou now have ${drawResult.collectionSize} cards in your collection.`;
+    // Format rarity stars
+    let rarityStars = '';
+    switch (result.card.rarity) {
+        case 'common': rarityStars = '⭐'; break;
+        case 'uncommon': rarityStars = '⭐⭐'; break;
+        case 'rare': rarityStars = '⭐⭐⭐'; break;
+        case 'epic': rarityStars = '⭐⭐⭐⭐'; break;
+        case 'legendary': rarityStars = '⭐⭐⭐⭐⭐'; break;
+    }
     
+    // Create card message
+    let cardMessage = `*🎴 NEW CARD OBTAINED! 🎴*\n\n`;
+    cardMessage += `${rarityStars} *${result.card.rarity.toUpperCase()}*: ${result.card.name}\n`;
+    cardMessage += `Anime: ${result.card.anime}\n`;
+    cardMessage += `Power: ${result.card.power}\n\n`;
+    cardMessage += `_${result.card.description}_\n\n`;
+    cardMessage += `_Card ID: ${result.card.id}_\n`;
+    cardMessage += `_Use .card inventory to view your collection!_`;
+    
+    // Send card message
     await sock.sendMessage(remoteJid, { 
-        text: response,
+        text: cardMessage,
         quoted: message 
     });
-    
-    // Award points for using the command
-    pointsSystem.awardPoints(sender, 'COMMAND', remoteJid);
 }
 
 /**
- * Command handler for viewing collection (.mycards)
+ * Show a user's card inventory
+ * @param {object} sock WA socket
+ * @param {string} remoteJid Chat ID
+ * @param {string} sender Sender ID
+ * @param {string} userArg Optional user to check inventory for
  */
-async function handleMyCardsCommand({ sock, sender, message, remoteJid, messageContent }) {
-    // Get user's card collection
-    const collection = animeCardGame.getUserCards(sender);
+async function showInventory(sock, remoteJid, sender, userArg) {
+    // Determine which user to show stats for
+    let targetUser = sender;
+    let showingSelf = true;
     
-    if (collection.cards.length === 0) {
-        await sock.sendMessage(remoteJid, { 
-            text: "You don't have any cards yet! Use *.drawcard* to get your first card.",
-            quoted: message 
-        });
-        return;
-    }
-    
-    // Check if user wants to see a specific card
-    const args = messageContent.split(' ').slice(1);
-    
-    if (args.length > 0 && !isNaN(parseInt(args[0]))) {
-        // Show specific card
-        const cardIndex = parseInt(args[0]) - 1;
-        
-        if (cardIndex < 0 || cardIndex >= collection.cards.length) {
-            await sock.sendMessage(remoteJid, { 
-                text: `❌ Invalid card number. You have ${collection.cards.length} cards (1-${collection.cards.length}).`,
-                quoted: message 
-            });
-            return;
-        }
-        
-        const card = collection.cards[cardIndex];
-        const formattedCard = animeCardGame.formatCard(card);
-        
-        await sock.sendMessage(remoteJid, { 
-            text: `*Card #${cardIndex + 1}*\n\n${formattedCard}`,
-            quoted: message 
-        });
-        return;
-    }
-    
-    // Show collection summary
-    let response = `*🎴 Your Anime Card Collection 🎴*\n\n`;
-    response += `Total Cards: ${collection.stats.total}\n\n`;
-    
-    response += `*Collection by Rarity:*\n`;
-    response += `• Common: ${collection.stats.common}\n`;
-    response += `• Uncommon: ${collection.stats.uncommon}\n`;
-    response += `• Rare: ${collection.stats.rare}\n`;
-    response += `• Epic: ${collection.stats.epic}\n`;
-    response += `• Legendary: ${collection.stats.legendary}\n\n`;
-    
-    // List first 10 cards
-    if (collection.cards.length > 0) {
-        response += `*Your cards (showing first 10):*\n`;
-        
-        collection.cards.slice(0, 10).forEach((card, index) => {
-            const rarityInfo = Object.values(animeCardGame.RARITIES).find(r => r.id === card.rarity);
-            response += `${index + 1}. ${rarityInfo.color} ${card.name} (${card.anime})\n`;
-        });
-        
-        if (collection.cards.length > 10) {
-            response += `\n_...and ${collection.cards.length - 10} more cards_`;
+    // If user mentioned someone else
+    if (userArg && userArg.startsWith('@')) {
+        const mentioned = userArg.substring(1);
+        // Convert mentioned username to full JID
+        if (/^\d+$/.test(mentioned)) {
+            targetUser = mentioned + '@s.whatsapp.net';
+            showingSelf = false;
         }
     }
     
-    // Add draw info
-    response += `\n\n*Next card draw:* ${collection.canDraw ? 'Available now!' : collection.nextDraw.toLocaleString()}`;
-    response += `\n\n_Use .mycards [number] to view details of a specific card_`;
+    // Generate showcase message
+    const showcaseMessage = animeCardGame.generateCardShowcase(targetUser);
     
+    // Send message
     await sock.sendMessage(remoteJid, { 
-        text: response,
-        quoted: message 
+        text: showcaseMessage,
+        mentions: showingSelf ? [] : [targetUser]
     });
-    
-    // Award points for using the command
-    pointsSystem.awardPoints(sender, 'COMMAND', remoteJid);
 }
 
 /**
- * Command handler for starting a card battle (.cardbattle)
+ * Show card game stats for a user
+ * @param {object} sock WA socket
+ * @param {string} remoteJid Chat ID
+ * @param {string} sender Sender ID
+ * @param {string} userArg Optional user to check stats for
  */
-async function handleCardBattleCommand({ sock, sender, message, remoteJid, messageContent }) {
-    // Check if there's an opponent mentioned
-    const mentionedJid = message.message?.extendedTextMessage?.contextInfo?.mentionedJid;
+async function showCardStats(sock, remoteJid, sender, userArg) {
+    // Determine which user to show stats for
+    let targetUser = sender;
+    let showingSelf = true;
     
-    if (!mentionedJid || mentionedJid.length === 0) {
-        await sock.sendMessage(remoteJid, { 
-            text: "❌ You need to mention someone to battle with! Example: *.cardbattle @user*",
-            quoted: message 
-        });
-        return;
+    // If user mentioned someone else
+    if (userArg && userArg.startsWith('@')) {
+        const mentioned = userArg.substring(1);
+        // Convert mentioned username to full JID
+        if (/^\d+$/.test(mentioned)) {
+            targetUser = mentioned + '@s.whatsapp.net';
+            showingSelf = false;
+        }
     }
     
-    const opponentJid = mentionedJid[0];
+    // Get card stats
+    const stats = animeCardGame.getUserCardStats(targetUser);
+    const completion = animeCardGame.getCollectionCompletion(targetUser);
+    const points = pointsSystem.getUserPoints(targetUser);
     
-    // Start the battle
-    const battleResult = animeCardGame.startBattle(remoteJid, sender, opponentJid);
+    // Format display name
+    const displayName = showingSelf ? 'Your' : `@${targetUser.split('@')[0]}'s`;
     
-    if (!battleResult.success) {
-        await sock.sendMessage(remoteJid, { 
-            text: `❌ ${battleResult.error}`,
-            quoted: message 
-        });
-        return;
-    }
+    // Create stats message
+    let message = `*${displayName} Anime Card Collection Stats*\n\n`;
+    message += `Total cards: ${stats.total}\n`;
+    message += `Collection completion: ${completion.percentage}% (${completion.uniqueCards}/${completion.totalUniqueCards})\n\n`;
     
-    // Format and send challenge message
-    const challengerNumber = sender.split('@')[0];
-    const opponentNumber = opponentJid.split('@')[0];
+    message += `*Cards by rarity:*\n`;
+    message += `⭐ Common: ${stats.byRarity.common}\n`;
+    message += `⭐⭐ Uncommon: ${stats.byRarity.uncommon}\n`;
+    message += `⭐⭐⭐ Rare: ${stats.byRarity.rare}\n`;
+    message += `⭐⭐⭐⭐ Epic: ${stats.byRarity.epic}\n`;
+    message += `⭐⭐⭐⭐⭐ Legendary: ${stats.byRarity.legendary}\n\n`;
     
-    const challengeMessage = `*🎴 CARD BATTLE CHALLENGE 🎴*\n\n@${challengerNumber} has challenged @${opponentNumber} to an anime card battle!\n\nChallenger's cards: ${battleResult.challengerCardCount}\nOpponent's cards: ${battleResult.opponentCardCount}\n\n@${opponentNumber}, use *.acceptbattle* to accept this challenge!\n\n_This challenge expires in 5 minutes._`;
+    message += `Current points: ${points}\n\n`;
     
-    await sock.sendMessage(remoteJid, { 
-        text: challengeMessage,
-        quoted: message,
-        mentions: [sender, opponentJid]
-    });
-    
-    // Award points for using the command
-    pointsSystem.awardPoints(sender, 'COMMAND', remoteJid);
-}
-
-/**
- * Command handler for accepting a card battle (.acceptbattle)
- */
-async function handleAcceptBattleCommand({ sock, sender, message, remoteJid }) {
-    // Accept the battle
-    const acceptResult = animeCardGame.acceptBattle(remoteJid, sender);
-    
-    if (!acceptResult.success) {
-        await sock.sendMessage(remoteJid, { 
-            text: `❌ ${acceptResult.error}`,
-            quoted: message 
-        });
-        return;
-    }
-    
-    // Format and send acceptance message
-    const challengerCard = acceptResult.challengerCard;
-    const opponentCard = acceptResult.opponentCard;
-    
-    // Get rarity info
-    const challengerRarity = Object.values(animeCardGame.RARITIES).find(r => r.id === challengerCard.rarity);
-    const opponentRarity = Object.values(animeCardGame.RARITIES).find(r => r.id === opponentCard.rarity);
-    
-    const acceptMessage = `*🎴 BATTLE ACCEPTED 🎴*\n\nThe battle has begun!\n\n*Challenger's Card:*\n${challengerRarity.color} ${challengerCard.name} (${challengerCard.anime})\n\n*Opponent's Card:*\n${opponentRarity.color} ${opponentCard.name} (${opponentCard.anime})\n\nChallenger, use *.selectstat [stat]* to choose which stat to battle with!\n\nAvailable stats: power, speed, intelligence, special`;
-    
-    await sock.sendMessage(remoteJid, { 
-        text: acceptMessage,
-        quoted: message
-    });
-    
-    // Award points for using the command
-    pointsSystem.awardPoints(sender, 'COMMAND', remoteJid);
-}
-
-/**
- * Command handler for selecting a battle stat (.selectstat)
- */
-async function handleSelectStatCommand({ sock, sender, message, remoteJid, messageContent }) {
-    // Extract stat from command
-    const args = messageContent.split(' ').slice(1);
-    
-    if (args.length === 0) {
-        await sock.sendMessage(remoteJid, { 
-            text: "❌ You need to specify which stat to battle with! Example: *.selectstat power*\n\nAvailable stats: power, speed, intelligence, special",
-            quoted: message 
-        });
-        return;
-    }
-    
-    const stat = args[0].toLowerCase();
-    
-    // Select the stat and get battle result
-    const battleResult = animeCardGame.selectBattleStat(remoteJid, sender, stat);
-    
-    if (!battleResult.success) {
-        await sock.sendMessage(remoteJid, { 
-            text: `❌ ${battleResult.error}`,
-            quoted: message 
-        });
-        return;
-    }
-    
-    // Format and send battle result
-    const challengerCard = battleResult.challengerCard;
-    const opponentCard = battleResult.opponentCard;
-    
-    // Get rarity info
-    const challengerRarity = Object.values(animeCardGame.RARITIES).find(r => r.id === challengerCard.rarity);
-    const opponentRarity = Object.values(animeCardGame.RARITIES).find(r => r.id === opponentCard.rarity);
-    
-    // Format stat name
-    const statName = battleResult.selectedStat.charAt(0).toUpperCase() + battleResult.selectedStat.slice(1);
-    
-    // Determine winner text
-    let winnerText = '';
-    if (battleResult.isDraw) {
-        winnerText = "It's a draw! Both cards are equally matched!";
+    // Add tip for new users
+    if (stats.total === 0) {
+        message += `_You haven't collected any cards yet. Use .card draw to get your first card!_`;
     } else {
-        const winnerNumber = battleResult.winner.split('@')[0];
-        winnerText = `@${winnerNumber} wins the battle!\n\n+${pointsSystem.POINT_VALUES.GROUP_GAME} points awarded!`;
+        message += `_Keep collecting to complete your anime card collection!_`;
     }
     
-    const resultMessage = `*🎴 BATTLE RESULT 🎴*\n\nStat selected: *${statName}*\n\n*Challenger's Card:*\n${challengerRarity.color} ${challengerCard.name}\n${statName}: ${battleResult.challengerStatValue}\n\n*Opponent's Card:*\n${opponentRarity.color} ${opponentCard.name}\n${statName}: ${battleResult.opponentStatValue}\n\n*${winnerText}*`;
-    
+    // Send message
     await sock.sendMessage(remoteJid, { 
-        text: resultMessage,
-        quoted: message,
-        mentions: battleResult.isDraw ? [] : [battleResult.winner]
+        text: message,
+        mentions: showingSelf ? [] : [targetUser]
     });
-    
-    // Award points for using the command
-    pointsSystem.awardPoints(sender, 'COMMAND', remoteJid);
 }
 
 /**
- * Command handler for viewing card game help (.cardhelp)
+ * Trade a card with another user
+ * @param {object} sock WA socket
+ * @param {string} remoteJid Chat ID
+ * @param {string} sender Sender ID
+ * @param {string} args Command arguments
+ * @param {object} quotedMsg Quoted message (if any)
  */
-async function handleCardHelpCommand({ sock, sender, message, remoteJid }) {
-    const helpText = `*🎴 Anime Card Game Help 🎴*
-
-*Commands:*
-• .drawcard - Draw a new anime character card (cooldown: 1 hour)
-• .mycards - View your card collection
-• .mycards [number] - View details of a specific card
-• .cardbattle @user - Challenge someone to a card battle
-• .acceptbattle - Accept a card battle challenge
-• .selectstat [stat] - Select a stat to battle with
-• .cardhelp - Show this help message
-
-*Card Rarities:*
-• ⚪ Common - 60% chance
-• 🟢 Uncommon - 25% chance
-• 🔵 Rare - 10% chance
-• 🟣 Epic - 4% chance
-• 🟡 Legendary - 1% chance
-
-*Card Stats:*
-• Power - Raw strength and attack power
-• Speed - Agility and reaction time
-• Intelligence - Tactical thinking and knowledge
-• Special - Unique abilities and techniques
-
-*Battle Rules:*
-1. The challenger selects which stat to battle with
-2. The card with the higher stat value wins
-3. Rarity provides a stat boost (Legendary cards are 3x stronger!)
-4. Winner gets +${pointsSystem.POINT_VALUES.GROUP_GAME} points
-
-Start your collection today with *.drawcard*!`;
-
-    await sock.sendMessage(remoteJid, { 
-        text: helpText,
-        quoted: message 
-    });
+async function tradeCard(sock, remoteJid, sender, args, quotedMsg) {
+    // Check if trading is to another user (must be in reply to their message)
+    if (!quotedMsg || !quotedMsg.participant) {
+        await sock.sendMessage(remoteJid, { 
+            text: "To trade a card, reply to the recipient's message with: .card trade [card_id]",
+            quoted: message 
+        });
+        return;
+    }
     
-    // Award points for using the command
-    pointsSystem.awardPoints(sender, 'COMMAND', remoteJid);
+    // Get recipient
+    const recipient = quotedMsg.participant;
+    
+    // Check if sender is trying to trade with themselves
+    if (recipient === sender) {
+        await sock.sendMessage(remoteJid, { 
+            text: "You cannot trade cards with yourself!",
+            quoted: message 
+        });
+        return;
+    }
+    
+    // Get card ID from args
+    const cardId = args.trim();
+    if (!cardId) {
+        await sock.sendMessage(remoteJid, { 
+            text: "Please specify a card ID to trade. Use .card inventory to see your cards.",
+            quoted: message 
+        });
+        return;
+    }
+    
+    // Attempt the trade
+    const result = animeCardGame.tradeCard(sender, recipient, cardId);
+    
+    if (!result.success) {
+        await sock.sendMessage(remoteJid, { 
+            text: result.message,
+            quoted: message 
+        });
+        return;
+    }
+    
+    // Format rarity stars
+    let rarityStars = '';
+    switch (result.card.rarity) {
+        case 'common': rarityStars = '⭐'; break;
+        case 'uncommon': rarityStars = '⭐⭐'; break;
+        case 'rare': rarityStars = '⭐⭐⭐'; break;
+        case 'epic': rarityStars = '⭐⭐⭐⭐'; break;
+        case 'legendary': rarityStars = '⭐⭐⭐⭐⭐'; break;
+    }
+    
+    // Create trade success message
+    let tradeMessage = `*🔄 CARD TRADE SUCCESSFUL! 🔄*\n\n`;
+    tradeMessage += `@${sender.split('@')[0]} gave @${recipient.split('@')[0]}:\n\n`;
+    tradeMessage += `${rarityStars} *${result.card.name}* (${result.card.anime})\n`;
+    tradeMessage += `_${result.card.description}_\n\n`;
+    tradeMessage += `_Use .card inventory to view your updated collection!_`;
+    
+    // Send trade message
+    await sock.sendMessage(remoteJid, { 
+        text: tradeMessage,
+        mentions: [sender, recipient]
+    });
+}
+
+/**
+ * Show help for card commands
+ * @param {object} sock WA socket
+ * @param {string} remoteJid Chat ID
+ */
+async function showCardHelp(sock, remoteJid) {
+    const message = `*🎴 Anime Card Collection Game 🎴*\n\n` +
+        `📋 *Basic Commands:*\n` +
+        `• .card draw - Obtain a random anime character card\n` +
+        `• .card inventory - Browse your card collection\n` +
+        `• .card help - Show this complete guide\n\n` +
+        
+        `📊 *Collection Stats:*\n` +
+        `• .card stats - See your collection statistics\n` +
+        `• .card stats @user - View another collector's stats\n` +
+        `• .card inventory @user - Peek at someone else's collection\n\n` +
+        
+        `🔄 *Trading System:*\n` +
+        `• .card trade [card_id] - Trade a card with another user\n` +
+        `  (Reply to recipient's message when using this command)\n\n` +
+        
+        `📝 *Card Rarities:*\n` +
+        `• ⭐ Common - Basic characters (50% chance)\n` +
+        `• ⭐⭐ Uncommon - Supporting characters (30% chance)\n` +
+        `• ⭐⭐⭐ Rare - Major characters (15% chance)\n` +
+        `• ⭐⭐⭐⭐ Epic - Fan favorites (4% chance)\n` +
+        `• ⭐⭐⭐⭐⭐ Legendary - Iconic anime heroes (1% chance)\n\n` +
+        
+        `💡 *Game Tips:*\n` +
+        `• You can draw up to 5 cards per day\n` +
+        `• Each card has a unique ID for trading\n` +
+        `• Collect all characters to complete your collection\n` +
+        `• Trade duplicates with friends to find missing cards`;
+    
+    await sock.sendMessage(remoteJid, { text: message });
 }
 
 module.exports = {
-    handleDrawCardCommand,
-    handleMyCardsCommand,
-    handleCardBattleCommand,
-    handleAcceptBattleCommand,
-    handleSelectStatCommand,
-    handleCardHelpCommand
+    handleCardCommand
 };

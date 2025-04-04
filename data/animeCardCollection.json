@@ -1,0 +1,202 @@
+[
+  {
+    "id": "c001",
+    "name": "Sakura Haruno",
+    "anime": "Naruto",
+    "rarity": "common",
+    "description": "A skilled medical ninja and member of Team 7",
+    "power": 25
+  },
+  {
+    "id": "c002",
+    "name": "Krillin",
+    "anime": "Dragon Ball",
+    "rarity": "common",
+    "description": "A skilled martial artist and close friend of Goku",
+    "power": 20
+  },
+  {
+    "id": "c003",
+    "name": "Usopp",
+    "anime": "One Piece",
+    "rarity": "common",
+    "description": "The sniper of the Straw Hat Pirates",
+    "power": 15
+  },
+  {
+    "id": "c004",
+    "name": "Armin Arlert",
+    "anime": "Attack on Titan",
+    "rarity": "common",
+    "description": "A strategic genius and member of the Survey Corps",
+    "power": 18
+  },
+  {
+    "id": "c005",
+    "name": "Ochako Uraraka",
+    "anime": "My Hero Academia",
+    "rarity": "common",
+    "description": "A student at U.A. High with Zero Gravity quirk",
+    "power": 22
+  },
+  {
+    "id": "u001",
+    "name": "Kakashi Hatake",
+    "anime": "Naruto",
+    "rarity": "uncommon",
+    "description": "The Copy Ninja and leader of Team 7",
+    "power": 45
+  },
+  {
+    "id": "u002",
+    "name": "Vegeta",
+    "anime": "Dragon Ball",
+    "rarity": "uncommon",
+    "description": "The proud prince of the Saiyan race",
+    "power": 50
+  },
+  {
+    "id": "u003",
+    "name": "Sanji",
+    "anime": "One Piece",
+    "rarity": "uncommon",
+    "description": "The cook of the Straw Hat Pirates",
+    "power": 42
+  },
+  {
+    "id": "u004",
+    "name": "Mikasa Ackerman",
+    "anime": "Attack on Titan",
+    "rarity": "uncommon",
+    "description": "An elite soldier and adoptive sister of Eren",
+    "power": 48
+  },
+  {
+    "id": "u005",
+    "name": "Shoto Todoroki",
+    "anime": "My Hero Academia",
+    "rarity": "uncommon",
+    "description": "A student with powerful Half-Cold Half-Hot quirk",
+    "power": 46
+  },
+  {
+    "id": "r001",
+    "name": "Sasuke Uchiha",
+    "anime": "Naruto",
+    "rarity": "rare",
+    "description": "Last of the Uchiha clan with Sharingan eyes",
+    "power": 75
+  },
+  {
+    "id": "r002",
+    "name": "Gohan",
+    "anime": "Dragon Ball",
+    "rarity": "rare",
+    "description": "Son of Goku with immense hidden power",
+    "power": 78
+  },
+  {
+    "id": "r003",
+    "name": "Zoro",
+    "anime": "One Piece",
+    "rarity": "rare",
+    "description": "Swordsman of the Straw Hat Pirates",
+    "power": 72
+  },
+  {
+    "id": "r004",
+    "name": "Levi Ackerman",
+    "anime": "Attack on Titan",
+    "rarity": "rare",
+    "description": "Humanity's strongest soldier",
+    "power": 80
+  },
+  {
+    "id": "r005",
+    "name": "All Might",
+    "anime": "My Hero Academia",
+    "rarity": "rare",
+    "description": "The former #1 Hero and Symbol of Peace",
+    "power": 79
+  },
+  {
+    "id": "e001",
+    "name": "Naruto Uzumaki",
+    "anime": "Naruto",
+    "rarity": "epic",
+    "description": "The Nine-Tails Jinchuriki and future Hokage",
+    "power": 90
+  },
+  {
+    "id": "e002",
+    "name": "Goku",
+    "anime": "Dragon Ball",
+    "rarity": "epic",
+    "description": "The legendary Super Saiyan",
+    "power": 92
+  },
+  {
+    "id": "e003",
+    "name": "Luffy",
+    "anime": "One Piece",
+    "rarity": "epic",
+    "description": "Captain of the Straw Hat Pirates",
+    "power": 88
+  },
+  {
+    "id": "e004",
+    "name": "Eren Yeager",
+    "anime": "Attack on Titan",
+    "rarity": "epic",
+    "description": "The Attack Titan who seeks freedom",
+    "power": 86
+  },
+  {
+    "id": "e005",
+    "name": "Izuku Midoriya",
+    "anime": "My Hero Academia",
+    "rarity": "epic",
+    "description": "Successor of One For All quirk",
+    "power": 85
+  },
+  {
+    "id": "l001",
+    "name": "Madara Uchiha",
+    "anime": "Naruto",
+    "rarity": "legendary",
+    "description": "Legendary Uchiha leader with godlike powers",
+    "power": 98
+  },
+  {
+    "id": "l002",
+    "name": "Ultra Instinct Goku",
+    "anime": "Dragon Ball",
+    "rarity": "legendary",
+    "description": "Goku in his ultimate transformation",
+    "power": 99
+  },
+  {
+    "id": "l003",
+    "name": "Gol D. Roger",
+    "anime": "One Piece",
+    "rarity": "legendary",
+    "description": "The Pirate King who conquered the Grand Line",
+    "power": 97
+  },
+  {
+    "id": "l004",
+    "name": "Founding Titan",
+    "anime": "Attack on Titan",
+    "rarity": "legendary",
+    "description": "The most powerful of all Titans",
+    "power": 96
+  },
+  {
+    "id": "l005",
+    "name": "All For One",
+    "anime": "My Hero Academia",
+    "rarity": "legendary",
+    "description": "The ultimate villain with power-stealing ability",
+    "power": 95
+  }
+]

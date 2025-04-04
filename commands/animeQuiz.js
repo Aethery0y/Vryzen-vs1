@@ -1,359 +1,223 @@
 /**
- * Anime Quiz Commands
- * Handles all commands related to the anime quiz game
+ * Anime Quiz Commands for WhatsApp Bot
+ * Handles quiz-related commands and answer processing
  */
 
 const animeQuiz = require('../lib/animeQuiz');
-const config = require('../config');
 const pointsSystem = require('../lib/pointsSystem');
 
-// Map of letter answers to indices
-const answerMap = {
-    'a': 0, 'b': 1, 'c': 2, 'd': 3, 'e': 4
-};
-
 /**
- * Command handler for starting a quiz (.animequiz)
+ * Handle quiz-related commands
+ * @param {object} params Command parameters
  */
-async function handleStartQuizCommand({ sock, sender, message, remoteJid, messageContent }) {
-    // Extract difficulty and category from command if provided
-    const args = messageContent.split(' ').slice(1);
+async function handleQuizCommand(params) {
+    const { sock, message, messageContent, sender, remoteJid, quotedMsg } = params;
     
-    let difficulty = null;
-    let category = null;
+    // Get command and arguments
+    const parts = messageContent.split(' ');
+    const subCommand = parts[1]?.toLowerCase();
     
-    // Parse arguments
-    if (args.length > 0) {
-        // Check for difficulty
-        const diffArg = args.find(arg => 
-            Object.values(animeQuiz.DIFFICULTY).includes(arg.toLowerCase())
-        );
-        
-        if (diffArg) {
-            difficulty = diffArg.toLowerCase();
-        }
-        
-        // Check for category
-        const catArg = args.find(arg => 
-            Object.values(animeQuiz.CATEGORIES).includes(arg.toLowerCase())
-        );
-        
-        if (catArg) {
-            category = catArg.toLowerCase();
-        }
-    }
+    // Extract args (combine remaining parts)
+    const args = parts.slice(2).join(' ');
     
-    // Start the quiz
-    const quiz = animeQuiz.startQuiz(remoteJid, difficulty, category);
-    
-    if (!quiz.success) {
-        await sock.sendMessage(remoteJid, { 
-            text: `❌ ${quiz.error}`,
-            quoted: message 
-        });
-        return;
-    }
-    
-    // Format difficulty tag based on level
-    let difficultyTag = '';
-    switch (quiz.difficulty) {
-        case animeQuiz.DIFFICULTY.EASY:
-            difficultyTag = '🟢 EASY';
+    switch (subCommand) {
+        case 'start':
+        case 'new':
+            await startNewQuiz(sock, remoteJid, sender);
             break;
-        case animeQuiz.DIFFICULTY.MEDIUM:
-            difficultyTag = '🟡 MEDIUM';
+            
+        case 'end':
+        case 'stop':
+            await endCurrentQuiz(sock, remoteJid, sender);
             break;
-        case animeQuiz.DIFFICULTY.HARD:
-            difficultyTag = '🔴 HARD';
+            
+        case 'stats':
+            await showQuizStats(sock, remoteJid, sender, args);
             break;
-        case animeQuiz.DIFFICULTY.WEEB:
-            difficultyTag = '⚫ WEEB';
+            
+        case 'leaderboard':
+        case 'top':
+            await showLeaderboard(sock, remoteJid);
+            break;
+            
+        case 'help':
+        default:
+            await showQuizHelp(sock, remoteJid);
             break;
     }
-    
-    // Format category
-    const categoryText = quiz.category.charAt(0).toUpperCase() + quiz.category.slice(1);
-    
-    // Format quiz message
-    const quizMessage = `*🎮 ANIME QUIZ - ${difficultyTag}*
-*Category:* ${categoryText}
-*Time:* ${quiz.timeLimit}
-
-*Question:* ${quiz.question}
-
-${quiz.options}
-
-_Reply with just A, B, C, or D to answer!_
-_+${pointsSystem.POINT_VALUES.ANIME_QUIZ_CORRECT} points for correct answer_`;
-    
-    await sock.sendMessage(remoteJid, { 
-        text: quizMessage,
-        quoted: message 
-    });
-    
-    // Award points for using the command
-    pointsSystem.awardPoints(sender, 'COMMAND', remoteJid);
 }
 
 /**
- * Command handler for anime quiz answer
- * This is not a direct command but processes A/B/C/D answers to quizzes
+ * Start a new quiz in the group
+ * @param {object} sock WA socket
+ * @param {string} remoteJid Chat ID
+ * @param {string} sender Sender ID
  */
-async function handleQuizAnswer({ sock, sender, message, remoteJid, messageContent }) {
-    // Extract answer from message (should be just A, B, C, D or a full option text)
-    const answer = messageContent.trim();
-    
-    // Check if answer is valid (A, B, C, D)
-    const isValidAnswer = answer.length === 1 && answer.match(/[A-D]/i);
-    
-    // If not a valid answer format, don't process
-    if (!isValidAnswer) {
-        return false;
-    }
-    
-    // Submit the answer
-    const result = animeQuiz.answerQuiz(remoteJid, sender, answer);
-    
-    // If no active quiz, silently ignore
-    if (!result.success) {
-        return false;
-    }
-    
-    // If correct answer
-    if (result.correct) {
-        const userNumber = sender.split('@')[0];
-        
-        await sock.sendMessage(remoteJid, { 
-            text: `🎉 *Correct!* 🎉\n\n@${userNumber} got it right!\nAnswer: ${result.correctAnswer}\n\n+${result.pointsAwarded} points awarded!`,
-            quoted: message,
-            mentions: [sender]
-        });
-        
-        return true;
-    }
-    
-    // For incorrect answers, we don't need to send a message to avoid cluttering the chat
-    return true;
-}
-
-/**
- * Command handler for quiz stats (.quizstats)
- */
-async function handleQuizStatsCommand({ sock, sender, message, remoteJid }) {
-    // Get quiz statistics
-    const stats = animeQuiz.getQuizStats();
-    
-    // Format response
-    let response = `*📊 Anime Quiz Statistics 📊*\n\n`;
-    response += `*Total Questions:* ${stats.totalQuestions}\n\n`;
-    
-    response += `*Questions by Difficulty:*\n`;
-    for (const [diff, count] of Object.entries(stats.byDifficulty)) {
-        const diffName = diff.toUpperCase();
-        response += `• ${diffName}: ${count}\n`;
-    }
-    
-    response += `\n*Questions by Category:*\n`;
-    for (const [cat, count] of Object.entries(stats.byCategory)) {
-        const catName = cat.charAt(0).toUpperCase() + cat.slice(1);
-        response += `• ${catName}: ${count}\n`;
-    }
-    
-    response += `\n_Start a quiz with .animequiz_`;
-    
-    await sock.sendMessage(remoteJid, { 
-        text: response,
-        quoted: message 
-    });
-    
-    // Award points for using the command
-    pointsSystem.awardPoints(sender, 'COMMAND', remoteJid);
-}
-
-/**
- * Command handler for ending a quiz (.endquiz)
- * Only group admins and bot admins can end a quiz
- */
-async function handleEndQuizCommand({ sock, sender, message, remoteJid, isGroup }) {
-    // Check if user is authorized (bot admin or group admin)
-    const isAuthorized = config.botAdmins.includes(sender.split('@')[0]);
-    
-    if (!isAuthorized) {
-        await sock.sendMessage(remoteJid, { 
-            text: "❌ Only bot admins can end an active quiz.",
-            quoted: message 
-        });
-        return;
-    }
-    
-    // End the quiz
-    const result = animeQuiz.endQuiz(remoteJid);
+async function startNewQuiz(sock, remoteJid, sender) {
+    const result = await animeQuiz.startQuiz({ sock, remoteJid, sender });
     
     if (!result.success) {
         await sock.sendMessage(remoteJid, { 
-            text: `❌ ${result.error}`,
+            text: result.message,
             quoted: message 
+        });
+    }
+    // If successful, the startQuiz function already sent the quiz message
+}
+
+/**
+ * End the current quiz in the group
+ * @param {object} sock WA socket
+ * @param {string} remoteJid Chat ID
+ * @param {string} sender Sender ID
+ */
+async function endCurrentQuiz(sock, remoteJid, sender) {
+    const result = await animeQuiz.endQuiz({ sock, remoteJid });
+    
+    if (!result.success) {
+        await sock.sendMessage(remoteJid, { 
+            text: result.message
+        });
+    }
+    // If successful, the endQuiz function already sent the results message
+}
+
+/**
+ * Show quiz statistics for a user
+ * @param {object} sock WA socket
+ * @param {string} remoteJid Chat ID
+ * @param {string} sender Sender ID
+ * @param {string} userArg Optional user to check stats for
+ */
+async function showQuizStats(sock, remoteJid, sender, userArg) {
+    // Determine which user to show stats for
+    let targetUser = sender;
+    let showingSelf = true;
+    
+    // If user mentioned someone else
+    if (userArg && userArg.startsWith('@')) {
+        const mentioned = userArg.substring(1);
+        // Convert mentioned username to full JID
+        if (/^\d+$/.test(mentioned)) {
+            targetUser = mentioned + '@s.whatsapp.net';
+            showingSelf = false;
+        }
+    }
+    
+    // Get user stats
+    const stats = animeQuiz.getUserStats(targetUser);
+    const points = pointsSystem.getUserPoints(targetUser);
+    
+    // Format display name
+    const displayName = showingSelf ? 'Your' : `@${targetUser.split('@')[0]}'s`;
+    
+    // Calculate accuracy
+    const accuracy = stats.totalAnswered > 0 
+        ? Math.round(stats.correctAnswers / stats.totalAnswered * 100) 
+        : 0;
+    
+    // Create stats message
+    let message = `*${displayName} Anime Quiz Stats*\n\n`;
+    message += `Total quizzes answered: ${stats.totalAnswered}\n`;
+    message += `Correct answers: ${stats.correctAnswers}\n`;
+    message += `Accuracy: ${accuracy}%\n`;
+    message += `Current streak: ${stats.streakCurrent}\n`;
+    message += `Best streak: ${stats.streakBest}\n`;
+    message += `Current points: ${points}\n\n`;
+    
+    // Add tip for new users
+    if (stats.totalAnswered === 0) {
+        message += `_Participate in quizzes by answering with A, B, C, or D when a quiz is active!_`;
+    } else {
+        message += `_Keep playing to earn more points and increase your streak!_`;
+    }
+    
+    // Send message
+    await sock.sendMessage(remoteJid, { 
+        text: message,
+        mentions: showingSelf ? [] : [targetUser]
+    });
+}
+
+/**
+ * Show anime quiz leaderboard
+ * @param {object} sock WA socket
+ * @param {string} remoteJid Chat ID
+ */
+async function showLeaderboard(sock, remoteJid) {
+    // Get top quiz performers
+    const leaderboard = animeQuiz.getLeaderboard(10);
+    
+    if (leaderboard.length === 0) {
+        await sock.sendMessage(remoteJid, { 
+            text: "No quiz data available yet. Be the first to play!"
         });
         return;
     }
     
-    // Send result message
-    await sock.sendMessage(remoteJid, { 
-        text: `*Quiz Ended*\n\nThe correct answer was: ${result.correctAnswer}\n\n${result.participants} participants attempted this quiz.`,
-        quoted: message 
+    // Create leaderboard message
+    let message = `*🏆 ANIME QUIZ LEADERBOARD 🏆*\n\n`;
+    
+    // Add each user to the leaderboard
+    leaderboard.forEach((entry, index) => {
+        const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `${index + 1}.`;
+        message += `${medal} @${entry.userId.split('@')[0]} - ${entry.correctAnswers} correct (${entry.accuracy}%)\n`;
     });
     
-    // Award points for using the command
-    pointsSystem.awardPoints(sender, 'COMMAND', remoteJid);
+    message += `\n_Use .quiz stats to see your personal stats._`;
+    
+    // Get user IDs for mentions
+    const mentions = leaderboard.map(entry => entry.userId);
+    
+    // Send message with mentions
+    await sock.sendMessage(remoteJid, { 
+        text: message,
+        mentions
+    });
 }
 
 /**
- * Command handler for adding a new quiz question (.addquiz)
- * Only bot admins can add new questions
+ * Show help for quiz commands
+ * @param {object} sock WA socket
+ * @param {string} remoteJid Chat ID
  */
-async function handleAddQuizCommand({ sock, sender, message, remoteJid, messageContent }) {
-    // Check if user is authorized (bot admin)
-    const cleanSender = sender.split('@')[0];
-    if (!config.botAdmins.includes(cleanSender)) {
-        await sock.sendMessage(remoteJid, { 
-            text: "❌ Only bot admins can add quiz questions.",
-            quoted: message 
-        });
-        return;
-    }
+async function showQuizHelp(sock, remoteJid) {
+    const message = `*🎮 Anime Quiz Game Commands 🎮*\n\n` +
+        `📋 *Basic Commands:*\n` +
+        `• .quiz start - Begin a new anime trivia quiz\n` +
+        `• .quiz end - Finish the current active quiz\n` +
+        `• .quiz help - Show this help message\n\n` +
+        
+        `📊 *Stats & Rankings:*\n` +
+        `• .quiz stats - View your personal quiz statistics\n` +
+        `• .quiz stats @user - Check another player's stats\n` +
+        `• .quiz leaderboard - See top quiz players ranking\n\n` +
+        
+        `🎯 *How to Play:*\n` +
+        `• When a quiz is active, the bot posts a question with 4 options\n` +
+        `• Simply reply with A, B, C, or D to submit your answer\n` +
+        `• Correct answers earn you points and increase your streak\n` +
+        `• Be quick! Quizzes have a 30-second time limit\n` +
+        `• Earn bonus points for consecutive correct answers\n\n` +
+        
+        `💡 *Pro Tips:*\n` +
+        `• Build your anime knowledge to improve your score\n` +
+        `• Play regularly to appear on the leaderboard\n` +
+        `• Challenge friends to beat your accuracy percentage`;
     
-    // Extract question data from the message
-    // Format expected: .addquiz "Question text" "Option A" "Option B" "Option C" "Option D" 0 [category] [difficulty]
-    
-    try {
-        // Remove command
-        const argText = messageContent.substring('.addquiz'.length).trim();
-        
-        // Use regex to extract quoted strings
-        const quotedRegex = /"([^"]*)"/g;
-        const matches = [...argText.matchAll(quotedRegex)];
-        
-        if (matches.length < 5) {
-            throw new Error('Not enough quoted arguments.');
-        }
-        
-        // Extract question and options
-        const question = matches[0][1];
-        const options = [
-            matches[1][1], 
-            matches[2][1], 
-            matches[3][1], 
-            matches[4][1]
-        ];
-        
-        // Get remaining arguments after the quoted strings
-        const remainingArgs = argText.replace(quotedRegex, '').trim().split(/\s+/);
-        
-        // Parse answer index
-        const answerIndex = parseInt(remainingArgs[0], 10);
-        
-        if (isNaN(answerIndex) || answerIndex < 0 || answerIndex >= options.length) {
-            throw new Error(`Invalid answer index: ${remainingArgs[0]}`);
-        }
-        
-        // Parse optional category and difficulty
-        let category = remainingArgs[1] || 'series';
-        let difficulty = remainingArgs[2] || 'medium';
-        
-        // Validate category
-        if (!Object.values(animeQuiz.CATEGORIES).includes(category)) {
-            category = 'series';
-        }
-        
-        // Validate difficulty
-        if (!Object.values(animeQuiz.DIFFICULTY).includes(difficulty)) {
-            difficulty = 'medium';
-        }
-        
-        // Create question object
-        const questionData = {
-            question,
-            options,
-            answer: answerIndex,
-            category,
-            difficulty
-        };
-        
-        // Add the question
-        const result = animeQuiz.addQuestion(questionData);
-        
-        if (result.success) {
-            await sock.sendMessage(remoteJid, { 
-                text: `✅ Quiz question added successfully! Total questions: ${result.questionCount}`,
-                quoted: message 
-            });
-        } else {
-            await sock.sendMessage(remoteJid, { 
-                text: `❌ Error adding question: ${result.error}`,
-                quoted: message 
-            });
-        }
-    } catch (error) {
-        await sock.sendMessage(remoteJid, { 
-            text: `❌ Invalid format. Use: .addquiz "Question text" "Option A" "Option B" "Option C" "Option D" CorrectAnswerIndex [category] [difficulty]`,
-            quoted: message 
-        });
-    }
-    
-    // Award points for using the command
-    pointsSystem.awardPoints(sender, 'COMMAND', remoteJid);
+    await sock.sendMessage(remoteJid, { text: message });
 }
 
 /**
- * Command handler for showing quiz help (.quizhelp)
+ * Handle a potential quiz answer (A, B, C, D)
+ * @param {object} params Answer parameters
+ * @returns {boolean} True if the message was processed as a quiz answer
  */
-async function handleQuizHelpCommand({ sock, sender, message, remoteJid }) {
-    const helpText = `*🎮 Anime Quiz Help 🎮*
-
-*Start a quiz:*
-• .animequiz - Start a random quiz
-• .animequiz easy - Start an easy quiz
-• .animequiz medium - Start a medium quiz
-• .animequiz hard - Start a hard quiz
-• .animequiz weeb - Start a weeb (expert) quiz
-• .animequiz characters - Start a character quiz
-• .animequiz [difficulty] [category] - Start a quiz with specific difficulty and category
-
-*Categories:*
-• characters - Anime character questions
-• series - Anime series questions
-• studios - Animation studio questions
-• quotes - Anime quotes
-• openings - Anime opening songs
-• genres - Anime genres
-• voice_actors - Voice actor questions
-• manga - Manga-related questions
-
-*Other Commands:*
-• .quizstats - Show quiz statistics
-• .endquiz - End an active quiz (admin only)
-• .addquiz - Add a new quiz question (admin only)
-
-*Points:*
-• Participation: +${pointsSystem.POINT_VALUES.ANIME_QUIZ_PARTICIPATION} points
-• Correct answer: +${pointsSystem.POINT_VALUES.ANIME_QUIZ_CORRECT} points
-
-_To answer a quiz, just reply with A, B, C, or D!_`;
-
-    await sock.sendMessage(remoteJid, { 
-        text: helpText,
-        quoted: message 
-    });
-    
-    // Award points for using the command
-    pointsSystem.awardPoints(sender, 'COMMAND', remoteJid);
+async function handleQuizAnswer(params) {
+    return await animeQuiz.handleQuizAnswer(params);
 }
 
 module.exports = {
-    handleStartQuizCommand,
-    handleQuizAnswer,
-    handleQuizStatsCommand,
-    handleEndQuizCommand,
-    handleAddQuizCommand,
-    handleQuizHelpCommand
+    handleQuizCommand,
+    handleQuizAnswer
 };
