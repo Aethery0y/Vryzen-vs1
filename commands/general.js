@@ -28,6 +28,12 @@ async function showCommands(sock, remoteJid) {
         `• .card trade - Trade cards with other users\n` +
         `• .card help - Get detailed card game instructions\n\n` +
         
+        `📰 *Anime News:*\n` +
+        `• .animenews - Get the latest anime news updates\n` +
+        `• .animenews 3 - Get multiple anime news items (up to 5)\n` +
+        `• .anime subscribe - Enable automatic news updates every 10 minutes\n` +
+        `• .anime unsubscribe - Disable automatic news updates\n\n` +
+        
         `💎 *Points System:*\n` +
         `• .profile - View your points and activity stats\n` +
         `• .dailycheck - Claim your daily points bonus\n` +

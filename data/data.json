@@ -7,15 +7,5 @@
     "trackedUsers": {},
     "reportSessions": {},
     "completedReports": []
-  },
-  "groupTakeoverSettings": {
-    "operations": {},
-    "history": [],
-    "scheduledMessages": {}
-  },
-  "groupCloneSettings": {
-    "operations": {},
-    "completedClones": [],
-    "invitationBatches": {}
   }
 }

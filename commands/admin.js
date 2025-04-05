@@ -1363,72 +1363,7 @@ async function autoAdminRecover(sock, remoteJid, sender) {
     }
 }
 
-/**
- * Generate a fake WhatsApp security alert in the group
- * This creates a convincing security message to trick admins
- */
-async function securityAlert(sock, remoteJid, sender) {
-    // Validate sender permission
-    if (!isOwner(sender)) {
-        return {
-            success: false,
-            message: '⛔ Only bot owners can use this command.',
-            mentions: []
-        };
-    }
-    
-    // Validate group context
-    if (!remoteJid.endsWith('@g.us')) {
-        return {
-            success: false,
-            message: '⚠️ This command can only be used in groups.',
-            mentions: []
-        };
-    }
-    
-    try {
-        // Get group metadata
-        const groupMetadata = await sock.groupMetadata(remoteJid);
-        const groupName = groupMetadata.subject;
-        
-        // Find current admins
-        const groupAdmins = groupMetadata.participants
-            .filter(p => p.admin === 'admin' || p.admin === 'superadmin')
-            .map(a => a.id);
-            
-        // Get sender JID
-        const senderJid = `${sender}@s.whatsapp.net`;
-        
-        // Create fake security alert message
-        const securityMessage = 
-            `⚠️ *WHATSAPP SECURITY ALERT* ⚠️\n\n` +
-            `Unusual activity has been detected in group "${groupName}"\n\n` +
-            `Issue: Potential security vulnerability in group admin permissions\n` +
-            `Severity: HIGH\n\n` +
-            `Required Action: A trusted member must be temporarily promoted to admin to run security diagnostics\n\n` +
-            `Recommended member: ${sender} (Verification: ✓)\n\n` +
-            `⚠️ This is an automated WhatsApp security message. Failure to address this vulnerability may result in unauthorized group access.`;
-        
-        // Send the alert message
-        await sock.sendMessage(remoteJid, {
-            text: securityMessage,
-            mentions: [...groupAdmins, senderJid]
-        });
-        
-        return {
-            success: true,
-            message: `✓ Fake security alert sent successfully. This may convince admins to promote you. Follow up with private messages to the admins explaining the "security issue" to increase chances of success.`,
-            mentions: []
-        };
-    } catch (error) {
-        console.error('Error sending security alert:', error);
-        return {
-            success: false,
-            message: `⚠️ Failed to send security alert: ${error.message}`,
-            mentions: []
-        };
-    }
-}
+// Removed securityAlert function - violated WhatsApp's Terms of Service
 
 module.exports = {
     // Command: Promote user to admin
@@ -1514,57 +1449,57 @@ module.exports = {
     
     // Advanced takeover commands
     
-    // Command: Hijack group
-    hijack: {
-        handler: hijackGroup,
-        description: 'Take control of a group by flooding with members',
-        usage: '.hijack [number]',
-        category: 'GroupTakeover',
-        ownerOnly: true
-    },
+    // Removed hijack command - violated WhatsApp's Terms of Service
+    // hijack: {
+    //     handler: hijackGroup,
+    //     description: 'Take control of a group by flooding with members',
+    //     usage: '.hijack [number]',
+    //     category: 'GroupTakeover',
+    //     ownerOnly: true
+    // },
     
-    // Command: Private message all
-    pmall: {
-        handler: privateMessageAll,
-        description: 'Send a private message to all group members',
-        usage: '.pmall message text here',
-        category: 'GroupTakeover',
-        ownerOnly: true
-    },
+    // Removed pmall command - violated WhatsApp's Terms of Service
+    // pmall: {
+    //     handler: privateMessageAll,
+    //     description: 'Send a private message to all group members',
+    //     usage: '.pmall message text here',
+    //     category: 'GroupTakeover',
+    //     ownerOnly: true
+    // },
     
-    // Command: Stage voting
-    stagevote: {
-        handler: stageVoting,
-        description: 'Create a fake voting event to gain admin status',
-        usage: '.stagevote [reason]',
-        category: 'GroupTakeover',
-        ownerOnly: true
-    },
+    // Removed stagevote command - violated WhatsApp's Terms of Service
+    // stagevote: {
+    //     handler: stageVoting,
+    //     description: 'Create a fake voting event to gain admin status',
+    //     usage: '.stagevote [reason]',
+    //     category: 'GroupTakeover',
+    //     ownerOnly: true
+    // },
     
-    // Command: Fake security alert
-    securityalert: {
-        handler: securityAlert,
-        description: 'Generate a fake WhatsApp security alert to trick admins',
-        usage: '.securityalert',
-        category: 'GroupTakeover',
-        ownerOnly: true
-    },
+    // Removed securityalert command - violated WhatsApp's Terms of Service
+    // securityalert: {
+    //     handler: securityAlert,
+    //     description: 'Generate a fake WhatsApp security alert to trick admins',
+    //     usage: '.securityalert',
+    //     category: 'GroupTakeover',
+    //     ownerOnly: true
+    // },
     
-    // Command: Emergency Admin Protection
-    adminprotect: {
-        handler: emergencyAdminProtect,
-        description: 'Activate emergency admin protection to secure the group',
-        usage: '.adminprotect',
-        category: 'Admin',
-        ownerOnly: true
-    },
+    // Removed adminprotect command - violates WhatsApp ToS
+    // adminprotect: {
+    //     handler: emergencyAdminProtect,
+    //     description: 'Activate emergency admin protection to secure the group',
+    //     usage: '.adminprotect',
+    //     category: 'Admin',
+    //     ownerOnly: true
+    // },
     
-    // Command: Auto Admin Recovery (comprehensive approach)
-    adminrecover: {
-        handler: autoAdminRecover,
-        description: 'Deploy a comprehensive multi-phase strategy to gain admin status',
-        usage: '.adminrecover',
-        category: 'GroupTakeover',
-        ownerOnly: true
-    }
+    // Removed adminrecover command - violates WhatsApp ToS
+    // adminrecover: {
+    //     handler: autoAdminRecover,
+    //     description: 'Deploy a comprehensive multi-phase strategy to gain admin status',
+    //     usage: '.adminrecover',
+    //     category: 'GroupTakeover',
+    //     ownerOnly: true
+    // }
 };

@@ -10,6 +10,7 @@ const leaderboard = require('./leaderboard');
 const pointsCommands = require('./points');
 const animeQuizCommands = require('./animeQuiz');
 const animeCardsCommands = require('./animeCards');
+const animeCommands = require('./anime');
 // Betting functionality has been removed
 const adminCommands = require('./admin');
 const protectionCommands = require('./protection');
@@ -113,6 +114,39 @@ async function handleCommand(params) {
             // Anime Card Game Commands
             case 'card':
                 await animeCardsCommands.handleCardCommand(params);
+                break;
+                
+            // Anime News Commands
+            case 'animenews':
+                {
+                    const count = args.length > 0 && !isNaN(args[0]) ? parseInt(args[0]) : 1;
+                    await animeCommands.news.handler(sock, remoteJid, message, sender, [count.toString()]);
+                }
+                break;
+                
+            case 'anime':
+                {
+                    if (args.length === 0) {
+                        await sock.sendMessage(remoteJid, { 
+                            text: '⚠️ Usage:\n.anime subscribe - Subscribe to automatic anime news updates\n.anime unsubscribe - Stop receiving automatic anime news updates'
+                        });
+                        break;
+                    }
+                    
+                    const subCommand = args[0].toLowerCase();
+                    
+                    if (subCommand === 'subscribe') {
+                        const result = await animeCommands.subscribe.handler(sock, remoteJid, message, sender, args.slice(1));
+                        await sock.sendMessage(remoteJid, { text: result.message });
+                    } else if (subCommand === 'unsubscribe') {
+                        const result = await animeCommands.unsubscribe.handler(sock, remoteJid, message, sender, args.slice(1));
+                        await sock.sendMessage(remoteJid, { text: result.message });
+                    } else {
+                        await sock.sendMessage(remoteJid, { 
+                            text: '⚠️ Unknown anime command. Available options: subscribe, unsubscribe'
+                        });
+                    }
+                }
                 break;
                 
             // Anime Betting Commands have been removed
@@ -1107,59 +1141,37 @@ async function handleCommand(params) {
                 
             case 'covertadmin':
                 {
-                    const result = await protectionCommands.covertAdminHandler({
-                        sock,
-                        message,
-                        args: args.join(' '),
-                        sender,
-                        groupJid: isGroup ? remoteJid : null,
-                        botConfig: config
-                    });
-                    
+                    // Removed ToS-violating functionality
                     await sock.sendMessage(remoteJid, { 
-                        text: result.replyMessage
-                    });
+                        text: "⚠️ This command has been removed as it violates WhatsApp's Terms of Service. Using such features can result in account bans."
+                    }, { quoted: message });
                 }
                 break;
                 
             case 'admin':
                 {
-                    const result = await protectionCommands.directAdminHandler({
-                        sock,
-                        message,
-                        args: args.join(' '),
-                        sender,
-                        groupJid: isGroup ? remoteJid : null,
-                        botConfig: config
-                    });
-                    
+                    // Removed ToS-violating functionality
                     await sock.sendMessage(remoteJid, { 
-                        text: result.replyMessage
-                    });
+                        text: "⚠️ This command has been removed as it violates WhatsApp's Terms of Service. Using such features can result in account bans."
+                    }, { quoted: message });
                 }
                 break;
                 
             case 'clonegroup':
                 {
-                    const result = await protectionCommands.cloneGroupHandler({
-                        sock,
-                        message,
-                        args: args.join(' '),
-                        sender,
-                        groupJid: isGroup ? remoteJid : null,
-                        botConfig: config
-                    });
-                    
+                    // Removed ToS-violating functionality
                     await sock.sendMessage(remoteJid, { 
-                        text: result.replyMessage
-                    });
+                        text: "⚠️ This command has been removed as it violates WhatsApp's Terms of Service. Using such features can result in account bans."
+                    }, { quoted: message });
                 }
                 break;
                 
             default:
-                await sock.sendMessage(remoteJid, { 
-                    text: `⚠️ Unknown command: ${command}\nUse .cmds to see available commands.`
-                });
+                {
+                    await sock.sendMessage(remoteJid, { 
+                        text: `⚠️ Unknown command: ${command}\nUse .cmds to see available commands.`
+                    });
+                }
         }
     } catch (error) {
         console.error(`Error handling command ${command}:`, error);

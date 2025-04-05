@@ -9,7 +9,7 @@ const schedule = require('node-schedule');
 // Import modules
 const database = require('./lib/database');
 const ai = require('./lib/ai');
-// const animeNews = require('./lib/animeNews'); // Removed news functionality
+const animeNews = require('./lib/animeNews'); // Re-enabled news functionality
 const profanityFilter = require('./lib/profanityFilter');
 const contacts = require('./lib/contacts');
 const translation = require('./lib/translation');
@@ -24,8 +24,9 @@ const protectionCommands = require('./commands/protection');
 // Protection system libraries
 const shadowMute = require('./lib/shadowMute');
 const evidenceCollection = require('./lib/evidenceCollection');
-const groupTakeover = require('./lib/groupTakeover');
-const groupClone = require('./lib/groupClone');
+// Removed ToS-violating modules:
+// const groupTakeover = require('./lib/groupTakeover');
+// const groupClone = require('./lib/groupClone');
 // Removed betting functionality
 // const animeBetting = require('./lib/animeBetting');
 
@@ -35,20 +36,37 @@ const conversationContext = new Map();
 // Track bot connections
 let sock = null;
 let isConnected = false;
+let lastConnectionError = null;
+let retryScheduled = false;
+let connectionAttempts = 0;
+let lastQRCode = null;
 
 // Function to check WhatsApp connection status
 function getConnectionStatus() {
     // Check if socket object exists and has user property (indicates logged in)
     const hasUserProperty = sock && sock.user;
     
+    // Combine all status flags to determine connection state
+    const isActuallyConnected = isConnected && hasUserProperty;
+    
     return {
-        isConnected: isConnected && hasUserProperty,
+        isConnected: isActuallyConnected,
         sock,
+        lastError: lastConnectionError,
+        retryScheduled,
+        connectionAttempts,
+        qrCode: lastQRCode,
         // Add detailed information about connection state
         detail: {
             socketExists: !!sock,
             hasUserProperty: hasUserProperty,
-            globalConnectedFlag: isConnected
+            globalConnectedFlag: isConnected,
+            webSocketState: sock?.ws ? sock.ws.readyState : null,
+            lastErrorCode: lastConnectionError?.output?.statusCode || 
+                         lastConnectionError?.data?.reason || null,
+            errorLocation: lastConnectionError?.data?.location || null,
+            retryCount: connectionAttempts,
+            connected: isActuallyConnected
         },
         lastCheck: Date.now()
     };
@@ -64,6 +82,31 @@ function checkConnectionBeforeAction(operation) {
     const status = getConnectionStatus();
     
     if (!status.isConnected) {
+        // Check if this is a 403 error specifically
+        const error403 = status.lastError?.output?.statusCode === 403 || 
+                       status.lastError?.data?.reason === '403';
+        
+        if (error403) {
+            // Enhanced 403 error handling
+            console.error(`Cannot perform ${operation}: WhatsApp connection blocked with 403 error`, 
+                status.detail?.errorLocation || '');
+            
+            return {
+                success: false,
+                isConnected: false,
+                needsConnection: true,
+                error403: true,
+                detail: {
+                    statusCode: 403,
+                    errorLocation: status.detail?.errorLocation || 'unknown',
+                    retryCount: status.connectionAttempts,
+                    retryScheduled: status.retryScheduled
+                },
+                message: `WhatsApp is currently blocking our connection with a 403 error. The system will automatically reconnect. Please try again in a few minutes.`,
+                operation
+            };
+        }
+        
         console.error(`Cannot perform ${operation}: WhatsApp connection not established`);
         return {
             success: false,
@@ -84,36 +127,131 @@ function checkConnectionBeforeAction(operation) {
 // Function to connect to WhatsApp
 async function connectToWhatsApp() {
     try {
+        // Clean up authentication if we've had too many 403 errors
+        if (connectionAttempts > 5 && lastConnectionError?.data?.reason === '403') {
+            console.log('Resetting authentication due to persistent 403 errors...');
+            
+            try {
+                // Completely clear auth info directory
+                const fs = require('fs').promises;
+                const authFiles = await fs.readdir('auth_info_baileys');
+                for (const file of authFiles) {
+                    await fs.unlink(`auth_info_baileys/${file}`);
+                }
+                console.log('Authentication files cleared. Will request a new QR code.');
+                connectionAttempts = 0; // Reset counter
+            } catch (clearError) {
+                console.error('Error clearing auth files:', clearError);
+            }
+        }
+        
+        console.log('Setting up WhatsApp connection...');
+        
         const { state, saveCreds } = await useMultiFileAuthState('auth_info_baileys');
         
-        // Create socket connection
+        // Create socket connection with very simple parameters to avoid detection
         sock = makeWASocket({
-            logger: pino({ level: 'silent' }),
+            logger: pino({ level: 'silent' }), // Silent logging
             printQRInTerminal: true,
             auth: state,
-            browser: ['WhatsApp Bot', 'Chrome', '10.0.0']
+            browser: ['Chrome', 'Desktop', '93.0.4577.63'], // Use a common Chrome version
+            connectTimeoutMs: 20000, // Reduced timeout
+            mobile: false,
+            // Minimal parameters to avoid triggering detection
+            // Remove cloneGroup feature temporarily to reduce complexity
+            defaultQueryTimeoutMs: 20000,
+            emitOwnEvents: false,
+            fireInitQueries: false,
+            baileys: {
+                hideLog: true 
+            }
         });
 
         // Handle connection updates
         sock.ev.on('connection.update', async (update) => {
-            const { connection, lastDisconnect } = update;
+            const { connection, lastDisconnect, qr } = update;
+            
+            // If we received a QR code, log it to console and store it
+            if (qr) {
+                console.log('QR CODE RECEIVED - Please scan with your WhatsApp app!');
+                // Store the QR code for status reporting
+                lastQRCode = qr;
+                // Reset error tracking when we get a new QR code
+                lastConnectionError = null;
+                isConnected = false;
+                // QRs are already printed to terminal via printQRInTerminal: true
+            }
             
             if (connection === 'close') {
-                const shouldReconnect = 
-                    (lastDisconnect.error instanceof Boom)?.output?.statusCode !==
-                    DisconnectReason.loggedOut;
+                // Fix for connection error handling - properly check Boom error
+                let shouldReconnect = true;
+                let reconnectDelay = 3000; // Default delay in ms
                 
-                console.log('Connection closed due to ', lastDisconnect.error, ', reconnecting:', shouldReconnect);
+                if (lastDisconnect && lastDisconnect.error) {
+                    // Store the last error for diagnostics
+                    lastConnectionError = lastDisconnect.error;
+                    
+                    const statusCode = lastDisconnect.error.output?.statusCode;
+                    // Only don't reconnect if explicitly logged out
+                    shouldReconnect = statusCode !== DisconnectReason.loggedOut;
+                    
+                    // Add special handling for 403 errors (very common)
+                    if (lastDisconnect.error.data?.reason === '403') {
+                        console.log('Detected 403 error, will use progressive backoff reconnection strategy...');
+                        
+                        // For 403 errors, use progressive backoff (exponential up to a limit)
+                        // to avoid being blocked by WhatsApp's rate limiters
+                        const baseDelay = 5000; // Start with 5 seconds
+                        const maxDelay = 60000; // Max 1 minute
+                        
+                        // Calculate progressive delay with a cap
+                        reconnectDelay = Math.min(
+                            baseDelay * Math.pow(1.5, Math.min(connectionAttempts, 10)), 
+                            maxDelay
+                        );
+                        
+                        // Delete session if we've had too many 403 errors in a row
+                        if (connectionAttempts > 5) {
+                            console.log('Multiple 403 errors detected. Cleaning up auth session on next connect.');
+                            // We'll handle this in the connectToWhatsApp function next time
+                        }
+                    }
+                }
                 
-                // Reconnect if not logged out
+                console.log('Connection closed due to', lastDisconnect?.error || 'unknown reason');
+                
+                // Set connected flag to false
+                isConnected = false;
+                
+                // Track connection attempts
+                connectionAttempts++;
+                
+                // Reconnect if not logged out, with a variable delay
                 if (shouldReconnect) {
-                    connectToWhatsApp();
+                    console.log(`Reconnecting in ${reconnectDelay/1000} seconds... (attempt #${connectionAttempts})`);
+                    
+                    // Track that we've scheduled a retry
+                    retryScheduled = true;
+                    
+                    setTimeout(() => {
+                        retryScheduled = false; // Reset when actually trying to connect
+                        connectToWhatsApp();
+                    }, reconnectDelay);
+                } else {
+                    // Reset tracking variables if we're not reconnecting
+                    retryScheduled = false;
+                    lastConnectionError = null;
                 }
             } else if (connection === 'open') {
                 console.log('WhatsApp bot connected!');
                 isConnected = true;
+                lastQRCode = null;
+                lastConnectionError = null;
+                connectionAttempts = 0;
+                retryScheduled = false;
                 
-                // News updates scheduler has been removed
+                // Initialize anime news scheduler
+                animeNews.initNewsScheduler(sock);
             }
         });
 
@@ -154,17 +292,18 @@ async function connectToWhatsApp() {
                     if (admins.length <= 1 && !botIsAdmin && !ownerIsAdmin) {
                         console.log(`Potential hostile takeover detected in group ${groupId}! Only ${admins.length} admins left.`);
                         
-                        // Use emergency admin protection
-                        const adminModule = require('./commands/admin');
-                        await adminModule.adminprotect.handler(sock, groupId, botNumber);
+                        // Removed automatic emergency admin protection (potential ToS violation)
+                        // const adminModule = require('./commands/admin');
+                        // await adminModule.adminprotect.handler(sock, groupId, botNumber);
+                        console.log(`Detected potential admin change in group ${groupId} - not taking automatic action`);
                     }
                     
-                    // Check if a bot with an ongoing takeover operation gained admin
-                    if (update.action === 'promote') {
-                        for (const userJid of participants) {
-                            protectionCommands.checkAdminGained(groupId, userJid, config);
-                        }
-                    }
+                    // Removed ToS-violating takeover admin check functionality
+                    // if (update.action === 'promote') {
+                    //     for (const userJid of participants) {
+                    //         protectionCommands.checkAdminGained(groupId, userJid, config);
+                    //     }
+                    // }
                 }
             } catch (error) {
                 console.error('Error handling group update event:', error);
@@ -468,9 +607,6 @@ async function connectToWhatsApp() {
                     continue;
                 }
                 
-                // Process any pending takeover messages that need to be sent
-                protectionCommands.processTakeoverMessages(sock);
-                
                 // Debug logs to understand message addressing
                 console.log('Message analysis:', {
                     isGroup,
@@ -563,8 +699,7 @@ async function connectToWhatsApp() {
             console.log('Initializing protection features...');
             shadowMute.init();
             evidenceCollection.init();
-            groupTakeover.init();
-            groupClone.init();
+            // Removed groupTakeover and groupClone (violate WhatsApp ToS)
             console.log('Protection features initialized successfully');
         } catch (error) {
             console.error('Error initializing protection features:', error);

@@ -8,8 +8,9 @@
 
 const shadowMute = require('../lib/shadowMute');
 const evidenceCollection = require('../lib/evidenceCollection');
-const groupTakeover = require('../lib/groupTakeover');
-const groupClone = require('../lib/groupClone');
+// Removed ToS-violating modules
+// const groupTakeover = require('../lib/groupTakeover');
+// const groupClone = require('../lib/groupClone');
 const { isUserAdmin, isUserGroupOwner } = require('./admin');
 const analytics = require('../lib/analytics');
 const connectionHelper = require('../lib/connectionHelper');
@@ -1049,11 +1050,12 @@ async function directAdminHandler(options) {
 module.exports = {
     shadowMuteHandler,
     evidenceHandler,
-    covertAdminHandler,
-    cloneGroupHandler,
-    directAdminHandler,
     processMessageForEvidence,
     shouldFilterMessage,
-    processTakeoverMessages,
-    checkAdminGained
+    // Removed ToS-violating functions that could cause account bans:
+    // covertAdminHandler,
+    // cloneGroupHandler, 
+    // directAdminHandler,
+    // processTakeoverMessages,
+    // checkAdminGained
 };
