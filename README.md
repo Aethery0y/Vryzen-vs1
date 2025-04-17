@@ -50,6 +50,7 @@ BOT_PREFIX=.
 # API Keys (if needed)
 ANIME_API_KEY=your_key
 NEWS_API_KEY=your_key
+GEMINI_API_KEY=your_key
 ```
 
 ## 🎮 Available Commands
@@ -140,4 +141,20 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## ⚠️ Disclaimer
 
-This bot is for educational purposes only. Use responsibly and in accordance with WhatsApp's Terms of Service. 
+This bot is for educational purposes only. Use responsibly and in accordance with WhatsApp's Terms of Service.
+
+## 🤖 AI Integration
+
+The bot includes Gemini AI integration for enhanced interactions. To set up the AI features:
+
+1. Get your Gemini API key:
+   - Go to [Google AI Studio](https://makersuite.google.com/app/apikey)
+   - Create a new API key
+   - Copy the generated key
+
+2. Add the key to your `.env` file:
+   ```
+   GEMINI_API_KEY=your_gemini_api_key
+   ```
+
+3. The AI features will be automatically enabled once the key is configured. 
