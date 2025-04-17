@@ -173,13 +173,16 @@ async function connectToWhatsApp() {
             
             // If we received a QR code, log it to console and store it
             if (qr) {
-                console.log('QR CODE RECEIVED - Please scan with your WhatsApp app!');
-                // Store the QR code for status reporting
-                lastQRCode = qr;
-                // Reset error tracking when we get a new QR code
-                lastConnectionError = null;
-                isConnected = false;
-                // QRs are already printed to terminal via printQRInTerminal: true
+                // Only show QR if we're not already connected
+                if (!isConnected) {
+                    console.log('QR CODE RECEIVED - Please scan with your WhatsApp app!');
+                    // Store the QR code for status reporting
+                    lastQRCode = qr;
+                    // Reset error tracking when we get a new QR code
+                    lastConnectionError = null;
+                    isConnected = false;
+                    // QRs are already printed to terminal via printQRInTerminal: true
+                }
             }
             
             if (connection === 'close') {
@@ -216,6 +219,13 @@ async function connectToWhatsApp() {
                             // We'll handle this in the connectToWhatsApp function next time
                         }
                     }
+                    
+                    // Handle stream conflict error (440)
+                    if (statusCode === 440) {
+                        console.log('Detected stream conflict. This usually means another instance is running.');
+                        console.log('Please close any other instances of the bot before continuing.');
+                        shouldReconnect = false; // Don't reconnect on stream conflict
+                    }
                 }
                 
                 console.log('Connection closed due to', lastDisconnect?.error || 'unknown reason');
@@ -227,7 +237,7 @@ async function connectToWhatsApp() {
                 connectionAttempts++;
                 
                 // Reconnect if not logged out, with a variable delay
-                if (shouldReconnect) {
+                if (shouldReconnect && !isConnected) {  // Only reconnect if not already connected
                     console.log(`Reconnecting in ${reconnectDelay/1000} seconds... (attempt #${connectionAttempts})`);
                     
                     // Track that we've scheduled a retry
@@ -832,6 +842,7 @@ connectToWhatsApp();
 
 // Export the connection status and checking functions
 module.exports = {
+    connectToWhatsApp,
     getConnectionStatus,
     checkConnectionBeforeAction
 };
