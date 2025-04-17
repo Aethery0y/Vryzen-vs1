@@ -1,0 +1,50 @@
+# Dependencies
+node_modules/
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Build files
+dist/
+build/
+
+# IDE files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Session and auth files
+authinfobailey/
+auth backup/
+auth_info_baileys.json
+auth_info_baileys.json.backup
+auth_info_baileys.json.old
+auth_info_baileys.json.backup.old
+
+# Server directory
+server/
+
+# Logs
+logs/
+*.log
+
+# Temporary files
+tmp/
+temp/
+
+# Database files (if using local database)
+*.db
+*.sqlite
+*.sqlite3 
