@@ -1,7 +1,7 @@
 // Configuration settings for the WhatsApp bot
 const config = {
     // API keys
-    geminiApiKey: process.env.GEMINI_API_KEY || '',
+    geminiApiKey: process.env.GEMINI_API_KEY || 'YOUR_GEMINI_API_KEY_HERE',
     
     // Database paths
     databaseDir: './data',
@@ -12,8 +12,8 @@ const config = {
     animeCardsFile: './data/animeCards.json',
     
     // Bot settings
-    botOwners: ['+918810502592', '+918920659106'], // Owner numbers
-    botAdmins: ['+918810502592', '+918920659106'], // Admin numbers (includes owners by default)
+    botOwners: ['YOUR_PHONE_NUMBER_HERE'], // Add your phone number with country code (e.g., '+1234567890')
+    botAdmins: ['YOUR_PHONE_NUMBER_HERE'], // Add your phone number with country code
     defaultPublicAccess: true, // Whether the bot is publicly accessible by default
     
     // Message handling settings

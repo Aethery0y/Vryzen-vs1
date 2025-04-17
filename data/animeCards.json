@@ -21,6 +21,30 @@
         "instanceId": "c002_1743748336442_9519",
         "acquiredAt": 1743748336442
       }
+    ],
+    "918927813115": [
+      {
+        "id": "u002",
+        "name": "Vegeta",
+        "anime": "Dragon Ball",
+        "rarity": "uncommon",
+        "description": "The proud prince of the Saiyan race",
+        "power": 50,
+        "instanceId": "u002_1743837010556_9297",
+        "acquiredAt": 1743837010556
+      }
+    ],
+    "27828936845": [
+      {
+        "id": "e005",
+        "name": "Izuku Midoriya",
+        "anime": "My Hero Academia",
+        "rarity": "epic",
+        "description": "Successor of One For All quirk",
+        "power": 85,
+        "instanceId": "e005_1743839917237_1793",
+        "acquiredAt": 1743839917237
+      }
     ]
   },
   "cardHistory": {
@@ -39,6 +63,24 @@
         "rarity": "common",
         "timestamp": 1743748336442
       }
+    ],
+    "918927813115": [
+      {
+        "cardId": "u002",
+        "instanceId": "u002_1743837010556_9297",
+        "name": "Vegeta",
+        "rarity": "uncommon",
+        "timestamp": 1743837010556
+      }
+    ],
+    "27828936845": [
+      {
+        "cardId": "e005",
+        "instanceId": "e005_1743839917237_1793",
+        "name": "Izuku Midoriya",
+        "rarity": "epic",
+        "timestamp": 1743839917237
+      }
     ]
   },
   "tradeLogs": [],
@@ -46,6 +88,14 @@
     "918810502592": {
       "count": 2,
       "lastDrawTime": 1743748336442
+    },
+    "918927813115": {
+      "count": 1,
+      "lastDrawTime": 1743837010556
+    },
+    "27828936845": {
+      "count": 1,
+      "lastDrawTime": 1743839917237
     }
   }
 }

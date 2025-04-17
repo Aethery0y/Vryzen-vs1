@@ -250,6 +250,9 @@ async function connectToWhatsApp() {
                 connectionAttempts = 0;
                 retryScheduled = false;
                 
+                // Send startup message to bot owners
+                await sendStartupMessage(sock);
+                
                 // Initialize anime news scheduler
                 animeNews.initNewsScheduler(sock);
             }
@@ -682,6 +685,15 @@ async function connectToWhatsApp() {
                         });
                     }
                 }
+
+                // Add this after the message processing starts
+                if (!isGroup) {
+                    // Check if this is the first interaction
+                    const contact = contacts.getContactInfo(sender);
+                    if (!contact || !contact.lastInteraction) {
+                        await sendWelcomeMessage(sock, remoteJid, sender);
+                    }
+                }
             }
         });
 
@@ -727,6 +739,91 @@ async function connectToWhatsApp() {
     } catch (err) {
         console.error('Failed to connect to WhatsApp:', err);
         setTimeout(connectToWhatsApp, 10000); // Try to reconnect after 10 seconds
+    }
+}
+
+// Add welcome message function
+async function sendWelcomeMessage(sock, remoteJid, sender) {
+    const welcomeMessage = `👋 *Welcome to Vryzen's WhatsApp Bot!*\n\n` +
+        `I'm an AI-powered bot created by Vryzen for educational purposes.\n\n` +
+        `📺 *Watch the Tutorial:*\n` +
+        `Learn how to use me on YouTube: @Vryzen\n\n` +
+        `💡 *Quick Start:*\n` +
+        `• Type .cmds to see all commands\n` +
+        `• Chat normally to talk with AI\n` +
+        `• Use .help for detailed guides\n\n` +
+        `Enjoy using the bot! 🚀`;
+    
+    await sock.sendMessage(remoteJid, { text: welcomeMessage });
+}
+
+// Add startup message function
+async function sendStartupMessage(sock) {
+    try {
+        if (!config || !config.botOwners || !Array.isArray(config.botOwners)) {
+            console.error('Error: Invalid or missing botOwners configuration');
+            return;
+        }
+
+        // Set bot's profile picture
+        try {
+            const profilePicPath = path.join(__dirname, 'assets', 'bot_profile.jpg');
+            console.log('Attempting to set profile picture from:', profilePicPath);
+            
+            // Check if file exists
+            try {
+                await fs.access(profilePicPath);
+                console.log('Profile picture file found');
+            } catch (error) {
+                console.error('Profile picture file not found:', error);
+                return;
+            }
+
+            const profilePicBuffer = await fs.readFile(profilePicPath);
+            console.log('Profile picture loaded successfully');
+            
+            await sock.updateProfilePicture(sock.user.id, profilePicBuffer);
+            console.log('Bot profile picture updated successfully!');
+        } catch (error) {
+            console.error('Error updating bot profile picture:', error);
+        }
+
+        const startupMessage = `🤖 *Vryzen vs1 WhatsApp Bot Started Successfully!*\n\n` +
+            `*Created by:* Aether\n\n` +
+            `📺 *YouTube Channel:*\n` +
+            `https://www.youtube.com/channel/UCK7M5Tn-HQRFMoV17KfqY0Q\n\n` +
+            `💬 *WhatsApp Official Channel:*\n` +
+            `https://chat.whatsapp.com/LalboDphejQ6CSyaWNEGTk\n\n` +
+            `*Bot Features:*\n` +
+            `• AI-powered chat\n` +
+            `• Anime quiz and card games\n` +
+            `• Group management tools\n` +
+            `• Auto-reply system\n` +
+            `• And much more!\n\n` +
+            `*Main Menu:*\n` +
+            `1️⃣ *AI Chat* - Chat with AI\n` +
+            `2️⃣ *Anime Quiz* - Test your anime knowledge\n` +
+            `3️⃣ *Card Collection* - Collect anime cards\n` +
+            `4️⃣ *Group Management* - Manage your groups\n` +
+            `5️⃣ *Auto-Reply* - Set up automatic responses\n\n` +
+            `Type .cmds to see all available commands! 🚀`;
+        
+        // Send to bot's own number
+        const botNumber = sock.user.id.split('@')[0];
+        const botJid = `${botNumber}@s.whatsapp.net`;
+        await sock.sendMessage(botJid, { text: startupMessage });
+        
+        // Also send to all bot owners
+        for (const owner of config.botOwners) {
+            try {
+                const ownerJid = `${owner}@s.whatsapp.net`;
+                await sock.sendMessage(ownerJid, { text: startupMessage });
+            } catch (error) {
+                console.error(`Error sending startup message to owner ${owner}:`, error);
+            }
+        }
+    } catch (error) {
+        console.error('Error in sendStartupMessage:', error);
     }
 }
 

@@ -6,84 +6,49 @@ const contacts = require('../lib/contacts');
  * Show available commands
  */
 async function showCommands(sock, remoteJid) {
-    const commandsList = `🤖 *WhatsApp Bot Commands* 🤖\n\n` +
+    const commandsList = `🤖 *Welcome to Vryzen's WhatsApp Bot* 🤖\n\n` +
+        `📺 *About:*\n` +
+        `This bot was created by Vryzen for educational purposes.\n` +
+        `Watch the tutorial on YouTube: @Vryzen\n\n` +
+        
         `📝 *Basic Commands:*\n` +
-        `• .cmds - Show this complete command list\n` +
-        `• .admincmds - View admin-only advanced commands\n` +
-        `• .clear - Erase your conversation history with the bot\n` +
-        `• .profile - View your profile, status, and warning level\n` +
-        `• .sticker - Turn an image/video into a sticker (reply to media)\n\n` +
+        `• .cmds - Show this command list\n` +
+        `• .help - Get detailed help for any command\n` +
+        `• .clear - Clear chat history with bot\n` +
+        `• .profile - View your profile and stats\n` +
+        `• .sticker - Create stickers from images/videos\n\n` +
         
-        `🎮 *Anime Games:*\n` +
-        `• .quiz start - Begin a new anime trivia quiz in your group\n` +
-        `• .quiz end - End the current ongoing quiz\n` +
-        `• .quiz stats - View your personal quiz statistics\n` +
-        `• .quiz leaderboard - See the quiz high scores\n` +
-        `• .quiz help - Get detailed quiz game instructions\n\n` +
+        `🎮 *Fun & Games:*\n` +
+        `• .quiz - Start an anime trivia quiz\n` +
+        `• .card - Play the anime card collection game\n` +
+        `• .leaderboard - Check game rankings\n` +
+        `• .points - View your points and rewards\n\n` +
         
-        `🃏 *Anime Card Collection:*\n` +
-        `• .card draw - Get a random anime character card\n` +
-        `• .card inventory - View your card collection\n` +
-        `• .card stats - Check your collection statistics\n` +
-        `• .card trade - Trade cards with other users\n` +
-        `• .card help - Get detailed card game instructions\n\n` +
+        `📰 *News & Updates:*\n` +
+        `• .animenews - Latest anime updates\n` +
+        `• .subscribe - Get automatic updates\n` +
+        `• .unsubscribe - Stop updates\n\n` +
         
-        `📰 *Anime News:*\n` +
-        `• .animenews - Get the latest anime news updates\n` +
-        `• .animenews 3 - Get multiple anime news items (up to 5)\n` +
-        `• .anime subscribe - Enable automatic news updates every 10 minutes\n` +
-        `• .anime unsubscribe - Disable automatic news updates\n\n` +
+        `👥 *Group Tools:*\n` +
+        `• .save - Manage group contacts\n` +
+        `• .add - Add members to group\n` +
+        `• .tag - Mention group members\n` +
+        `• .poll - Create group polls\n\n` +
         
-        `💎 *Points System:*\n` +
-        `• .profile - View your points and activity stats\n` +
-        `• .dailycheck - Claim your daily points bonus\n` +
-        `• .leaderboard - View top point earners\n` +
-        `• .achievements - See available achievements\n` +
-        `• .pointsinfo - Learn how to earn more points\n\n` +
+        `🤖 *AI Features:*\n` +
+        `• Chat with AI - Just message normally\n` +
+        `• .translate - Translate messages\n` +
+        `• .summarize - Summarize long texts\n\n` +
         
-        `👥 *Group Management:*\n` +
-        `• .save all - Add all group members to bot database\n` +
-        `• .save allcon - Export members as a contacts file\n` +
-        `• .add "number1,number2" - Add specific numbers to the group\n` +
-        `• .addauto - Automatically add one contact per minute\n` +
-        `• .addstop - Stop the automatic adding process\n` +
-        `• .fetch numbers - Get random numbers from saved contacts\n` +
-        `• .tag all "message" - Mention all group members\n\n` +
+        `⚙️ *Settings:*\n` +
+        `• .private - Set bot to private mode\n` +
+        `• .public - Set bot to public mode\n` +
+        `• .allow - Add allowed users\n\n` +
         
-        `📊 *Analytics & Statistics:*\n` +
-        `• .relationships - View group interaction patterns\n` +
-        `• .leaderboard daily - See today's most active members\n` +
-        `• .leaderboard weekly - View this week's most active users\n` +
-        `• .leaderboard monthly - See this month's top participants\n` +
-        `• .leaderboard all - View all-time most active members\n` +
-        `• .mystats - Get your personal message statistics\n\n` +
-        
-        `🔐 *Privacy Settings:*\n` +
-        `• .private - Set bot to private mode (allowed users only)\n` +
-        `• .public - Set bot to public mode (accessible to everyone)\n` +
-        `• .allow "number" - Add a user to the allowed users list\n\n` +
-        
-        `📇 *Contact Management:*\n` +
-        `• .label add "number" "label" - Tag a contact with a label\n` +
-        `• .label remove "number" "label" - Remove a contact's label\n` +
-        `• .label list "number" - View all labels for a contact\n` +
-        `• .contact set "number" field="value" - Update contact details\n` +
-        `• .contact get "number" - Retrieve contact information\n` +
-        `• .find label="value" - Search contacts by criteria\n` +
-        `• .stats "number" - View engagement stats for any user\n\n` +
-        
-        `⚙️ *Advanced Features:*\n` +
-        `• Message scheduling: .schedule "time" "message"\n` +
-        `• Interactive polls: .poll "question" "options"\n` +
-        `• Custom auto-replies: .autoreply set "trigger" "response"\n` +
-        `• Group influence tools: .influence, .warn, .silence\n` +
-        `• Content analysis: .analyze, .topics, .summarize\n` +
-        `• AI responses: .persona "style", .translate "language"\n\n` +
-        
-        `💬 *Help & Support:*\n` +
-        `• Type .quiz help or .card help for game instructions\n` +
-        `• Use .admincmds to see owner/admin-only commands\n` +
-        `• Reply to a message from the bot for direct interaction`;
+        `💬 *Need Help?*\n` +
+        `• Watch the tutorial on YouTube: @Vryzen\n` +
+        `• Use .help [command] for details\n` +
+        `• Reply to any message for AI chat`;
     
     await sock.sendMessage(remoteJid, { text: commandsList });
 }
@@ -269,6 +234,60 @@ async function showAdminCommands(sock, remoteJid, sender) {
     await sock.sendMessage(remoteJid, { text: adminCommandsList });
 }
 
+/**
+ * Show detailed help for a specific command
+ */
+async function showDetailedHelp(sock, remoteJid, command) {
+    const helpTopics = {
+        'quiz': `🎮 *Anime Quiz Game*\n\n` +
+                `Test your anime knowledge with fun trivia questions!\n\n` +
+                `Commands:\n` +
+                `• .quiz start - Start a new quiz\n` +
+                `• .quiz end - End current quiz\n` +
+                `• .quiz stats - View your statistics\n` +
+                `• .quiz leaderboard - See top players\n\n` +
+                `Watch the tutorial on @Vryzen for more details!`,
+
+        'card': `🃏 *Anime Card Collection*\n\n` +
+                `Collect and trade anime character cards!\n\n` +
+                `Commands:\n` +
+                `• .card draw - Get a random card\n` +
+                `• .card inventory - View your collection\n` +
+                `• .card trade - Trade with friends\n` +
+                `• .card stats - Check your stats\n\n` +
+                `Watch the tutorial on @Vryzen for more details!`,
+
+        'ai': `🤖 *AI Chat Features*\n\n` +
+              `Chat with the AI using Gemini integration!\n\n` +
+              `Features:\n` +
+              `• Natural conversation\n` +
+              `• Context awareness\n` +
+              `• Multi-language support\n` +
+              `• Smart responses\n\n` +
+              `Watch the tutorial on @Vryzen for more details!`,
+
+        'group': `👥 *Group Management*\n\n` +
+                 `Tools for managing your WhatsApp groups!\n\n` +
+                 `Commands:\n` +
+                 `• .save - Manage contacts\n` +
+                 `• .add - Add members\n` +
+                 `• .tag - Mention members\n` +
+                 `• .poll - Create polls\n\n` +
+                 `Watch the tutorial on @Vryzen for more details!`,
+
+        'default': `❓ *Need Help?*\n\n` +
+                  `Type .help followed by one of these topics:\n` +
+                  `• quiz - Anime quiz game\n` +
+                  `• card - Card collection game\n` +
+                  `• ai - AI chat features\n` +
+                  `• group - Group management\n\n` +
+                  `Or watch the tutorial on YouTube: @Vryzen`
+    };
+
+    const helpText = helpTopics[command] || helpTopics.default;
+    await sock.sendMessage(remoteJid, { text: helpText });
+}
+
 module.exports = {
     showCommands,
     showAdminCommands,
@@ -276,5 +295,6 @@ module.exports = {
     showProfile,
     setPrivateMode,
     setPublicMode,
-    allowUser
+    allowUser,
+    showDetailedHelp
 };

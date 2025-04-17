@@ -69,8 +69,15 @@ async function handleCommand(params) {
         switch (command) {
             // General commands
             case 'cmds':
-            case 'help':
                 await generalCommands.showCommands(sock, remoteJid);
+                break;
+                
+            case 'help':
+                if (args.length > 0) {
+                    await generalCommands.showDetailedHelp(sock, remoteJid, args[0].toLowerCase());
+                } else {
+                    await generalCommands.showCommands(sock, remoteJid);
+                }
                 break;
                 
             case 'admincmds':
