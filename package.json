@@ -6,6 +6,9 @@
     "lib": "lib"
   },
   "scripts": {
+    "start": "node index.js",
+    "start:qr": "node start-qr.js",
+    "start:phone": "node start-phone.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
