@@ -27,11 +27,31 @@ npm install
 
 3. Configure the bot:
 - Copy `.env.example` to `.env`
-- Fill in your WhatsApp credentials and other settings
+- Fill in your configuration settings (see Configuration section below)
 
-4. Start the bot:
+4. Connect to WhatsApp:
+   
+   Choose one of the following methods:
+
+   ### Method 1: QR Code (Recommended)
+   ```bash
+   npm run start:qr
+   ```
+   - Scan the QR code with your WhatsApp
+   - The session will be saved automatically
+
+   ### Method 2: Phone Number Verification
+   ```bash
+   npm run start:phone
+   ```
+   - Enter your phone number with country code (e.g., +1234567890)
+   - You'll receive a verification code on WhatsApp
+   - Enter the verification code when prompted
+   - The session will be saved automatically
+
+5. Start the bot:
 ```bash
-node index.js
+npm start
 ```
 
 ## 📝 Configuration
@@ -39,7 +59,8 @@ node index.js
 Create a `.env` file with the following variables:
 ```
 # WhatsApp Configuration
-WHATSAPP_NUMBER=your_number
+WHATSAPP_CONNECTION_METHOD=qr    # Use 'qr' or 'phone'
+WHATSAPP_NUMBER=your_number      # Required only for phone verification method
 WHATSAPP_SESSION=your_session_name
 
 # Bot Settings
@@ -52,6 +73,18 @@ ANIME_API_KEY=your_key
 NEWS_API_KEY=your_key
 GEMINI_API_KEY=your_key
 ```
+
+### WhatsApp Connection Settings
+
+1. QR Code Method:
+   - Set `WHATSAPP_CONNECTION_METHOD=qr` in `.env`
+   - No phone number required
+   - More secure and recommended for personal use
+
+2. Phone Number Method:
+   - Set `WHATSAPP_CONNECTION_METHOD=phone` in `.env`
+   - Set `WHATSAPP_NUMBER` with your full phone number including country code
+   - Useful for business accounts or when QR scanning is not possible
 
 ## 🎮 Available Commands
 
