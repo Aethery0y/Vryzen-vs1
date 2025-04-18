@@ -5,6 +5,18 @@ const pino = require('pino');
 const fs = require('fs').promises;
 const path = require('path');
 const schedule = require('node-schedule');
+const http = require('http');
+
+// Start keep-alive server
+const keepAliveServer = http.createServer((req, res) => {
+    res.writeHead(200, { 'Content-Type': 'text/plain' });
+    res.end('Bot is alive!');
+});
+
+const PORT = process.env.PORT || 3000;
+keepAliveServer.listen(PORT, () => {
+    console.log(`Keep-alive server running on port ${PORT}`);
+});
 
 // Import modules
 const database = require('./lib/database');
